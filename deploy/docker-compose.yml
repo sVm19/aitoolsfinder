@@ -1,0 +1,68 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: aitoolsfinder-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: aitoolsfinder
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d aitoolsfinder"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: aitoolsfinder-backend
+    restart: unless-stopped
+    environment:
+      APP_ENV: development
+      PORT: 8000
+      HOST: 0.0.0.0
+      LOG_LEVEL: INFO
+      DATABASE_URL: postgresql+asyncpg://postgres:postgrespassword@postgres:5432/aitoolsfinder
+      DATABASE_URL_SYNC: postgresql://postgres:postgrespassword@postgres:5432/aitoolsfinder
+      CORS_ORIGINS: '["http://localhost:3000","https://aitoolsfinder.cloud"]'
+      OFFICIAL_DOMAIN: "https://aitoolsfinder.cloud"
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: aitoolsfinder-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_APP_URL: "https://aitoolsfinder.cloud"
+      NEXT_PUBLIC_API_BASE_URL: "http://backend:8000/api/v1"
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  pgdata:

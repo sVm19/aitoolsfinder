@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: Inter;
+
+  /* Brand Approved Color Palette */
+  --background: #010102; /* Space Black */
+  --foreground: #F7F5FA; /* Primary text */
+  
+  --primary: #7022FC; /* Deep Lavender */
+  --primary-foreground: #FFFFFF;
+  --primary-hover: #823CFC;
+  --primary-content: #C4A3FD; /* Accessible lavender text */
+
+  --accent: #FD8F32; /* Sunrise Orange */
+  --accent-foreground: #010102;
+  --accent-hover: #FEA454;
+
+  /* Surfaces */
+  --surface-1: #0B0A0F; /* Dark surface */
+  --surface-2: #121018; /* Secondary surface */
+  --surface-3: #1A1722; /* Elevated surface */
+
+  /* Text Neutrals */
+  --muted: #1A1722;
+  --muted-foreground: #B5ADBF; /* Secondary text */
+  --text-muted: #948CA0; /* AA contrast on elevated surfaces */
+
+  /* Structural */
+  --border: #302A3A; /* Approved border */
+  --ring: #7022FC;
+  --radius: 0.75rem;
+  --shadow-lavender-glow: 0 0 24px -4px rgba(112, 34, 252, 0.35);
+  --shadow-orange-glow: 0 0 24px -4px rgba(253, 143, 50, 0.35);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
