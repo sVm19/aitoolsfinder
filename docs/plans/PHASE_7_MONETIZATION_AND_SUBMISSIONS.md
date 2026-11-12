@@ -1,7 +1,7 @@
 # Implementation Plan — Phase 7: Monetization & Submissions
 
 **Official Domain:** [https://aitoolsfinder.cloud](https://aitoolsfinder.cloud)  
-**Database:** PostgreSQL 16 (Supabase / Docker)  
+**Database:** Supabase 16 (Docker)  
 **Integrations:** Resend (Email), Tiun Business (Payments - Verification Gate)  
 **Status:** Queued (Depends on Phase 6)  
 **Exit Criteria:** Vendors can submit tools; admins can moderate and publish them; outbound affiliate clicks are tracked with disclosures; payment webhooks process idempotently.

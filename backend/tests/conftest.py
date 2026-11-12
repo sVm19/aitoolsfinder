@@ -14,6 +14,9 @@ from src.core.database import Base, get_db
 
 # Import all models so metadata is complete
 import src.modules.catalog.models  # noqa: F401
+import src.modules.ai.models  # noqa: F401
+import src.modules.identity.models  # noqa: F401
+import src.modules.vendor.models  # noqa: F401
 
 test_engine = create_async_engine(
     "sqlite+aiosqlite:///:memory:",

@@ -10,6 +10,7 @@ from src.modules.catalog.models import (
     ToolModel,
     ToolCategoryModel,
     ToolTagModel,
+    ToolFeatureModel,
 )
 
 
@@ -100,13 +101,19 @@ class CatalogRepository:
                 ),
                 selectinload(ToolModel.tags).selectinload(ToolTagModel.tag),
                 selectinload(ToolModel.pricing_plans),
+                selectinload(ToolModel.features).selectinload(ToolFeatureModel.feature),
             )
         return (await self.session.execute(stmt)).scalar_one_or_none()
 
     async def get_tool_by_slug(
-        self, slug: str, load_relations: bool = True
+        self,
+        slug: str,
+        load_relations: bool = True,
+        status: Optional[str] = None,
     ) -> Optional[ToolModel]:
         stmt = select(ToolModel).where(ToolModel.slug == slug)
+        if status:
+            stmt = stmt.where(ToolModel.platform_status == status)
         if load_relations:
             stmt = stmt.options(
                 selectinload(ToolModel.primary_category),
@@ -115,6 +122,7 @@ class CatalogRepository:
                 ),
                 selectinload(ToolModel.tags).selectinload(ToolTagModel.tag),
                 selectinload(ToolModel.pricing_plans),
+                selectinload(ToolModel.features).selectinload(ToolFeatureModel.feature),
             )
         return (await self.session.execute(stmt)).scalar_one_or_none()
 

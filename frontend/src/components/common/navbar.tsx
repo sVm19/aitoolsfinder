@@ -14,17 +14,79 @@ import {
   GitCompare,
 } from "lucide-react";
 
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLElement>(null);
+  const progressRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    gsap.registerPlugin(ScrollTrigger);
+    const header = headerRef.current;
+    const progress = progressRef.current;
+    if (!header || !progress) return;
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const context = gsap.context(() => {
+      if (!reduce) {
+        gsap.from("[data-nav-brand]", {
+          y: -18,
+          autoAlpha: 0,
+          duration: 0.6,
+          ease: "power3.out",
+          clearProps: "transform,opacity,visibility",
+        });
+        gsap.from("[data-nav-link]", {
+          y: -14,
+          autoAlpha: 0,
+          stagger: 0.05,
+          delay: 0.12,
+          duration: 0.5,
+          ease: "power3.out",
+          clearProps: "transform,opacity,visibility",
+        });
+        gsap.from("[data-nav-action]", {
+          y: -10,
+          autoAlpha: 0,
+          stagger: 0.06,
+          delay: 0.28,
+          duration: 0.45,
+          ease: "power3.out",
+          clearProps: "transform,opacity,visibility",
+        });
+      }
+
+      gsap.to(progress, {
+        scaleX: 1,
+        ease: "none",
+        scrollTrigger: {
+          start: 0,
+          end: "max",
+          scrub: 0.25,
+        },
+      });
+
+      ScrollTrigger.create({
+        start: 12,
+        onToggle: (self) => {
+          header.classList.toggle("is-scrolled", self.isActive);
+        },
+      });
+    }, header);
+
+    return () => context.revert();
+  }, []);
 
   // Keep keyboard focus inside the mobile navigation while it is open.
   useEffect(() => {
     if (!mobileMenuOpen) return;
 
     const focusableSelector =
-      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      "a[href], button:not([disabled]), [tabindex]:not([tabindex=\"-1\"])";
     const getFocusableElements = () =>
       Array.from(
         drawerRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ?? [],
@@ -53,7 +115,22 @@ export function Navbar() {
       }
     };
     document.addEventListener("keydown", handleKeyDown);
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const links = drawerRef.current?.querySelectorAll("[data-drawer-link]");
+    const tween =
+      !reduce && links && links.length
+        ? gsap.from(links, {
+            y: 16,
+            autoAlpha: 0,
+            stagger: 0.045,
+            duration: 0.35,
+            ease: "power2.out",
+          })
+        : null;
+
     return () => {
+      tween?.kill();
       document.removeEventListener("keydown", handleKeyDown);
       menuButtonRef.current?.focus();
     };
@@ -65,7 +142,7 @@ export function Navbar() {
       const previousOverflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
-        document.body.style.overflow = previousOverflow;
+        document.body.style.overflow = previousOverflow!;
       };
     }
   }, [mobileMenuOpen]);
@@ -75,16 +152,20 @@ export function Navbar() {
     { name: "Categories", href: "/categories", icon: Layers },
     { name: "Rankings", href: "/rankings", icon: Award },
     { name: "Compare", href: "/compare", icon: GitCompare },
-    { name: "AI Finder", href: "/finder", icon: Sparkles, highlight: true },
+    { name: "AI Finder", href: "/ai-finder", icon: Sparkles, highlight: true },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/80 bg-background/85 backdrop-blur-md transition-all">
+    <header
+      ref={headerRef}
+      className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl transition-[background-color,box-shadow] duration-300"
+    >
+      <span ref={progressRef} className="nav-progress absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary via-accent to-primary" />
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Identity */}
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-hover text-white shadow-lavender-glow transition-transform duration-200 group-hover:scale-105">
+          <Link href="/" data-nav-brand className="flex items-center gap-2.5 group">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary-hover text-white shadow-lavender-glow transition-transform duration-300 group-hover:rotate-6 group-hover:scale-105">
               <Sparkles className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
@@ -106,7 +187,8 @@ export function Navbar() {
                   key={link.name}
                   href={link.href}
                   prefetch={false}
-                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                  data-nav-link
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors relative ${
                     link.highlight
                       ? "text-primary-content hover:text-white hover:bg-primary/15"
                       : "text-muted-foreground hover:text-foreground hover:bg-surface-2"
@@ -126,25 +208,26 @@ export function Navbar() {
           <Link
             href="/explore"
             prefetch={false}
-            className="flex items-center gap-2 h-9 px-3 rounded-lg border border-border bg-surface-1 text-xs text-subtle-foreground hover:text-muted-foreground hover:border-primary/50 transition-colors"
+            data-nav-action
+            className="flex items-center gap-2 h-9 px-3 rounded-full border border-border bg-surface-1 text-xs text-subtle-foreground hover:text-primary-content hover:border-primary/50 transition-colors overflow-hidden"
           >
             <Search className="w-3.5 h-3.5" />
-            <span>Search 1,240+ tools...</span>
+            <span>Search the directory</span>
             <kbd className="ml-1 rounded border border-border bg-surface-2 px-1.5 py-0.5 text-[10px] font-mono text-subtle-foreground">
               /
             </kbd>
           </Link>
 
-          <Link href="/submit" prefetch={false}>
-            <Button variant="secondary" size="sm">
+          {/* GSAP-enhanced submit button with hover background */}
+          <Link href="/submit" prefetch={false} data-nav-action>
+            <Button variant="secondary" size="sm" className="rounded-full">
               Submit Tool
             </Button>
           </Link>
 
-          <Link href="/finder" prefetch={false}>
+          <Link href="/ai-finder" prefetch={false} data-nav-action>
             <Button variant="primary" size="sm">
-              <Sparkles className="w-3.5 h-3.5 mr-1" />
-              AI Match
+              <Sparkles className="w-3.5 h-3.5 mr-1" /> AI Match
             </Button>
           </Link>
         </div>
@@ -197,6 +280,7 @@ export function Navbar() {
                   key={link.name}
                   href={link.href}
                   prefetch={false}
+                  data-drawer-link
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg text-base font-medium transition-colors ${
                     link.highlight
@@ -223,7 +307,7 @@ export function Navbar() {
               </Button>
             </Link>
             <Link
-              href="/finder"
+              href="/ai-finder"
               prefetch={false}
               onClick={() => setMobileMenuOpen(false)}
               className="block"
@@ -239,4 +323,3 @@ export function Navbar() {
     </header>
   );
 }
-

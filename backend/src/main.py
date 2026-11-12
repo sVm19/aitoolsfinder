@@ -8,9 +8,11 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
+from slowapi.errors import RateLimitExceeded
 
 from src.core.config import settings
 from src.core.logging import setup_logging, request_id_ctx
+from src.core.ratelimit import limiter
 from src.common.exceptions import AppError
 from src.common.schemas import ErrorResponse, ErrorDetail
 from src.modules.operations.router import router as operations_router
@@ -18,6 +20,10 @@ from src.modules.catalog.router import (
     router as catalog_router,
     admin_router as catalog_admin_router,
 )
+from src.modules.intelligence.router import router as intelligence_router
+from src.modules.ai.router import router as ai_router
+from src.modules.identity.router import router as identity_router
+from src.modules.vendor.router import router as vendor_router
 
 setup_logging(settings.LOG_LEVEL)
 logger = logging.getLogger("aitoolsfinder.api")
@@ -82,6 +88,24 @@ def create_application() -> FastAPI:
         return response
 
     # 4. Exception Handlers
+    app.state.limiter = limiter
+
+    @app.exception_handler(RateLimitExceeded)
+    async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+        req_id = request_id_ctx.get() or "none"
+        logger.warning(f"Rate limit exceeded on {request.url.path}")
+        return JSONResponse(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            content=ErrorResponse(
+                error=ErrorDetail(
+                    code="RATE_LIMITED",
+                    message="Too many requests. Please try again shortly.",
+                    request_id=req_id,
+                )
+            ).model_dump(),
+            headers={"Retry-After": "60"},
+        )
+
     @app.exception_handler(AppError)
     async def app_error_handler(request: Request, exc: AppError):
         req_id = request_id_ctx.get() or "none"
@@ -129,7 +153,11 @@ def create_application() -> FastAPI:
     # Core API v1 router
     app.include_router(operations_router, prefix="/api/v1")
     app.include_router(catalog_router, prefix="/api/v1")
+    app.include_router(intelligence_router, prefix="/api/v1")
     app.include_router(catalog_admin_router, prefix="/api/v1")
+    app.include_router(ai_router, prefix="/api/v1")
+    app.include_router(identity_router)
+    app.include_router(vendor_router)
 
     # Root endpoint
     @app.get("/", tags=["Root"])

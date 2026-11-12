@@ -60,7 +60,7 @@
 
 ---
 
-## Phase 5 — AI Recommendations Engine
+## Phase 5 — AI Recommendations Engine (Completed & Verified)
 - OpenRouter client adapter with timeouts, bounded retries, and token usage logging.
 - Two-stage grounded retrieval pipeline: Supabase FTS candidate selection -> LLM ranking & explanation -> database ID verification.
 - Anti-hallucination guardrails: zero invented tools, prices, or ratings; factual tradeoffs.

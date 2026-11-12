@@ -15,6 +15,10 @@ from src.core.database import Base
 
 # Import all models for Alembic autogeneration
 import src.modules.catalog.models  # noqa: F401
+import src.modules.intelligence.models  # noqa: F401
+import src.modules.ai.models  # noqa: F401
+import src.modules.identity.models  # noqa: F401
+import src.modules.vendor.models  # noqa: F401
 
 config = context.config
 

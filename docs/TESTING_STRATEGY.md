@@ -37,6 +37,7 @@
   - PostgreSQL full-text search and trigram ranking relevance.
   - Deterministic intelligence scoring calculations (no floating point drift).
   - OpenRouter candidate ID verification and anti-hallucination guardrails.
+  - Recommendation rate limiting (5/minute/IP → 429) and feedback persistence.
   - Payment webhook signature verification and event deduplication idempotency.
 
 ---

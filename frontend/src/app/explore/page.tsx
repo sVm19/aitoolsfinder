@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { canonicalUrl } from "@/lib/site";
 import { ExploreView, type ExploreFilters } from "./view";
 import {
   getActiveCategories,
@@ -24,7 +25,7 @@ function scalar(value: string | string[] | undefined): string | undefined {
 export const metadata: Metadata = {
   title: "Explore AI Tools",
   description: "Search and filter published AI tools by category, pricing, and verification.",
-  alternates: { canonical: "https://aitoolsfinder.cloud/explore" },
+  alternates: { canonical: canonicalUrl("/explore") },
   robots: { index: false, follow: true },
 };
 
@@ -34,12 +35,18 @@ export default async function ExplorePage({
   searchParams: Promise<SearchParams>;
 }) {
   const raw = await searchParams;
+  const q = scalar(raw.q) ?? "";
+  const requestedSort = scalar(raw.sort) ?? "newest";
   const filters: ExploreFilters = {
-    q: scalar(raw.q) ?? "",
-    categories: values(raw.category),
+    q,
+    categories: [...new Set(values(raw.category))],
     pricing: scalar(raw.pricing_model) ?? "",
     verified: scalar(raw.is_verified) === "true",
-    sort: scalar(raw.sort) ?? "newest",
+    sort:
+      ["newest", "alphabetical", "relevance"].includes(requestedSort) &&
+      (requestedSort !== "relevance" || Boolean(q.trim()))
+        ? requestedSort
+        : "newest",
   };
   const pageValue = Number(scalar(raw.page) ?? "1");
   const page = Number.isSafeInteger(pageValue) && pageValue > 0 ? pageValue : 1;

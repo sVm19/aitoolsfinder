@@ -81,3 +81,20 @@ To maintain tight budget control for an early-stage deployment:
 - **AWS Budgets:** Configured with billing threshold alerts (e.g., $25, $50, $100) alerting via email.
 - **CloudWatch Retention:** Pinned to 14 days retention to prevent log storage cost accumulation.
 - **Database Backups:** Automated daily snapshots in Supabase (or S3 daily dumps if containerized PostgreSQL).
+
+---
+
+## 6. Observability, Cost, and Recovery
+
+- CloudWatch log groups (14-day retention): `/aitoolsfinder/backend`, `/aitoolsfinder/frontend`, `/aitoolsfinder/nginx`.
+- Container logs ship through Docker's `awslogs` driver; no log agent runs on the host.
+- AWS Budgets alerts at $25, $50, and $100 (ACTUAL spend), emailed to the address in `budget_email`.
+- Nightly backups: cron runs `deploy/scripts/backup-db.sh` at 03:00 UTC and writes a custom-format dump to `s3://{BACKUP_BUCKET}/postgres/{timestamp}.dump` (30-day lifecycle).
+- Certificate renewal: cron runs Certbot renew at 02:00 UTC and reloads Nginx.
+
+### Restore drill (run quarterly)
+
+1. `aws s3 ls s3://{BACKUP_BUCKET}/postgres/ | tail -5` — pick the newest dump.
+2. On a staging database: `bash deploy/scripts/restore-db.sh s3://{BACKUP_BUCKET}/postgres/<file>.dump`.
+3. Verify row counts: `SELECT count(*) FROM tools;` matches production within the backup window.
+4. Record the drill date and result in `docs/plans/PHASE_8_PRODUCTION_HARDENING_AND_DEPLOYMENT.md` Task 8.6.

@@ -1,7 +1,7 @@
 # Implementation Plan — Phase 1: Catalog Foundation
 
 **Official Domain:** [https://aitoolsfinder.cloud](https://aitoolsfinder.cloud)  
-**Database:** PostgreSQL 16 (Supabase Managed DB or Containerized DB)  
+**Database:** Supabase Managed DB  
 **Backend Application:** `backend/` (FastAPI Modular Monolith)  
 **Status:** Completed  
 **Exit Criteria:** Database models and migrations applied; 40 categories and 105 tags seeded; Admin CRUD operational with 100% test coverage.
@@ -10,10 +10,10 @@
 
 ## 1. Objectives & Scope
 
-Phase 1 establishes the relational catalog foundation in **PostgreSQL**. It implements the core entities, constraints, migrations, seed importers, and admin/public API endpoints that power every discovery feature on `https://aitoolsfinder.cloud`.
+Phase 1 establishes the relational catalog foundation in **Supabase**. It implements the core entities, constraints, migrations, seed importers, and admin/public API endpoints that power every discovery feature on `https://aitoolsfinder.cloud`.
 
 ### In Scope
-1. **PostgreSQL Database Schema Setup:**
+1. **Supabase Database Schema Setup:**
    - Extensions: `uuid-ossp`, `pg_trgm`.
    - Core tables: `categories`, `tags`, `tools`, `tool_categories`, `tool_tags`, `features`, `tool_features`, `pricing_plans`.
 2. **Alembic Database Migration:**
@@ -120,8 +120,8 @@ erDiagram
 ## 3. Step-by-Step Task Checklist
 
 - [x] **Task 1.1: Database Configuration & Connectivity**
-  - Verify PostgreSQL connection string format in `backend/src/core/config.py`.
-  - Enable SSL requirement for managed database (e.g. Supabase `ssl=require`).
+  - Verify Supabase connection string format in `backend/src/core/config.py`.
+  - Enable SSL requirement for managed database (e.g. `ssl=require`).
   - Verify connection pool settings for session pooler / direct connection.
 
 - [x] **Task 1.2: SQLAlchemy Declarative Models (`backend/src/modules/catalog/models.py`)**

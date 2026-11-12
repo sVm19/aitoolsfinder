@@ -12,5 +12,8 @@
     "backend:test": "backend/.venv/Scripts/pytest backend/tests",
     "backend:lint": "backend/.venv/Scripts/ruff check backend/src backend/tests",
     "backend:format": "backend/.venv/Scripts/ruff format backend/src backend/tests"
+  },
+  "dependencies": {
+    "gsap": "^3.15.1"
   }
 }

@@ -14,17 +14,29 @@ class Base(DeclarativeBase):
 
 
 connect_args: Dict[str, Any] = {}
-if settings.DB_SSL_MODE:
-    connect_args["ssl"] = settings.DB_SSL_MODE
+use_supabase = settings.ENABLE_SUPABASE
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=(settings.APP_ENV == "development" and settings.LOG_LEVEL == "DEBUG"),
-    pool_pre_ping=True,
-    pool_size=10,
-    max_overflow=20,
-    connect_args=connect_args,
+if use_supabase:
+    # Supabase requires SSL connection
+    connect_args["ssl"] = {"reject_unsafe_": True}
+    engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=(settings.APP_ENV == "development" and settings.LOG_LEVEL == "DEBUG"),
+        pool_pre_ping=True,
+        pool_size=10,
+        max_overflow=20,
+        connect_args=connect_args,
+    )
+else:
+    engine = create_async_engine(
+        settings.DATABASE_URL,
+        echo=(settings.APP_ENV == "development" and settings.LOG_LEVEL == "DEBUG"),
+        pool_pre_ping=True,
+        pool_size=10,
+        max_overflow=20,
+        connect_args=connect_args,
 )
+
 
 async_session_factory = async_sessionmaker(
     bind=engine,

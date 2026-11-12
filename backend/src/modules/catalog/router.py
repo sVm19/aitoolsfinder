@@ -80,6 +80,13 @@ async def list_tags(
     )
 
 
+@router.get("/tags/{slug}", response_model=TagRead)
+async def get_tag(slug: str, session: AsyncSession = Depends(get_db)):
+    service = CatalogService(session)
+    tag = await service.get_tag(slug)
+    return TagRead.model_validate(tag)
+
+
 # ==============================================================================
 # Public Endpoints - Tools
 # ==============================================================================
@@ -153,7 +160,7 @@ async def autocomplete_tools(
 @router.get("/tools/{slug}", response_model=ToolDetailRead)
 async def get_tool(slug: str, session: AsyncSession = Depends(get_db)):
     service = CatalogService(session)
-    tool = await service.get_tool(slug)
+    tool = await service.get_published_tool(slug)
     return ToolDetailRead.model_validate(tool)
 
 

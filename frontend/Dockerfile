@@ -17,6 +17,11 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+ARG NEXT_PUBLIC_APP_URL=https://aitoolsfinder.cloud
+ARG NEXT_PUBLIC_API_BASE_URL=https://aitoolsfinder.cloud/api/v1
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+
 RUN npm run build
 
 # Production image, copy all the files and run next

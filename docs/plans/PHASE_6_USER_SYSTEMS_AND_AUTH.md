@@ -2,7 +2,7 @@
 
 **Official Domain:** [https://aitoolsfinder.cloud](https://aitoolsfinder.cloud)  
 **Auth Provider:** AWS Cognito (User Pools + JWKS Validation)  
-**Database:** PostgreSQL 16 (Supabase / Docker)  
+**Database:** Supabase 16 (Docker)  
 **Status:** Queued (Depends on Phase 4 & 5)  
 **Exit Criteria:** Users can sign up, sign in, save tools to their dashboard, and access protected endpoints with validated Cognito JWTs.
 
@@ -17,7 +17,7 @@ Phase 6 implements secure user identity, authentication, and bookmarking systems
    - Backend validation of Cognito JWT tokens (ID & Access tokens).
    - In-memory JWKS key caching with automatic rotation refresh.
    - Verification of `iss` (Cognito User Pool URL), `aud` (App Client ID), `exp`, and `token_use`.
-2. **Internal User Mapping in PostgreSQL:**
+2. **Internal User Mapping in Supabase:**
    - `users` table keyed to stable Cognito `sub`.
    - Role-based authorization (`user`, `vendor`, `admin`) enforced in FastAPI service dependencies.
 3. **Saved Tools & Preferences:**
@@ -76,6 +76,6 @@ Phase 6 implements secure user identity, authentication, and bookmarking systems
 ## 3. Milestone Exit Criteria
 
 1. Users can register, confirm email, and sign in.
-2. Saving a tool saves the association in PostgreSQL and updates the UI state immediately.
+2. Saving a tool saves the association in Supabase and updates the UI state immediately.
 3. Backend strictly enforces token validity and rejects unauthorized requests with standard error envelopes.
 4. User dashboard renders bookmarks cleanly with full mobile responsiveness.

@@ -15,13 +15,14 @@
     "clsx": "^2.1.1",
     "gsap": "^3.12.7",
     "lucide-react": "^0.475.0",
-    "next": "15.2.1",
+    "next": "15.5.29",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tailwind-merge": "^3.0.1",
     "three": "^0.187.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.51.1",
     "@types/node": "^22.13.4",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",

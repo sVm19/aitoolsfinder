@@ -29,15 +29,17 @@ ENV/
 .ruff_cache/
 
 # Environment and Secrets (NEVER COMMIT)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env*
+!.env.example
 *.pem
 *.key
 *.cert
-.env.production
+*.crt
+*.pfx
+*.p12
+*.bak
+*secret*
+*credentials*
 
 # Database data
 pgdata/

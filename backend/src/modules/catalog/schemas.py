@@ -243,6 +243,7 @@ class ToolDetailRead(ToolRead):
     categories: List[CategoryRead] = Field(default_factory=list)
     tags: List[TagRead] = Field(default_factory=list)
     pricing_plans: List[PricingPlanRead] = Field(default_factory=list)
+    features: List[ToolFeatureRead] = Field(default_factory=list)
 
     @field_validator("categories", mode="before")
     @classmethod

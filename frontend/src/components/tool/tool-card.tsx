@@ -1,9 +1,12 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ScoreBadge } from "@/components/tool/score-badge";
 import { Bookmark, GitCompare, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCompare } from "@/components/comparison/compare-provider";
 
 export interface ToolCardData {
   id: string;
@@ -12,7 +15,7 @@ export interface ToolCardData {
   tagline: string;
   category: string;
   categorySlug: string;
-  pricingModel: "free" | "freemium" | "paid" | "usage_based" | "contact_sales";
+  pricingModel: "free" | "freemium" | "paid" | "usage_based" | "contact_sales" | "unknown";
   startingPrice?: string;
   score?: number;
   isVerified?: boolean;
@@ -36,6 +39,8 @@ export function ToolCard({
   onCompare,
   isSaved = false,
 }: ToolCardProps) {
+  const { tools: compareTools, addTool, removeTool, isFull } = useCompare();
+  const isComparing = compareTools.some((item) => item.slug === tool.slug);
   const getPricingBadgeVariant = (model: string) => {
     switch (model) {
       case "free":
@@ -59,6 +64,10 @@ export function ToolCard({
         return "Paid";
       case "usage_based":
         return "Usage-Based";
+      case "contact_sales":
+        return "Contact sales";
+      case "unknown":
+        return "Pricing unknown";
       default:
         return "Custom";
     }
@@ -106,28 +115,47 @@ export function ToolCard({
                   </Badge>
                 )}
               </div>
-              <Link
-                href={`/categories/${tool.categorySlug}`}
-                prefetch={false}
-                className="text-xs text-subtle-foreground hover:text-muted-foreground transition-colors"
-              >
-                {tool.category}
-              </Link>
+              {tool.categorySlug ? (
+                <Link
+                  href={`/categories/${tool.categorySlug}`}
+                  prefetch={false}
+                  className="text-xs text-subtle-foreground hover:text-muted-foreground transition-colors"
+                >
+                  {tool.category}
+                </Link>
+              ) : (
+                <span className="text-xs text-subtle-foreground">{tool.category}</span>
+              )}
             </div>
           </div>
 
-          {(onSave || onCompare) && (
-            <div className="flex items-center gap-1">
-              {onCompare && (
-                <button
-                  type="button"
-                  onClick={() => onCompare(tool)}
-                  className="rounded-md p-1.5 text-subtle-foreground transition-colors hover:bg-surface-3 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                  aria-label={`Add ${tool.name} to compare`}
-                >
-                  <GitCompare aria-hidden="true" className="h-4 w-4" />
-                </button>
-              )}
+          <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  if (isComparing) removeTool(tool.slug);
+                  else {
+                    addTool(tool);
+                    onCompare?.(tool);
+                  }
+                }}
+                disabled={!isComparing && isFull}
+                aria-pressed={isComparing}
+                title={isComparing ? "Remove from compare" : isFull ? "Compare tray is full" : "Add to compare"}
+                className={cn(
+                  "rounded-md p-1.5 text-subtle-foreground transition-colors hover:bg-surface-3 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-40",
+                  isComparing && "bg-primary/15 text-primary-content",
+                )}
+                aria-label={
+                  isComparing
+                    ? `Remove ${tool.name} from compare`
+                    : isFull
+                      ? `Compare tray is full; ${tool.name} was not added`
+                      : `Add ${tool.name} to compare`
+                }
+              >
+                <GitCompare aria-hidden="true" className="h-4 w-4" />
+              </button>
               {onSave && (
                 <button
                   type="button"
@@ -140,8 +168,7 @@ export function ToolCard({
                   <Bookmark aria-hidden="true" className="h-4 w-4" />
                 </button>
               )}
-            </div>
-          )}
+          </div>
         </div>
 
         {/* Tagline / Factual Summary */}

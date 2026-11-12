@@ -1,6 +1,20 @@
 import type { Metadata } from "next";
+import { JetBrains_Mono, Outfit } from "next/font/google";
 import "@/styles/globals.css";
 import { canonicalUrl, SITE_URL } from "@/lib/site";
+import { CompareProvider } from "@/components/comparison/compare-provider";
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-outfit",
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-jetbrains",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -42,11 +56,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" data-type="software">
+    <html lang="en" className={`dark ${outfit.variable} ${jetbrains.variable}`} data-type="software">
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-foreground">
-        {children}
+        <div className="site-grain" aria-hidden="true" />
+        <CompareProvider>{children}</CompareProvider>
       </body>
     </html>
   );
 }
-

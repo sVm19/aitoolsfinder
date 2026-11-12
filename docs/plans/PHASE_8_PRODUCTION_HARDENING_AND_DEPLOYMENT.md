@@ -1,7 +1,7 @@
 # Implementation Plan — Phase 8: Production Hardening & AWS Deployment
 
 **Official Domain:** [https://aitoolsfinder.cloud](https://aitoolsfinder.cloud)  
-**Hosting Environment:** Single AWS EC2 instance (Docker Compose + Nginx) + Amazon ECR + CloudFront OAC + PostgreSQL  
+**Hosting Environment:** Single AWS EC2 instance (Docker Compose + Nginx) + Amazon ECR + CloudFront OAC  
 **Status:** Queued (Final Launch Milestone)  
 **Exit Criteria:** Core Web Vitals targets met (LCP ≤2.5s, INP ≤200ms, CLS ≤0.1); independent ECR pipelines verified; automated health checks and rollback drills operational; live on https://aitoolsfinder.cloud.
 
@@ -65,7 +65,7 @@ graph TD
     Nginx[Nginx Reverse Proxy & TLS]
     WebCont[frontend Container :3000]
     APICont[backend Container :8000]
-    Postgres[(PostgreSQL: Supabase / Docker)]
+    Postgres[(Supabase / Docker)]
     OpenRouter[OpenRouter AI API]
 
     Client -->|HTTPS :443| DNS
@@ -135,3 +135,28 @@ graph TD
 3. Independent ECR pipelines deploy only modified services and execute automated rollbacks on failure.
 4. Database connection pool operates stably under synthetic load.
 5. Zero critical or high-severity vulnerabilities found in security audit.
+
+---
+
+## 5. Local Hardening Verification (2026-11-12)
+
+The code-only hardening scope (Tasks 1–3 and the local portions of Tasks 8–11) is complete. AWS provisioning, TLS, Compose deployment, Terraform, and the deploy workflow remain manual follow-up (Tasks 4–7).
+
+| Check | Result |
+| --- | --- |
+| `pytest -q` (backend) | 46 passed |
+| Router mounting (`tests/test_router_mounting.py`) | 3 passed |
+| Security hardening (`tests/test_security_hardening.py`) | 10 passed |
+| `python -c "import src.main"` | exit 0 |
+| `npm run build` | succeeds; `.next/standalone/server.js` present |
+| `npm run typecheck` | pass |
+| `curl -sI http://localhost:3100/` | CSP, HSTS, and `X-Frame-Options` present |
+| Client secret scan (`.next/static`) | no `OPENROUTER_API_KEY`, `APP_SECRET_KEY`, or `DATABASE_URL` |
+| `npx playwright test --list` | 1 test listed |
+| `npm audit --omit=dev --audit-level=critical` | 0 critical (1 high in Next's pinned `postcss`, build-time only) |
+
+Notes:
+- With the repo-root lockfile present, Next traced output to the monorepo root and emitted `.next/standalone/frontend/server.js`; `outputFileTracingRoot` now pins tracing to `frontend/` so the Dockerfile's `node server.js` resolves.
+- Next.js was upgraded from 15.2.1 to 15.5.29 to clear the critical `sharp`/libvips advisories. The remaining high `postcss` advisory requires Next 16 and is tracked as a follow-up.
+- The E2E journey was not executed locally because no seeded PostgreSQL catalog is available; it runs after deployment.
+- Task 11's `.github/workflows/deploy.yml` E2E job is deferred with the deploy workflow to the manual deployment phase.

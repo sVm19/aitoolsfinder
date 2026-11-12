@@ -137,6 +137,12 @@ class CatalogService:
             raise NotFoundError(f"Tool '{slug_or_id}' not found")
         return tool
 
+    async def get_published_tool(self, slug: str) -> ToolModel:
+        tool = await self.repo.get_tool_by_slug(slug, status="published")
+        if not tool:
+            raise NotFoundError(f"Tool '{slug}' not found")
+        return tool
+
     async def list_tools(
         self,
         status: Optional[str] = "published",

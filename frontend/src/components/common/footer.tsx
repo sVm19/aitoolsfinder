@@ -21,7 +21,7 @@ export function Footer() {
     { name: "Explore All Tools", href: "/explore" },
     { name: "Curated Rankings", href: "/rankings" },
     { name: "Side-by-Side Comparisons", href: "/compare" },
-    { name: "AI Finder Assistant", href: "/finder" },
+    { name: "AI Finder Assistant", href: "/ai-finder" },
     { name: "Scoring Methodology", href: "/methodology" },
     { name: "API Documentation", href: canonicalUrl("/api/docs") },
   ];
@@ -36,8 +36,10 @@ export function Footer() {
   ];
 
   return (
-    <footer className="w-full border-t border-border bg-background text-muted-foreground">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <footer className="relative w-full overflow-hidden border-t border-border bg-background text-muted-foreground">
+      <div className="pointer-events-none absolute -left-16 top-0 h-40 w-40 rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-32 w-56 rounded-full bg-accent/10 blur-3xl" aria-hidden="true" />
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
           {/* Brand Info */}
           <div className="lg:col-span-2">
@@ -77,7 +79,7 @@ export function Footer() {
               {categories.map((cat) => (
                 <li key={cat.slug}>
                   <Link
-                    href={`/category/${cat.slug}`}
+                    href={`/categories/${cat.slug}`}
                     className="hover:text-foreground hover:underline underline-offset-4 transition-colors"
                   >
                     {cat.name}

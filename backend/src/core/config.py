@@ -19,7 +19,10 @@ class Settings(BaseSettings):
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "https://aitoolsfinder.cloud"]
 
-    # Database (Supabase PostgreSQL / Local PostgreSQL)
+    # Database Configuration
+    # When SUPABASE_URL is set, DATABASE_URL and DATABASE_URL_SYNC will auto-configure
+    # to use Supabase PostgreSQL with SSL required.
+    # Otherwise, falls back to local PostgreSQL as before.
     DATABASE_URL: str = (
         "postgresql+asyncpg://postgres:postgres@localhost:5432/aitoolsfinder"
     )
@@ -28,7 +31,7 @@ class Settings(BaseSettings):
     )
     DB_SSL_MODE: Optional[str] = None  # Set to "require" when connecting to Supabase
 
-    # Supabase Specific Keys (Optional API usage)
+    # Supabase Specific Keys
     SUPABASE_URL: Optional[str] = None
     SUPABASE_ANON_KEY: Optional[str] = None
     SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
@@ -41,12 +44,16 @@ class Settings(BaseSettings):
 
     # AWS S3 & CloudFront
     AWS_REGION: str = "us-east-1"
-    S3_BUCKET_NAME: Optional[str] = "aitoolsfinder-media"
-    CLOUDFRONT_DOMAIN: Optional[str] = "cdn.aitoolsfinder.cloud"
+    S3_BUCKET_NAME: str = "aitoolsfinder-media"
+    CLOUDFRONT_DOMAIN: str = "cdn.aitoolsfinder.cloud"
 
     # AI & Integrations
     OPENROUTER_API_KEY: Optional[str] = None
     OPENROUTER_MODEL: str = "anthropic/claude-3.5-sonnet"
+    GROQ_API_KEY: Optional[str] = None
+    GROQ_MODEL: str = "meta-llama/llama3-8b-8192"
+    OPENROUTER_TIMEOUT_SECONDS: float = 10.0
+    OPENROUTER_MAX_RETRIES: int = 2
     TIUN_API_KEY: Optional[str] = None
     TIUN_WEBHOOK_SECRET: Optional[str] = None
     RESEND_API_KEY: Optional[str] = None
@@ -54,5 +61,15 @@ class Settings(BaseSettings):
     POSTHOG_API_KEY: Optional[str] = None
     POSTHOG_HOST: str = "https://app.posthog.com"
 
+    # Feature Flags
+    ENABLE_SUPABASE: bool = False
+    ENABLE_COGNITO: bool = True
+
 
 settings = Settings()
+
+# Auto-configure Supabase flags when SUPABASE_URL is provided
+if settings.SUPABASE_URL:
+    settings.ENABLE_SUPABASE = True
+    if not settings.DB_SSL_MODE:
+        settings.DB_SSL_MODE = "require"

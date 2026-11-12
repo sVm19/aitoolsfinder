@@ -65,14 +65,19 @@
 - `GET /search/autocomplete?q=...`: Up to ten published tool name suggestions, ordered by approximate name match.
 
 ### 3.4 Intelligence & Comparisons
-- `GET /comparisons/{slug}`: Pre-computed public comparison page.
-- `POST /comparisons/preview`: Ephemeral multi-tool feature comparison matrix.
-- `GET /tools/{slug}/alternatives`: Curated and algorithmic tool alternatives.
-- `GET /rankings/{slug}`: Category leaderboard rankings.
+- `GET /comparisons/{slug}`: Published comparison with ordered published tools, normalized feature support (`yes`, `partial`, `no`, `unknown`), and pricing plans grouped by tool slug.
+- `POST /comparisons/preview`: Ephemeral comparison matrix. Accepts `tool_slugs` containing 2–4 distinct published tool slugs; does not create a comparison record.
+- `GET /tools/{slug}/alternatives`: Published curated alternatives followed by published tools with overlapping categories or tags. Curated records include their stored rationale; related suggestions report overlap counts.
+- `GET /rankings/{slug}`: Category or tag leaderboard from the latest stored score snapshot per published tool. Accepts `taxonomy_type=category|tag` (default `category`), `pricing_filter=all|free|paid`, `page`, and `page_size`; free includes free and freemium, paid includes paid/usage-based/contact-sales, and unknown pricing is omitted from filtered views. Sponsored tools are flagged and ranked separately from organic tools.
 
 ### 3.5 AI Recommendations (OpenRouter)
 - `POST /recommendations`: Natural-language requirement matching anchored in internal tool IDs.
-- `POST /recommendations/feedback`: Thumbs up/down accuracy feedback.
+  - Request: `query` (1–1000 chars, required), optional `category_slugs` (≤5), `tag_slugs` (≤5), `pricing_model` (`free`, `freemium`, `paid`, `usage_based`, `one_time`, `contact_sales`, `unknown`), and `limit` (1–15, default 15). Extra fields are rejected.
+  - Response: `items[]` (`tool_id`, `slug`, `name`, `tagline`, `match_score` 0–100, `match_score_method`, `match_reasons[]`, `tradeoffs[]`, `relevant_feature_slugs[]`, `pricing[]`, `website_url`, `is_verified`, `last_verified_at`), plus `personalized`, `notice`, `prompt_version`, `latency_ms`.
+  - `match_score` is relative within the result set (`rank_relative_v1`: top 100, last 55); do not compare scores across queries.
+  - Rate limit: **5 requests/minute per IP**. Exceeding it returns `429` with `Retry-After: 60` and the standard error envelope (`code: RATE_LIMITED`).
+  - If the provider is unavailable or output references unknown catalog IDs/feature slugs, the endpoint returns catalog-derived results with `personalized: false` and a `notice`.
+- `POST /recommendations/feedback`: Accuracy feedback (`rating` 1–5 required; optional `query` ≤1000 and `comment` ≤500) for a published `tool_id`. Returns `201` with `id`, `tool_id`, `rating`, `created_at`; unknown/unpublished tools return `404`.
 
 ### 3.6 Identity & User
 - `GET /users/me`: Current user profile.

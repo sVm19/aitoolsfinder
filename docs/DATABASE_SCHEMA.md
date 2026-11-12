@@ -113,6 +113,7 @@
 - summary TEXT NULL
 - status VARCHAR (`draft`, `published`, `archived`)
 - created_by UUID FK users.id NULL
+- `created_by` is nullable without an FK until the Phase 6 `users` table exists; Phase 6 adds the FK.
 - published_at TIMESTAMPTZ NULL
 - created_at, updated_at
 
@@ -133,6 +134,16 @@
 - evidence JSONB DEFAULT '[]'
 - calculated_at TIMESTAMPTZ NOT NULL
 - UNIQUE (tool_id, score_version, calculated_at)
+
+### recommendation_feedback
+- id UUID PK
+- tool_id UUID FK tools.id ON DELETE CASCADE
+- query TEXT NULL (sanitized original request, when available)
+- rating SMALLINT NOT NULL CHECK (rating BETWEEN 1 AND 5)
+- comment VARCHAR(500) NULL
+- created_at TIMESTAMPTZ NOT NULL
+- INDEX ix_recommendation_feedback_tool_created (tool_id, created_at)
+- Migration: `0006_recommendation_feedback`
 
 ### reviews
 - id UUID PK

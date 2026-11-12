@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -20,12 +22,37 @@ export function CategoryCard({
   icon,
   className,
 }: CategoryCardProps) {
+  const ref = useRef<HTMLAnchorElement>(null);
+
+  const onMove = (event: React.PointerEvent<HTMLAnchorElement>) => {
+    const el = ref.current;
+    if (!el) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const rect = el.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width;
+    const py = (event.clientY - rect.top) / rect.height;
+    el.style.setProperty("--mx", `${event.clientX - rect.left}px`);
+    el.style.setProperty("--my", `${event.clientY - rect.top}px`);
+    el.style.setProperty("--rx", `${(py - 0.5) * -6}deg`);
+    el.style.setProperty("--ry", `${(px - 0.5) * 8}deg`);
+  };
+
+  const onLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty("--rx", "0deg");
+    el.style.setProperty("--ry", "0deg");
+  };
+
   return (
     <Link
+      ref={ref}
       href={`/categories/${slug}`}
       prefetch={false}
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
       className={cn(
-        "group relative flex flex-col justify-between rounded-xl border border-border bg-surface-1 p-5 transition-all duration-200 hover:border-primary/60 hover:bg-surface-2 hover:shadow-lavender-glow",
+        "spotlight-card tilt-card group relative flex flex-col justify-between rounded-2xl border border-border p-5 transition-colors duration-200 hover:border-primary/60",
         className
       )}
     >

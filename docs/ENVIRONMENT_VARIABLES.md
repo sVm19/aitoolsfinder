@@ -31,6 +31,10 @@ This document specifies all expected environment variables for the `frontend/` a
 | `CLOUDFRONT_DOMAIN` | CDN distribution hostname for static assets | `cdn.aitoolsfinder.cloud` |
 | `OPENROUTER_API_KEY` | Secret API key for OpenRouter AI recommendations | `sk-or-v1-...` |
 | `OPENROUTER_MODEL` | Target foundation model on OpenRouter | `anthropic/claude-3.5-sonnet` |
+| `OPENROUTER_TIMEOUT_SECONDS` | Per-request timeout for OpenRouter calls | `10` |
+| `OPENROUTER_MAX_RETRIES` | Maximum retries for transient OpenRouter failures | `2` |
+| `GROQ_API_KEY` | Optional Groq API key; requires the `groq` SDK, otherwise the service uses OpenRouter | `gsk_...` |
+| `GROQ_MODEL` | Groq model used when the Groq adapter is enabled | `meta-llama/llama3-8b-8192` |
 | `TIUN_API_KEY` | Secret API key for Tiun Business payments (post-verification) | `tiun_live_...` |
 | `TIUN_WEBHOOK_SECRET` | Secret for verifying incoming Tiun webhook signatures | `whsec_...` |
 | `RESEND_API_KEY` | Transactional email provider API key | `re_...` |
@@ -53,3 +57,16 @@ This document specifies all expected environment variables for the `frontend/` a
 | `NEXT_PUBLIC_POSTHOG_HOST` | Public PostHog instance host | `https://app.posthog.com` |
 
 > **Security Rule:** Never prefix database passwords, secret keys, or provider tokens with `NEXT_PUBLIC_`.
+
+---
+
+## 3. Production Deployment (`deploy/.env.deploy`)
+
+| Variable | Description | Example / Default |
+| :--- | :--- | :--- |
+| `ECR_REGISTRY` | ECR registry hostname from Terraform output | `123456789012.dkr.ecr.us-east-1.amazonaws.com` |
+| `BACKEND_TAG` | Backend image tag deployed by CI | `sha-<commit>` |
+| `FRONTEND_TAG` | Frontend image tag deployed by CI | `sha-<commit>` |
+| `BACKUP_BUCKET` | S3 bucket receiving nightly PostgreSQL dumps | `aitoolsfinder-db-backups` |
+| `DOMAIN` | Public domain served by Nginx | `aitoolsfinder.cloud` |
+| `LETSENCRYPT_EMAIL` | Let's Encrypt registration and expiry email | `ops@aitoolsfinder.cloud` |

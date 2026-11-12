@@ -1,0 +1,22 @@
+{
+  "ci": {
+    "collect": {
+      "url": [
+        "https://aitoolsfinder.cloud/",
+        "https://aitoolsfinder.cloud/explore",
+        "https://aitoolsfinder.cloud/ai-finder"
+      ],
+      "numberOfRuns": 3
+    },
+    "assert": {
+      "assertions": {
+        "largest-contentful-paint": ["error", { "maxNumericValue": 2500 }],
+        "cumulative-layout-shift": ["error", { "maxNumericValue": 0.1 }],
+        "total-blocking-time": ["error", { "maxNumericValue": 200 }]
+      }
+    },
+    "upload": {
+      "target": "temporary-public-storage"
+    }
+  }
+}
