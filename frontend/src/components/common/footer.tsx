@@ -40,7 +40,7 @@ export function Footer() {
       <div className="pointer-events-none absolute -left-16 top-0 h-40 w-40 rounded-full bg-primary/10 blur-3xl" aria-hidden="true" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-32 w-56 rounded-full bg-accent/10 blur-3xl" aria-hidden="true" />
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand Info */}
           <div className="lg:col-span-2">
             <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">

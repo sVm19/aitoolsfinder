@@ -28,11 +28,6 @@ class CategoryModel(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
-    parent_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        Uuid(as_uuid=True),
-        ForeignKey("categories.id", ondelete="SET NULL"),
-        nullable=True,
-    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(
         String(255), unique=True, nullable=False, index=True
@@ -57,17 +52,11 @@ class CategoryModel(Base):
     )
 
     # Relationships
-    parent: Mapped[Optional["CategoryModel"]] = relationship(
-        "CategoryModel", remote_side=[id], back_populates="children"
-    )
-    children: Mapped[List["CategoryModel"]] = relationship(
-        "CategoryModel", back_populates="parent"
-    )
     tool_associations: Mapped[List["ToolCategoryModel"]] = relationship(
         "ToolCategoryModel", back_populates="category", cascade="all, delete-orphan"
     )
 
-    __table_args__ = (Index("ix_categories_parent_sort", "parent_id", "sort_order"),)
+    __table_args__ = (Index("ix_categories_sort_order", "sort_order"),)
 
 
 class TagModel(Base):
@@ -265,7 +254,6 @@ class PricingPlanModel(Base):
         String(50), default="unknown", nullable=False
     )
     is_free: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    pricing_url: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     limitations: Mapped[Dict[str, Any]] = mapped_column(
         JSON, default=dict, nullable=False
     )

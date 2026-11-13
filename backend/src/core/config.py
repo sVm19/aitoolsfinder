@@ -1,10 +1,20 @@
+import os
+from pathlib import Path
 from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_backend_dir = Path(__file__).resolve().parent.parent.parent
+_env_candidates = (
+    ".env",
+    str(_backend_dir / ".env"),
+    str(_backend_dir.parent / ".env"),
+)
+_env_file = next((f for f in _env_candidates if os.path.exists(f)), ".env")
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=".env", env_file_encoding="utf-8", extra="ignore"
+        env_file=_env_file, env_file_encoding="utf-8", extra="ignore"
     )
 
     # General App Settings
@@ -42,10 +52,11 @@ class Settings(BaseSettings):
     COGNITO_APP_CLIENT_ID: Optional[str] = None
     COGNITO_DOMAIN: Optional[str] = None
 
-    # AWS S3 & CloudFront
-    AWS_REGION: str = "us-east-1"
+    # AWS S3 & Media CDN (Cloudflare or CloudFront)
+    AWS_REGION: str = "ap-southeast-2"
     S3_BUCKET_NAME: str = "aitoolsfinder-media"
-    CLOUDFRONT_DOMAIN: str = "cdn.aitoolsfinder.cloud"
+    MEDIA_CDN_DOMAIN: str = "cdn.aitoolsfinder.cloud"
+    CLOUDFRONT_DOMAIN: Optional[str] = None  # Backward-compatible fallback
 
     # AI & Integrations
     OPENROUTER_API_KEY: Optional[str] = None

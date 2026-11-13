@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,8 +22,11 @@ export function Navbar() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const glowRef = useRef<HTMLSpanElement>(null);
   const progressRef = useRef<HTMLSpanElement>(null);
 
+  // --- Existing entrance / scroll animations ---
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const header = headerRef.current;
@@ -79,6 +82,54 @@ export function Navbar() {
     }, header);
 
     return () => context.revert();
+  }, []);
+
+  // --- 3D hover tilt + glow effect (desktop only, respects reduced motion) ---
+  useEffect(() => {
+    const header = headerRef.current;
+    const inner = innerRef.current;
+    const glow = glowRef.current;
+    if (!header || !inner) return;
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const desktopMQ = window.matchMedia("(min-width: 1024px)");
+    if (reduceMotion) return;
+
+    // GSAP quickTo for buttery-smooth tilt
+    const qRotateX = gsap.quickTo(inner, "rotateX", { duration: 0.4, ease: "power2.out" });
+    const qRotateY = gsap.quickTo(inner, "rotateY", { duration: 0.4, ease: "power2.out" });
+
+    const MAX_TILT = 2.5; // degrees
+
+    const handlePointerMove = (e: PointerEvent) => {
+      if (!desktopMQ.matches) return;
+      const rect = header.getBoundingClientRect();
+      // Normalise pointer position to -1…1
+      const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+      // rotateY follows X-axis, rotateX follows *inverted* Y-axis
+      qRotateY(nx * MAX_TILT);
+      qRotateX(-ny * MAX_TILT);
+      // Set glow position as percentage for the CSS radial-gradient
+      header.style.setProperty("--glow-x", `${((e.clientX - rect.left) / rect.width) * 100}%`);
+    };
+
+    const handlePointerLeave = () => {
+      qRotateX(0);
+      qRotateY(0);
+      header.style.removeProperty("--glow-x");
+    };
+
+    header.addEventListener("pointermove", handlePointerMove);
+    header.addEventListener("pointerleave", handlePointerLeave);
+
+    return () => {
+      header.removeEventListener("pointermove", handlePointerMove);
+      header.removeEventListener("pointerleave", handlePointerLeave);
+      // Reset transforms on cleanup
+      gsap.set(inner, { rotateX: 0, rotateY: 0 });
+      header.style.removeProperty("--glow-x");
+    };
   }, []);
 
   // Keep keyboard focus inside the mobile navigation while it is open.
@@ -158,10 +209,27 @@ export function Navbar() {
   return (
     <header
       ref={headerRef}
-      className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl transition-[background-color,box-shadow] duration-300"
+      className="sticky top-0 z-50 w-full border-b border-white/10 bg-background/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl transition-[background-color,box-shadow] duration-300 relative"
+      style={{ perspective: "1200px" }}
     >
+      {/* Glow border-bottom pseudo-element — follows pointer X */}
+      <span
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-px opacity-0 transition-opacity duration-300"
+        style={{
+          background:
+            "radial-gradient(circle at var(--glow-x, 50%) 100%, #7022FC 0%, #FD8F32 40%, transparent 70%)",
+          ...(headerRef.current?.style.getPropertyValue("--glow-x")
+            ? { opacity: 1 }
+            : {}),
+        }}
+        aria-hidden="true"
+      />
       <span ref={progressRef} className="nav-progress absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-primary via-accent to-primary" />
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div
+        ref={innerRef}
+        className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"
+        style={{ transformStyle: "preserve-3d", willChange: "transform" }}
+      >
         {/* Brand Identity */}
         <div className="flex items-center gap-8">
           <Link href="/" data-nav-brand className="flex items-center gap-2.5 group">

@@ -1,0 +1,59 @@
+services:
+  backend:
+    image: ${DOCKERHUB_USERNAME:-yourusername}/aitoolsfinder-backend:${IMAGE_TAG:-latest}
+    container_name: aitoolsfinder-backend
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      PORT: 8000
+      HOST: 0.0.0.0
+      LOG_LEVEL: INFO
+      CORS_ORIGINS: '["https://aitoolsfinder.cloud","https://www.aitoolsfinder.cloud"]'
+      OFFICIAL_DOMAIN: "https://aitoolsfinder.cloud"
+    expose:
+      - "8000"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/live')"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  frontend:
+    image: ${DOCKERHUB_USERNAME:-yourusername}/aitoolsfinder-frontend:${IMAGE_TAG:-latest}
+    container_name: aitoolsfinder-frontend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_APP_URL: "https://aitoolsfinder.cloud"
+      NEXT_PUBLIC_API_BASE_URL: "https://aitoolsfinder.cloud/api/v1"
+    expose:
+      - "3000"
+    networks:
+      - app-network
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  nginx:
+    image: ${DOCKERHUB_USERNAME:-yourusername}/aitoolsfinder-nginx:${IMAGE_TAG:-latest}
+    container_name: aitoolsfinder-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      frontend:
+        condition: service_started
+      backend:
+        condition: service_healthy
+
+networks:
+  app-network:
+    driver: bridge

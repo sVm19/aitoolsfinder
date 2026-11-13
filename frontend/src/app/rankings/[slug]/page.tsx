@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Info } from "lucide-react";
-import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { PageShell } from "@/components/common/page-shell";
 import { ErrorState } from "@/components/ui/error-state";
 import {
   CatalogApiError,
@@ -107,27 +105,22 @@ export default async function RankingsPage({
   const description = result.taxonomy_description;
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <Breadcrumbs
-            className="mb-8"
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Rankings", href: "/rankings" },
-              { label: result.taxonomy_name },
-            ]}
-          />
-          <header className="max-w-4xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
-              Category rankings
-            </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              {title}
-            </h1>
-            {description && <p className="mt-4 text-base leading-relaxed text-muted-foreground">{description}</p>}
-          </header>
+    <PageShell
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Rankings", href: "/rankings" },
+        { label: result.taxonomy_name },
+      ]}
+    >
+      <header className="max-w-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
+          Category rankings
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          {title}
+        </h1>
+        {description && <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">{description}</p>}
+      </header>
 
           <div className="mt-6 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface-1 p-4">
             <Info aria-hidden="true" className="h-4 w-4 text-primary-content" />
@@ -209,10 +202,7 @@ export default async function RankingsPage({
               )}
             </>
           )}
-        </div>
-      </main>
-      <Footer />
-    </div>
+    </PageShell>
   );
 }
 
@@ -292,12 +282,10 @@ function rankingPageHref(
 
 function PublicErrorPage({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="mx-auto flex w-full max-w-7xl flex-1 items-center px-4 py-12 sm:px-6 lg:px-8">
+    <PageShell>
+      <div className="py-12 max-w-2xl mx-auto">
         <ErrorState className="w-full" title={title} description={description} />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PageShell>
   );
 }

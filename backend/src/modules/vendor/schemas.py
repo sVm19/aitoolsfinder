@@ -1,19 +1,41 @@
 """Pydantic schemas for Phase 7: Monetization and vendor submissions."""
 
-from typing import Optional, List, Dict
+from datetime import datetime
+import uuid
+from typing import Optional, List, Dict, Union
 from pydantic import BaseModel, Field, validator
 
 
 class SubmissionCreate(BaseModel):
     """Request schema for creating a new tool submission."""
 
+    submission_type: str = Field(
+        default="standard",
+        pattern="^(standard|featured)$",
+        description="Standard (free review) or featured (fast-track 24-48h review + verified badge)",
+    )
     tool_name: str = Field(min_length=1, max_length=254, description="Name of the tool")
-    tagline: str = Field(min_length=1, max_length=500, description="Short tagline describing the tool")
+    tagline: str = Field(min_length=1, max_length=120, description="Short tagline describing the tool (max 120 chars)")
     description: Optional[str] = Field(
         default=None, max_length=2000, description="Detailed description of the tool"
     )
+    website_url: str = Field(
+        max_length=500, pattern="^https?://", description="Official website URL of the tool"
+    )
+    logo_object_key: Optional[str] = Field(
+        default=None, max_length=500, description="S3 or storage object key for tool logo"
+    )
+    screenshot_url: Optional[str] = Field(
+        default=None, max_length=500, description="S3 or storage URL for product screenshot"
+    )
     primary_category_id: Optional[str] = Field(
         default=None, max_length=36, description="UUID of the primary category"
+    )
+    secondary_tag_ids: List[str] = Field(
+        default_factory=list, description="List of tag UUIDs"
+    )
+    core_feature_ids: List[str] = Field(
+        default_factory=list, description="List of feature UUIDs"
     )
     pricing_model: str = Field(
         default="free",
@@ -26,12 +48,22 @@ class SubmissionCreate(BaseModel):
         description="Starting price in minor units (cents), e.g. 2900 = $29.00"
     )
     currency: str = Field(default="USD", pattern="^[A-Z]{3}$", description="ISO 4217 currency code")
-    website_url: Optional[str] = Field(
-        default=None, max_length=500, pattern="^https?://",
-        description="Official website URL of the tool"
+    pricing_url: Optional[str] = Field(
+        default=None, max_length=500, description="Direct URL to public pricing page for audit proof"
     )
-    submitter_email: Optional[str] = Field(
-        default=None, max_length=254, description="Email of the submitter"
+    submitter_name: Optional[str] = Field(
+        default=None, max_length=254, description="Name of the submitter"
+    )
+    submitter_email: str = Field(
+        max_length=254, description="Email of the submitter"
+    )
+    relationship: str = Field(
+        default="founder",
+        pattern="^(founder|team|advocate)$",
+        description="Submitter relationship: founder, team, or advocate",
+    )
+    affiliate_url: Optional[str] = Field(
+        default=None, max_length=500, description="Optional affiliate program link"
     )
 
 
@@ -52,7 +84,7 @@ class SubmissionReject(BaseModel):
 class SubmissionRead(BaseModel):
     """Read schema for a tool submission."""
 
-    id: str
+    id: Union[str, uuid.UUID]
     vendor_name: Optional[str] = None
     tool_name: str
     tool_slug: str
@@ -74,10 +106,11 @@ class SubmissionRead(BaseModel):
 class SubmissionListItem(BaseModel):
     """Light read schema for listing submissions in admin queue."""
 
-    id: str
-    vendor_name: str
+    id: Union[str, uuid.UUID]
+    vendor_name: Optional[str] = None
     tool_name: str
     tool_slug: str
+    website_url: Optional[str] = None
     status: str
     created_at: datetime
 

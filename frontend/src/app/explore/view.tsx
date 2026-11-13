@@ -2,10 +2,8 @@
 
 import { useEffect, useState, useTransition, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
-import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, RotateCcw, Search, SlidersHorizontal } from "lucide-react";
+import { PageShell } from "@/components/common/page-shell";
 import { ToolCard } from "@/components/tool/tool-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -120,6 +118,7 @@ export function ExploreView({
     );
   }
 
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const activeFilterCount =
     Number(Boolean(filters.q.trim())) +
     filters.categories.length +
@@ -127,66 +126,75 @@ export function ExploreView({
     Number(filters.verified);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Explore" },
-          ]}
-          className="mb-8"
-        />
-
-        <header className="max-w-3xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
-            Published catalog
-          </p>
-          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Explore AI tools
-          </h1>
-          <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-            Search published products and narrow the list by category, pricing, or verification.
-          </p>
-          <form role="search" onSubmit={submitSearch} className="mt-6 flex gap-2">
-            <label htmlFor="tool-search" className="sr-only">Search published tools</label>
-            <div className="relative min-w-0 flex-1">
-              <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle-foreground" />
-              <Input
-                id="tool-search"
-                type="search"
-                value={filters.q}
-                onChange={(event) => setFilters((current) => ({ ...current, q: event.target.value }))}
-                placeholder="Search by tool, feature, or task"
-                className="pl-10"
-              />
-            </div>
-            <Button type="submit" className="shrink-0">
+    <PageShell breadcrumbs={[{ label: "Home", href: "/" }, { label: "Explore" }]}>
+      <header className="max-w-3xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
+          Published catalog
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Explore AI tools
+        </h1>
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Search published products and narrow the list by category, pricing, or verification.
+        </p>
+        <form role="search" onSubmit={submitSearch} className="mt-6 flex flex-col sm:flex-row gap-2">
+          <label htmlFor="tool-search" className="sr-only">Search published tools</label>
+          <div className="relative min-w-0 flex-1">
+            <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-subtle-foreground" />
+            <Input
+              id="tool-search"
+              type="search"
+              value={filters.q}
+              onChange={(event) => setFilters((current) => ({ ...current, q: event.target.value }))}
+              placeholder="Search by tool, feature, or task"
+              className="pl-10 h-11"
+            />
+          </div>
+          <div className="flex gap-2">
+            <Button type="submit" size="md" className="flex-1 sm:flex-initial sm:px-6">
               Search
             </Button>
-          </form>
-        </header>
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
+              className="lg:hidden flex items-center gap-1.5"
+              aria-label="Toggle search filters"
+            >
+              <SlidersHorizontal className="h-4 w-4 text-primary-content" />
+              <span>Filters</span>
+              {activeFilterCount > 0 && <Badge variant="secondary" className="ml-1">{activeFilterCount}</Badge>}
+              {mobileFiltersOpen ? <ChevronUp className="h-3.5 w-3.5 ml-1" /> : <ChevronDown className="h-3.5 w-3.5 ml-1" />}
+            </Button>
+          </div>
+        </form>
+      </header>
 
-        <div className="mt-9 grid items-start gap-8 lg:grid-cols-[15rem_minmax(0,1fr)]">
-          <aside aria-label="Search filters" className="rounded-xl border border-border bg-surface-1 p-5">
-            <div className="flex items-center justify-between gap-2">
-              <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                <SlidersHorizontal aria-hidden="true" className="h-4 w-4 text-primary-content" />
-                Filters
-                {activeFilterCount > 0 && <Badge variant="secondary">{activeFilterCount}</Badge>}
-              </h2>
-              {activeFilterCount > 0 && (
-                <button
-                  type="button"
-                  onClick={clearFilters}
-                  className="inline-flex min-h-9 items-center gap-1 rounded-md px-2 text-xs font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-                >
-                  <RotateCcw aria-hidden="true" className="h-3.5 w-3.5" />
-                  Clear
-                </button>
-              )}
-            </div>
+      <div className="mt-9 grid items-start gap-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
+        <aside
+          aria-label="Search filters"
+          className={`rounded-2xl border border-white/10 bg-surface-1/80 p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md ${
+            mobileFiltersOpen ? "block" : "hidden lg:block"
+          }`}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="flex items-center gap-2 text-sm font-semibold text-foreground">
+              <SlidersHorizontal aria-hidden="true" className="h-4 w-4 text-primary-content" />
+              Filters
+              {activeFilterCount > 0 && <Badge variant="secondary">{activeFilterCount}</Badge>}
+            </h2>
+            {activeFilterCount > 0 && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex min-h-9 items-center gap-1 rounded-md px-2 text-xs font-medium text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <RotateCcw aria-hidden="true" className="h-3.5 w-3.5" />
+                Clear
+              </button>
+            )}
+          </div>
 
             <fieldset className="mt-5">
               <legend className="text-sm font-medium text-foreground">Categories</legend>
@@ -323,9 +331,6 @@ export function ExploreView({
             )}
           </section>
         </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    </PageShell>
   );
 }

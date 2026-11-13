@@ -171,6 +171,20 @@ header.is-scrolled {
   box-shadow: 0 16px 40px -28px rgba(0, 0, 0, 0.8);
 }
 
+/* Hide default cursor on non-touch devices */
+@media (pointer: fine) {
+  body {
+    cursor: none;
+  }
+}
+
+/* Hide custom cursor on touch devices */
+@media (pointer: coarse) {
+  .custom-cursor {
+    display: none !important;
+  }
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
   *,

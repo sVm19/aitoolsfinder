@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowRight, GitCompare, Sparkles } from "lucide-react";
-import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { PageShell } from "@/components/common/page-shell";
 import { ComparisonMatrixView } from "@/components/comparison/comparison-matrix";
 import { ErrorState } from "@/components/ui/error-state";
 import {
@@ -75,29 +73,24 @@ export default async function AlternativesPage({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <Breadcrumbs
-            className="mb-8"
-            items={[
-              { label: "Home", href: "/" },
-              { label: `Alternatives to ${data.tool.name}` },
-            ]}
-          />
-
-          <header className="max-w-4xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
-              Tool alternatives
-            </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Alternatives to {data.tool.name}
-            </h1>
-            <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              {data.tool.tagline ?? `Compare published alternatives to ${data.tool.name} using catalog details.`}
-            </p>
-          </header>
+    <PageShell
+      breadcrumbs={[
+        { label: "Home", href: "/" },
+        { label: "Alternatives", href: "/explore" },
+        { label: `Alternatives to ${data.tool.name}` },
+      ]}
+    >
+      <header className="max-w-4xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
+          Tool alternatives
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Alternatives to {data.tool.name}
+        </h1>
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+          {data.tool.tagline ?? `Compare published alternatives to ${data.tool.name} using verified catalog details.`}
+        </p>
+      </header>
 
           <section aria-labelledby="original-tool-title" className="mt-8 rounded-xl border border-primary/30 bg-primary/5 p-5 sm:p-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -185,21 +178,16 @@ export default async function AlternativesPage({
               )}
             </section>
           )}
-        </div>
-      </main>
-      <Footer />
-    </div>
+    </PageShell>
   );
 }
 
 function PublicErrorPage({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="mx-auto flex w-full max-w-7xl flex-1 items-center px-4 py-12 sm:px-6 lg:px-8">
+    <PageShell>
+      <div className="py-12 max-w-2xl mx-auto">
         <ErrorState className="w-full" title={title} description={description} />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PageShell>
   );
 }

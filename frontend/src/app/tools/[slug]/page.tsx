@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowUpRight, Check, CircleHelp, Sparkles } from "lucide-react";
-import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { PageShell } from "@/components/common/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { CatalogApiError, getToolBySlug, type CatalogPricingPlan, type CatalogToolDetail } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
@@ -207,39 +205,34 @@ export default async function ToolPage({
       ] as const);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          <Breadcrumbs items={breadcrumbItems} className="mb-8" />
-
-          <header className="border-b border-border/70 pb-8 sm:pb-10">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex min-w-0 items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-2 text-primary-content">
-                  <Sparkles aria-hidden="true" className="h-6 w-6" />
-                </div>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{tool.name}</h1>
-                    {tool.is_verified && <Badge variant="verified"><Check aria-hidden="true" className="h-3.5 w-3.5" />Verified</Badge>}
-                    {tool.is_sponsored && <Badge variant="sponsored">Sponsored</Badge>}
-                  </div>
-                  {tool.tagline && <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground">{tool.tagline}</p>}
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    {category && <Link href={`/categories/${category.slug}`} prefetch={false} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">{category.name}</Link>}
-                    {tool.tags.map((tag) => <Link key={tag.id} href={`/tags/${tag.slug}`} prefetch={false} className="rounded-full border border-border px-3 py-1 text-xs text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">{tag.name}</Link>)}
-                  </div>
-                </div>
-              </div>
-              {websiteUrl ? (
-                <a href={websiteUrl} target="_blank" rel="nofollow noopener noreferrer" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-                  Visit official website
-                  <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
-                </a>
-              ) : <span className="text-sm text-muted-foreground">Official website unavailable</span>}
+    <PageShell breadcrumbs={[...breadcrumbItems]} containerClassName="max-w-5xl">
+      <header className="border-b border-border/70 pb-8 sm:pb-10">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex min-w-0 items-start gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-surface-2 text-primary-content shadow-lavender-glow">
+              <Sparkles aria-hidden="true" className="h-6 w-6" />
             </div>
-          </header>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">{tool.name}</h1>
+                {tool.is_verified && <Badge variant="verified"><Check aria-hidden="true" className="h-3.5 w-3.5" />Verified</Badge>}
+                {tool.is_sponsored && <Badge variant="sponsored">Sponsored</Badge>}
+              </div>
+              {tool.tagline && <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">{tool.tagline}</p>}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                {category && <Link href={`/categories/${category.slug}`} prefetch={false} className="rounded-full border border-border bg-surface-1 px-3 py-1 text-xs text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">{category.name}</Link>}
+                {tool.tags.map((tag) => <Link key={tag.id} href={`/tags/${tag.slug}`} prefetch={false} className="rounded-full border border-border bg-surface-1 px-3 py-1 text-xs text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">{tag.name}</Link>)}
+              </div>
+            </div>
+          </div>
+          {websiteUrl ? (
+            <a href={websiteUrl} target="_blank" rel="nofollow noopener noreferrer" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+              Visit official website
+              <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+            </a>
+          ) : <span className="text-sm text-muted-foreground">Official website unavailable</span>}
+        </div>
+      </header>
 
           <div className="grid gap-10 lg:grid-cols-[17rem_minmax(0,1fr)]">
             <aside className="lg:sticky lg:top-24 lg:self-start">
@@ -360,25 +353,18 @@ export default async function ToolPage({
             </div>
 
           </div>
-        </div>
-      </main>
-      <Footer />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd }} />
-    </div>
+    </PageShell>
   );
 }
 
 function PublicErrorPage({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="mx-auto flex w-full max-w-7xl flex-1 items-center px-4 py-12 sm:px-6 lg:px-8">
-        <section role="alert" className="w-full rounded-xl border border-red-500/30 bg-red-950/20 p-6 text-center">
-          <h1 className="text-xl font-semibold text-foreground">{title}</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{description}</p>
-        </section>
-      </main>
-      <Footer />
-    </div>
+    <PageShell>
+      <section role="alert" className="w-full max-w-2xl mx-auto rounded-3xl border border-red-500/30 bg-red-950/20 p-8 text-center backdrop-blur-md">
+        <h1 className="text-xl font-semibold text-foreground">{title}</h1>
+        <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+      </section>
+    </PageShell>
   );
 }

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { ArrowRight, ShieldCheck, Scale, Award } from "lucide-react";
+import { PageShell } from "@/components/common/page-shell";
 import { canonicalUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -21,50 +20,65 @@ const dimensions = [
 
 export default function MethodologyPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <Breadcrumbs className="mb-8" items={[{ label: "Home", href: "/" }, { label: "Scoring methodology" }]} />
-          <header>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">Scoring methodology · v1</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">How tool scores are calculated</h1>
-            <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground">
-              Scores use evidence already recorded in the catalog. Each dimension is shown separately so you can see what contributed and what data is missing.
-            </p>
-          </header>
+    <PageShell
+      breadcrumbs={[{ label: "Home", href: "/" }, { label: "Scoring methodology" }]}
+      containerClassName="max-w-4xl"
+    >
+      <header>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
+          Scoring methodology · v1
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          How tool scores are calculated
+        </h1>
+        <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Scores use evidence recorded directly in the catalog. Each dimension is audited separately with transparent weight distributions.
+        </p>
+      </header>
 
-          <section aria-labelledby="score-dimensions-title" className="mt-9">
-            <h2 id="score-dimensions-title" className="text-xl font-semibold text-foreground">Score dimensions</h2>
-            <div className="mt-4 overflow-hidden rounded-xl border border-border bg-surface-1">
-              <dl className="divide-y divide-border">
-                {dimensions.map((dimension) => (
-                  <div key={dimension.name} className="grid gap-2 px-4 py-5 sm:grid-cols-[13rem_5rem_1fr] sm:gap-5 sm:px-5">
-                    <dt className="font-semibold text-foreground">{dimension.name}</dt>
-                    <dd className="text-sm font-semibold text-primary-content">{dimension.weight}</dd>
-                    <dd className="text-sm leading-relaxed text-muted-foreground">{dimension.detail}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </section>
-
-          <section aria-labelledby="score-rules-title" className="mt-9 rounded-xl border border-border bg-surface-1 p-5 sm:p-6">
-            <h2 id="score-rules-title" className="text-xl font-semibold text-foreground">How to read the overall score</h2>
-            <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted-foreground marker:text-primary-content">
-              <li>The overall score is a weighted mean of dimensions with available evidence. Missing dimensions are excluded and the remaining weights are renormalized.</li>
-              <li>Each stored score is a versioned snapshot. Rankings use the latest snapshot for each published tool in a category.</li>
-              <li>Sponsored placement does not change an intelligence score or an organic rank. Sponsored tools are labeled and listed separately.</li>
-              <li>Free pricing filters include free and freemium tools. Paid filters include paid, usage-based, and contact-sales models; unknown pricing is left out of those filtered views.</li>
-            </ul>
-          </section>
-
-          <p className="mt-8 text-sm text-muted-foreground">
-            <Link href="/rankings" className="text-primary-content underline underline-offset-4 hover:text-foreground">Browse category rankings</Link>
-          </p>
+      <section aria-labelledby="score-dimensions-title" className="mt-10">
+        <h2 id="score-dimensions-title" className="text-xl font-semibold text-foreground flex items-center gap-2">
+          <Scale className="w-5 h-5 text-accent" />
+          Score dimensions & weights
+        </h2>
+        <div className="mt-5 overflow-hidden rounded-3xl border border-white/10 bg-surface-1/80 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md">
+          <dl className="divide-y divide-border">
+            {dimensions.map((dimension) => (
+              <div key={dimension.name} className="grid gap-2 px-5 py-6 sm:grid-cols-[13rem_5rem_1fr] sm:gap-6 sm:px-6">
+                <dt className="font-semibold text-foreground flex items-center gap-2">
+                  <Award className="w-4 h-4 text-primary-content" />
+                  {dimension.name}
+                </dt>
+                <dd className="text-sm font-bold text-accent font-mono">{dimension.weight}</dd>
+                <dd className="text-sm leading-relaxed text-muted-foreground">{dimension.detail}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </section>
+
+      <section aria-labelledby="score-rules-title" className="mt-10 rounded-3xl border border-white/10 bg-surface-1/80 p-6 sm:p-8 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md">
+        <h2 id="score-rules-title" className="text-xl font-semibold text-foreground flex items-center gap-2">
+          <ShieldCheck className="w-5 h-5 text-emerald-400" />
+          Editorial integrity & score rules
+        </h2>
+        <ul className="mt-5 list-disc space-y-3 pl-5 text-sm leading-relaxed text-muted-foreground marker:text-primary-content">
+          <li>The overall score is a weighted mean of dimensions with available evidence. Missing dimensions are excluded and remaining weights renormalized.</li>
+          <li>Each stored score is a versioned snapshot. Rankings use the latest verified snapshot for each published tool in a category.</li>
+          <li>Sponsored placement NEVER alters an intelligence score or organic rank. Sponsored tools are always disclosed and labeled.</li>
+          <li>Free pricing filters include free and freemium tools. Paid filters include paid, usage-based, and contact-sales models.</li>
+        </ul>
+      </section>
+
+      <div className="mt-10 flex flex-wrap gap-4">
+        <Link
+          href="/rankings"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-primary-content hover:text-white transition-colors"
+        >
+          Browse category rankings
+          <ArrowRight className="w-4 h-4" />
+        </Link>
+      </div>
+    </PageShell>
   );
 }

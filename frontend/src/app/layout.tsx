@@ -3,6 +3,7 @@ import { JetBrains_Mono, Outfit } from "next/font/google";
 import "@/styles/globals.css";
 import { canonicalUrl, SITE_URL } from "@/lib/site";
 import { CompareProvider } from "@/components/comparison/compare-provider";
+import { CustomCursor } from "@/components/bits/custom-cursor";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -59,6 +60,7 @@ export default function RootLayout({
     <html lang="en" className={`dark ${outfit.variable} ${jetbrains.variable}`} data-type="software">
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-foreground">
         <div className="site-grain" aria-hidden="true" />
+        <CustomCursor />
         <CompareProvider>{children}</CompareProvider>
       </body>
     </html>

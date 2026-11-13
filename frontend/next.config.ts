@@ -7,9 +7,9 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isProduction ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://cdn.aitoolsfinder.cloud https://images.unsplash.com",
+  "img-src 'self' data: blob: https://cdn.aitoolsfinder.cloud https://ruykzodjhxywrykodnco.supabase.co https://*.supabase.co https://*.amazonaws.com https://images.unsplash.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://aitoolsfinder.cloud",
+  "connect-src 'self' https://aitoolsfinder.cloud https://ruykzodjhxywrykodnco.supabase.co https://*.supabase.co https://*.amazonaws.com http://localhost:8000 http://127.0.0.1:8000",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
@@ -25,6 +25,18 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "cdn.aitoolsfinder.cloud",
+      },
+      {
+        protocol: "https",
+        hostname: "ruykzodjhxywrykodnco.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+      },
+      {
+        protocol: "https",
+        hostname: "*.amazonaws.com",
       },
       {
         protocol: "https",

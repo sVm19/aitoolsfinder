@@ -1,5 +1,6 @@
 """User identity, authentication, and bookmarks API endpoints for Phase 6."""
 
+from datetime import datetime, timezone
 from typing import List
 from fastapi import APIRouter, Depends, Request, Response, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -86,37 +87,32 @@ async def get_saved_tools(
     """
     from src.modules.catalog.models import ToolModel as CatalogTool
 
-    # Query saved tools with joined tool data
+    # Query saved tools with joined tool data in a single SQL query
     result = await session.execute(
-        select(SavedToolModel).where(SavedToolModel.user_id == current_user.id)  # type: ignore[attr-defined]
+        select(SavedToolModel, CatalogTool)
+        .join(CatalogTool, SavedToolModel.tool_id == CatalogTool.id)
+        .where(SavedToolModel.user_id == current_user.id)
     )
-    saved_tools = result.scalars().all()
+    rows = result.all()
 
     output = []
-    for st in saved_tools:
-        # Fetch full tool details
-        tool_result = await session.execute(
-            select(CatalogTool).where(CatalogTool.id == st.tool_id)  # type: ignore[attr-defined]
-        )
-        tool = tool_result.scalar_one_or_none()
-
-        if tool:
-            output.append(
-                SavedToolRead(
-                    tool_id=str(tool.id),
-                    tool_name=tool.name,
-                    tool_tagline=tool.tagline,
-                    tool_description=tool.description[:100] if tool.description else None,
-                    tool_category=tool.primary_category.name if tool.primary_category else None,
-                    tool_pricing={  # simplified pricing snapshot
-                        "is_free": any(p.is_free for p in (tool.pricing_plans or [])),
-                        "amount_minor": (
-                            min((p.amount_minor for p in (tool.pricing_plans or []) if p.amount_minor is not None), default=None)
-                        ),
-                    },
-                    saved_at=st.created_at,
-                )
+    for st, tool in rows:
+        output.append(
+            SavedToolRead(
+                tool_id=str(tool.id),
+                tool_name=tool.name,
+                tool_tagline=tool.tagline,
+                tool_description=tool.description[:100] if tool.description else None,
+                tool_category=tool.primary_category.name if tool.primary_category else None,
+                tool_pricing={  # simplified pricing snapshot
+                    "is_free": any(p.is_free for p in (tool.pricing_plans or [])),
+                    "amount_minor": (
+                        min((p.amount_minor for p in (tool.pricing_plans or []) if p.amount_minor is not None), default=None)
+                    ),
+                },
+                saved_at=st.created_at,
             )
+        )
 
     return output
 

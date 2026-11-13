@@ -258,8 +258,8 @@ export function HomeView() {
                       className="h-12 min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-subtle-foreground"
                     />
                   </div>
-                  <Magnet strength={0.18}>
-                    <Button type="submit" size="lg" className="sm:px-5">
+                  <Magnet strength={0.18} className="w-full sm:w-auto">
+                    <Button type="submit" size="lg" className="w-full sm:w-auto sm:px-6">
                       Search tools
                     </Button>
                   </Magnet>
@@ -282,10 +282,7 @@ export function HomeView() {
             </div>
 
             <div className="relative hidden min-h-[420px] lg:block" aria-hidden="true">
-              <div className="absolute right-6 top-8 h-72 w-72">
-                <div className="orbit-ring" />
-                <div className="orbit-ring orbit-ring-alt" />
-              </div>
+              {/* Space reserved for 3D Black Hole horizon interaction */}
             </div>
           </div>
         </section>
@@ -306,7 +303,7 @@ export function HomeView() {
         <section
           data-workflow
           aria-labelledby="workflow-title"
-          className="relative border-b border-border/60 px-4 py-24 sm:px-6 lg:px-8"
+          className="relative border-b border-border/60 px-4 py-14 sm:py-24 sm:px-6 lg:px-8"
         >
           <div className="mx-auto grid max-w-7xl gap-14 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
             <div data-reveal className="lg:sticky lg:top-28">
@@ -316,10 +313,9 @@ export function HomeView() {
                 title="From task to shortlist"
                 description="Evidence first. Each step stays tied to what a tool actually publishes."
               />
-              <div className="relative mt-10 hidden h-44 w-44 lg:block" aria-hidden="true">
-                <div className="orbit-ring" />
-                <div className="orbit-ring orbit-ring-alt" />
-                <div className="absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-orange-glow" />
+              <div className="relative mt-10 hidden h-32 w-32 lg:block" aria-hidden="true">
+                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 to-accent/20 blur-xl" />
+                <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent shadow-orange-glow" />
               </div>
             </div>
 
@@ -352,7 +348,7 @@ export function HomeView() {
 
         <section
           aria-labelledby="categories-title"
-          className="border-b border-border/60 bg-surface-1/40 px-4 py-20 sm:px-6 lg:px-8"
+          className="border-b border-border/60 bg-surface-1/40 px-4 py-12 sm:py-20 sm:px-6 lg:px-8"
         >
           <div className="mx-auto max-w-7xl">
             <div data-reveal>
@@ -384,7 +380,7 @@ export function HomeView() {
 
         <section
           aria-labelledby="trending-title"
-          className="border-b border-border/60 px-4 py-20 sm:px-6 lg:px-8"
+          className="border-b border-border/60 px-4 py-12 sm:py-20 sm:px-6 lg:px-8"
         >
           <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.8fr_1.2fr]">
             <div data-reveal>
@@ -411,7 +407,7 @@ export function HomeView() {
 
         <section
           aria-labelledby="rankings-title"
-          className="border-b border-border/60 bg-surface-1/40 px-4 py-20 sm:px-6 lg:px-8"
+          className="border-b border-border/60 bg-surface-1/40 px-4 py-12 sm:py-20 sm:px-6 lg:px-8"
         >
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center">
             <div data-reveal>
@@ -450,7 +446,7 @@ export function HomeView() {
 
         <section
           aria-labelledby="comparisons-title"
-          className="border-b border-border/60 px-4 py-20 sm:px-6 lg:px-8"
+          className="border-b border-border/60 px-4 py-12 sm:py-20 sm:px-6 lg:px-8"
         >
           <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.85fr_1.15fr]">
             <div data-reveal>
@@ -485,7 +481,7 @@ export function HomeView() {
 
         <section
           aria-labelledby="finder-title"
-          className="border-b border-border/60 bg-surface-1/40 px-4 py-20 sm:px-6 lg:px-8"
+          className="border-b border-border/60 bg-surface-1/40 px-4 py-12 sm:py-20 sm:px-6 lg:px-8"
         >
           <div className="mx-auto grid max-w-7xl gap-12 lg:grid-cols-2 lg:items-center">
             <div data-reveal>
@@ -526,7 +522,7 @@ export function HomeView() {
 
         <section
           aria-labelledby="recent-title"
-          className="border-b border-border/60 px-4 py-20 sm:px-6 lg:px-8"
+          className="border-b border-border/60 px-4 py-12 sm:py-20 sm:px-6 lg:px-8"
         >
           <div className="mx-auto grid max-w-7xl items-center gap-10 lg:grid-cols-[0.8fr_1.2fr]">
             <div data-reveal>
@@ -550,7 +546,7 @@ export function HomeView() {
 
         <section
           aria-labelledby="editorial-title"
-          className="border-b border-border/60 bg-surface-1/40 px-4 py-24 sm:px-6 lg:px-8"
+          className="border-b border-border/60 bg-surface-1/40 px-4 py-14 sm:py-24 sm:px-6 lg:px-8"
         >
           <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.7fr_1.3fr] lg:items-start">
             <div data-reveal>
@@ -574,7 +570,7 @@ export function HomeView() {
           </div>
         </section>
 
-        <section aria-labelledby="vendor-title" className="px-4 py-20 sm:px-6 lg:px-8">
+        <section aria-labelledby="vendor-title" className="px-4 py-12 sm:py-20 sm:px-6 lg:px-8">
           <SpotlightPanel className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 rounded-[2rem] border border-primary/30 bg-surface-1 p-7 sm:p-10 lg:flex-row lg:items-center lg:p-14">
             <div className="max-w-2xl">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">For builders</p>

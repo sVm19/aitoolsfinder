@@ -130,6 +130,10 @@ class ToolSubmissionModel(Base):
         secondary=tool_submission_features,
     )
 
+    @property
+    def vendor_name(self) -> Optional[str]:
+        return self.vendor.name if self.vendor else None
+
 
 class AffiliateLinkModel(Base):
     """An affiliate link associated with a tool for tracking clicks and commissions."""

@@ -12,17 +12,21 @@ Features:
 import json
 import time
 import asyncio
+import uuid
+from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, List, Dict, Any, Callable
 from urllib.parse import urlparse
 
+import httpx
 from jose import jwt, JWTError, jwk  # josepy for JWK handling
 from jose.utils import base64url_decode
 
-from src.core.database import get_db, AsyncSession
+from src.core.database import get_db, async_session_factory, AsyncSession
 from src.core.config import settings
 from src.core.database import Base
 from src.modules.catalog.models import ToolModel
+from src.modules.identity.models import UserModel
 from sqlalchemy.ext.asyncio import AsyncSession as SAAsyncSession
 from sqlalchemy import select, UUID
 
@@ -253,18 +257,15 @@ async def get_current_user(request: Request) -> UserContext:
     )
 
     # JIT user creation / lookup in PostgreSQL
-    async with get_db() as session:  # type: ignore[attr-defined]
+    async with async_session_factory() as session:
         # Try to find existing user by cognito_sub
         result = await session.execute(
-            select(UserModel).where(UserModel.cognito_sub == cognito_sub)  # type: ignore[attr-defined]
+            select(UserModel).where(UserModel.cognito_sub == cognito_sub)
         )
         user = result.scalar_one_or_none()
 
         if user is None:
-            # Create new user (JIT)
-            from src.modules.identity.models import UserModel as IdentityUser
-
-            new_user = IdentityUser(
+            new_user = UserModel(
                 id=uuid.uuid4(),
                 cognito_sub=cognito_sub,
                 email=email,
@@ -287,6 +288,17 @@ async def get_current_user(request: Request) -> UserContext:
         role=user.role,
         is_email_verified=user.is_email_verified,
     )
+
+
+async def get_optional_current_user(request: Request) -> Optional[UserContext]:
+    """FastAPI dependency for endpoints that accept both anonymous and authenticated callers."""
+    auth_header = request.headers.get("Authorization", "")
+    if not auth_header or not auth_header.startswith("Bearer "):
+        return None
+    try:
+        return await get_current_user(request)
+    except HTTPException:
+        return None
 
 
 def require_role(

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { PageShell } from "@/components/common/page-shell";
 import { CatalogToolGrid } from "@/components/tool/catalog-tool-grid";
 import { ErrorState } from "@/components/ui/error-state";
 import {
@@ -78,45 +76,40 @@ export default async function TagPage({
   ]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Explore", href: "/explore" }, { label: tag.name }]} />
-          <header className="mt-8 max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">AI tool tag</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">{tag.name} AI tools</h1>
-            <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-              Published tools associated with the {tag.name} tag. Compare their available details, pricing models, and verification status.
-            </p>
-          </header>
-          {toolsResult.status === "rejected" ? (
-            <ErrorState className="mt-10" title="Tools are temporarily unavailable" description="We couldn't load the published tools with this tag. Try again in a moment." />
-          ) : (
-            <CatalogToolGrid
-              tools={toolsResult.value.items}
-              categories={categoriesResult.status === "fulfilled" ? categoriesResult.value : []}
-              total={toolsResult.value.total}
-              page={toolsResult.value.page}
-              totalPages={toolsResult.value.total_pages}
-              basePath={`/tags/${encodeURIComponent(slug)}`}
-            />
-          )}
-        </div>
-      </main>
-      <Footer />
-    </div>
+    <PageShell
+      breadcrumbs={[{ label: "Home", href: "/" }, { label: "Explore", href: "/explore" }, { label: tag.name }]}
+    >
+      <header className="max-w-3xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">AI tool tag</p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">{tag.name} AI tools</h1>
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+          Published tools associated with the {tag.name} tag. Compare their verified details, pricing models, and performance scores.
+        </p>
+      </header>
+      <div className="mt-8">
+        {toolsResult.status === "rejected" ? (
+          <ErrorState className="mt-10" title="Tools are temporarily unavailable" description="We couldn't load the published tools with this tag. Try again in a moment." />
+        ) : (
+          <CatalogToolGrid
+            tools={toolsResult.value.items}
+            categories={categoriesResult.status === "fulfilled" ? categoriesResult.value : []}
+            total={toolsResult.value.total}
+            page={toolsResult.value.page}
+            totalPages={toolsResult.value.total_pages}
+            basePath={`/tags/${encodeURIComponent(slug)}`}
+          />
+        )}
+      </div>
+    </PageShell>
   );
 }
 
 function PublicErrorPage({ title, description }: { title: string; description: string }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="mx-auto flex w-full max-w-7xl flex-1 items-center px-4 py-12 sm:px-6 lg:px-8">
+    <PageShell>
+      <div className="py-12 max-w-2xl mx-auto">
         <ErrorState className="w-full" title={title} description={description} />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PageShell>
   );
 }

@@ -10,10 +10,8 @@ function StaticFallback() {
     <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
       <div className="aurora-blob aurora-blob-a" />
       <div className="aurora-blob aurora-blob-b" />
-      <div className="absolute right-[8%] top-1/2 hidden h-64 w-64 -translate-y-1/2 md:block">
-        <div className="orbit-ring" />
-        <div className="orbit-ring orbit-ring-alt" />
-        <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-accent" />
+      <div className="absolute right-[12%] top-1/2 hidden h-56 w-56 -translate-y-1/2 md:block">
+        <div className="h-full w-full rounded-full bg-gradient-to-tr from-primary/30 via-accent/20 to-transparent blur-3xl" />
       </div>
     </div>
   );

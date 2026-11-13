@@ -1,5 +1,6 @@
 """Pydantic schemas for Phase 6: User identity and bookmarks."""
 
+from datetime import datetime
 from typing import Optional, List
 from pydantic import BaseModel, Field
 

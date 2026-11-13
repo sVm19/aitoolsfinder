@@ -1,9 +1,6 @@
 import Link from "next/link";
-import { ArrowRight, Clock } from "lucide-react";
-
-import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { ArrowRight, Clock, Sparkles } from "lucide-react";
+import { PageShell } from "@/components/common/page-shell";
 import { Button } from "@/components/ui/button";
 
 interface ComingSoonProps {
@@ -20,40 +17,36 @@ export function ComingSoon({
   breadcrumb,
 }: ComingSoonProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-2xl">
-          <Breadcrumbs
-            items={[{ label: "Home", href: "/" }, { label: breadcrumb }]}
-            className="mb-8"
-          />
-          <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary-content">
-            <Clock aria-hidden="true" className="h-5 w-5" />
-          </span>
-          <p className="mt-4 text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
-            {eyebrow}
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            {title}
-          </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-            {description}
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/ai-finder">
-              <Button>
-                Try the AI Finder
-                <ArrowRight aria-hidden="true" className="h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/explore">
-              <Button variant="outline">Browse the catalog</Button>
-            </Link>
-          </div>
+    <PageShell
+      breadcrumbs={[{ label: "Home", href: "/" }, { label: breadcrumb }]}
+      containerClassName="max-w-2xl py-6 sm:py-12"
+    >
+      <div className="relative rounded-3xl border border-white/10 bg-surface-1/80 p-8 sm:p-12 shadow-[0_24px_60px_-28px_rgba(0,0,0,0.7)] backdrop-blur-md">
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-primary-hover text-white shadow-lavender-glow">
+          <Clock aria-hidden="true" className="h-6 w-6" />
+        </span>
+        <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
+          {eyebrow}
+        </p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          {title}
+        </h1>
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+          {description}
+        </p>
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/ai-finder">
+            <Button variant="primary" size="md">
+              <Sparkles className="w-4 h-4 mr-1.5" />
+              Try the AI Finder
+              <ArrowRight aria-hidden="true" className="h-4 w-4 ml-1" />
+            </Button>
+          </Link>
+          <Link href="/explore">
+            <Button variant="outline" size="md">Browse the catalog</Button>
+          </Link>
         </div>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </PageShell>
   );
 }

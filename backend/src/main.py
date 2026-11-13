@@ -24,6 +24,7 @@ from src.modules.intelligence.router import router as intelligence_router
 from src.modules.ai.router import router as ai_router
 from src.modules.identity.router import router as identity_router
 from src.modules.vendor.router import router as vendor_router
+from src.modules.media.router import router as media_router
 
 setup_logging(settings.LOG_LEVEL)
 logger = logging.getLogger("aitoolsfinder.api")
@@ -158,6 +159,7 @@ def create_application() -> FastAPI:
     app.include_router(ai_router, prefix="/api/v1")
     app.include_router(identity_router)
     app.include_router(vendor_router)
+    app.include_router(media_router, prefix="/api/v1")
 
     # Root endpoint
     @app.get("/", tags=["Root"])

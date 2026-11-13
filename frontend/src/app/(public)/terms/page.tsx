@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { PageShell } from "@/components/common/page-shell";
 import { canonicalUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -17,30 +15,26 @@ const LAST_UPDATED = "November 12, 2026";
 
 export default function TermsPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-4xl">
-          <Breadcrumbs
-            className="mb-8"
-            items={[{ label: "Home", href: "/" }, { label: "Terms of Service" }]}
-          />
-          <header>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
-              Legal · Terms
-            </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Terms of Service
-            </h1>
-            <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground">
-              These terms govern your use of AIToolsFinder.cloud, including the tool
-              catalog, rankings, comparisons, AI Finder, and vendor submission
-              features. By using the service, you agree to them.
-            </p>
-            <p className="mt-2 text-sm text-subtle-foreground">
-              Last updated: {LAST_UPDATED}
-            </p>
-          </header>
+    <PageShell
+      breadcrumbs={[{ label: "Home", href: "/" }, { label: "Terms of Service" }]}
+      containerClassName="max-w-4xl"
+    >
+      <header className="border-l-2 border-primary/70 pl-6 sm:pl-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
+          Legal · Terms
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Terms of Service
+        </h1>
+        <p className="mt-4 max-w-3xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          These terms govern your use of AIToolsFinder.cloud, including the tool
+          catalog, rankings, comparisons, AI Finder, and vendor submission
+          features. By using the service, you agree to them.
+        </p>
+        <p className="mt-2 text-xs font-mono text-subtle-foreground">
+          Last updated: {LAST_UPDATED}
+        </p>
+      </header>
 
           <div className="mt-9 space-y-8 text-sm leading-relaxed text-muted-foreground">
             <section aria-labelledby="terms-service">
@@ -234,9 +228,6 @@ export default function TermsPage() {
               </p>
             </section>
           </div>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    </PageShell>
   );
 }

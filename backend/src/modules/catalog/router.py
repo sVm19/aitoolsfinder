@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_db
+from src.core.security import require_role
 from src.common.schemas import PaginatedResponse
 from src.modules.catalog.service import CatalogService
 from src.modules.catalog.schemas import (
@@ -21,7 +22,11 @@ from src.modules.catalog.schemas import (
 )
 
 router = APIRouter(tags=["Catalog"])
-admin_router = APIRouter(prefix="/admin", tags=["Admin - Catalog"])
+admin_router = APIRouter(
+    prefix="/admin",
+    tags=["Admin - Catalog"],
+    dependencies=[Depends(require_role(["admin"]))],
+)
 
 
 # ==============================================================================

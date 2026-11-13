@@ -55,6 +55,12 @@
       "skillPath": "skills/gsap-utils/SKILL.md",
       "computedHash": "d05b56284eea0118d481b8c673aff27cae66199282995bfe78315785f561002d"
     },
+    "security-audit": {
+      "source": "cloudflare/security-audit-skill",
+      "sourceType": "github",
+      "skillPath": "skills/security-audit/SKILL.md",
+      "computedHash": "8513eb3b2c39b8d05ef4f47b32ef4d18280b93a5efb91d8df6272f7435034af5"
+    },
     "supabase": {
       "source": "supabase/agent-skills",
       "sourceType": "github",

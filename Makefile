@@ -29,3 +29,6 @@ up:
 
 down:
 	docker compose -f deploy/docker-compose.yml down
+
+docker-push:
+	@powershell -ExecutionPolicy Bypass -File scripts/build-and-push.ps1 -Username $(DOCKERHUB_USERNAME)

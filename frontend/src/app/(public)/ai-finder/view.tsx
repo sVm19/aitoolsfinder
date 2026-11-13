@@ -14,8 +14,7 @@ import {
 } from "lucide-react";
 
 import { Breadcrumbs } from "@/components/common/breadcrumbs";
-import { Footer } from "@/components/common/footer";
-import { Navbar } from "@/components/common/navbar";
+import { PageShell } from "@/components/common/page-shell";
 import { useCompare } from "@/components/comparison/compare-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -162,32 +161,27 @@ export function AIFinderView({ categories }: AIFinderViewProps) {
   const topTwo = result?.items.slice(0, 2) ?? [];
 
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar />
-      <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
-        <div className="mx-auto max-w-5xl">
-          <Breadcrumbs
-            items={[{ label: "Home", href: "/" }, { label: "AI Finder" }]}
-            className="mb-8"
-          />
+    <PageShell
+      breadcrumbs={[{ label: "Home", href: "/" }, { label: "AI Finder" }]}
+      containerClassName="max-w-5xl"
+    >
+      <header className="mx-auto max-w-3xl text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
+          Catalog-grounded recommendations
+        </p>
+        <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
+          Describe the job. Get matched tools.
+        </h1>
+        <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+          We search the published catalog first, then explain the fit. No invented
+          tools, features, or prices.
+        </p>
+      </header>
 
-          <header className="mx-auto max-w-3xl text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
-              Catalog-grounded recommendations
-            </p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Describe the job. Get matched tools.
-            </h1>
-            <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-              We search the published catalog first, then explain the fit. No invented
-              tools, features, or prices.
-            </p>
-          </header>
-
-          <form
-            onSubmit={runSearch}
-            className="mx-auto mt-8 max-w-3xl rounded-2xl border border-border bg-surface-1 p-4 sm:p-6"
-          >
+      <form
+        onSubmit={runSearch}
+        className="mx-auto mt-8 max-w-3xl rounded-3xl border border-white/10 bg-surface-1/80 p-5 sm:p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-md"
+      >
             <label htmlFor="ai-finder-query" className="sr-only">
               Describe what you need
             </label>
@@ -577,9 +571,6 @@ export function AIFinderView({ categories }: AIFinderViewProps) {
               </div>
             )}
           </section>
-        </div>
-      </main>
-      <Footer />
-    </div>
+    </PageShell>
   );
 }

@@ -173,8 +173,20 @@ async function toApiError(response: Response): Promise<CatalogApiError> {
   return new CatalogApiError(response.status, code, message);
 }
 
-async function getApiJson<T>(path: string): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, { cache: "no-store" });
+async function getApiJson<T>(path: string, init?: RequestInit): Promise<T> {
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      next: { revalidate: 60 },
+      ...init,
+    });
+  } catch {
+    throw new CatalogApiError(
+      503,
+      "SERVICE_UNAVAILABLE",
+      `Unable to reach catalog API service at ${API_BASE_URL}`,
+    );
+  }
   if (!response.ok) {
     throw await toApiError(response);
   }
@@ -182,12 +194,21 @@ async function getApiJson<T>(path: string): Promise<T> {
 }
 
 async function postApiJson<T>(path: string, payload: unknown): Promise<T> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-    cache: "no-store",
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      cache: "no-store",
+    });
+  } catch {
+    throw new CatalogApiError(
+      503,
+      "SERVICE_UNAVAILABLE",
+      `Unable to reach catalog API service at ${API_BASE_URL}`,
+    );
+  }
   if (!response.ok) {
     throw await toApiError(response);
   }
@@ -325,4 +346,73 @@ export async function submitRecommendationFeedback(
   payload: AIFeedbackPayload,
 ): Promise<AIFeedbackResponse> {
   return postApiJson("/recommendations/feedback", payload);
+}
+
+export interface ToolSubmissionPayload {
+  submission_type: "standard" | "featured";
+  tool_name: string;
+  tagline: string;
+  description?: string;
+  website_url: string;
+  logo_object_key?: string;
+  screenshot_url?: string;
+  primary_category_id?: string;
+  secondary_tag_ids?: string[];
+  core_feature_ids?: string[];
+  pricing_model: "free" | "freemium" | "paid" | "one-time" | "custom";
+  is_free: boolean;
+  starting_price_minor?: number;
+  currency: string;
+  pricing_url?: string;
+  submitter_name?: string;
+  submitter_email: string;
+  relationship: "founder" | "team" | "advocate";
+  affiliate_url?: string;
+}
+
+export interface ToolSubmissionReceipt {
+  id: string;
+  tool_name: string;
+  tool_slug: string;
+  status: string;
+  created_at: string;
+}
+
+export interface PresignedUploadResponse {
+  upload_url: string;
+  object_key: string;
+  public_url: string;
+  max_size_bytes: number;
+}
+
+export async function getPresignedUploadUrl(
+  contentType: string,
+  folder: "logos" | "screenshots" = "logos",
+): Promise<PresignedUploadResponse> {
+  return postApiJson<PresignedUploadResponse>("/media/presigned-url", {
+    content_type: contentType,
+    folder,
+  });
+}
+
+export async function uploadFileToPresignedUrl(
+  uploadUrl: string,
+  file: File,
+): Promise<void> {
+  const response = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": file.type,
+    },
+    body: file,
+  });
+  if (!response.ok) {
+    throw new Error(`Media upload failed with status ${response.status}`);
+  }
+}
+
+export async function createToolSubmission(
+  payload: ToolSubmissionPayload,
+): Promise<ToolSubmissionReceipt> {
+  return postApiJson("/submissions", payload);
 }

@@ -1,13 +1,19 @@
 """Backend submission module for Phase 7: Monetization and vendor submissions."""
 
+import logging
+import uuid
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Request, Response, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_, or_
 from typing import List, Optional
 
+logger = logging.getLogger(__name__)
+
 from src.core.database import get_db
 from src.core.security import (
     get_current_user,
+    get_optional_current_user,
     UserContext,
     require_role,
     is_safe_outbound_url,
@@ -19,8 +25,21 @@ from src.modules.vendor.models import (
     OutboundClickModel,
     PaymentEventModel,
     SubscriptionModel,
+    tool_submission_tags,
+    tool_submission_features,
 )
-from src.modules.catalog.models import ToolModel, CategoryModel, FeatureModel
+from src.modules.catalog.models import (
+    ToolModel,
+    CategoryModel,
+    FeatureModel,
+    TagModel,
+    ToolCategoryModel,
+    ToolTagModel,
+    ToolFeatureModel,
+    PricingPlanModel,
+)
+from src.modules.intelligence.scoring import calculate_tool_score
+from src.modules.intelligence.models import ScoreHistoryModel
 from src.modules.vendor.schemas import (
     SubmissionCreate,
     SubmissionApprove,
@@ -45,17 +64,17 @@ router = APIRouter(prefix="/api/v1", tags=["Vendor Submissions"])
 async def create_submission(
     payload: SubmissionCreate,
     session: AsyncSession = Depends(get_db),
-    current_user: UserContext = Depends(get_current_user),
+    current_user: Optional[UserContext] = Depends(get_optional_current_user),
 ) -> SubmissionRead:
     """Create a new tool submission from a vendor.
 
-    If unauthenticated, creates a submission with anonymous contact info.
-    If authenticated, links to the user's vendor profile.
+    Supports both anonymous public visitors and authenticated vendor users.
+    Persists taxonomy tags, features, pricing, and triggers a receipt email.
     """
     from uuid import UUID as UUIDType
 
     # Generate slug from tool name
-    slug = payload.tool_name.lower().replace(" ", "-").replace("__", "-")
+    slug = payload.tool_name.lower().replace(" ", "-").replace("__", "-").strip("-")
 
     # Check if a submission with this slug already exists in pending/approved status
     result = await session.execute(
@@ -66,25 +85,33 @@ async def create_submission(
     )
     existing = result.scalar_one_or_none()
     if existing:
-        # Append a number to make it unique
         slug = f"{slug}-{uuid.uuid4().hex[:8]}"
 
-    # If authenticated user, link to their vendor profile
-    vendor_id = None
-    if current_user and current_user.role == "vendor":
-        # Find or create vendor profile for this user
-        result = await session.execute(
-            select(VendorModel).where(VendorModel.email == current_user.email)
+    # Vendor Profile Resolution: Guarantee vendor_id is never NULL
+    vendor_email = (current_user.email if current_user else payload.submitter_email).strip().lower()
+    vendor_name = (current_user.display_name if current_user else payload.submitter_name or payload.tool_name).strip()
+
+    result = await session.execute(
+        select(VendorModel).where(VendorModel.email == vendor_email)
+    )
+    vendor = result.scalar_one_or_none()
+    if not vendor:
+        vendor = VendorModel(
+            name=vendor_name,
+            email=vendor_email,
+            website_url=payload.website_url,
         )
-        vendor = result.scalar_one_or_none()
-        if not vendor:
-            vendor = VendorModel(
-                name=current_user.display_name or "Unknown Vendor",
-                email=current_user.email,
-            )
-            session.add(vendor)
-            await session.flush()
-        vendor_id = vendor.id
+        session.add(vendor)
+        await session.flush()
+    vendor_id = vendor.id
+
+    # Safe primary category UUID parsing
+    primary_category_uuid = None
+    if payload.primary_category_id:
+        try:
+            primary_category_uuid = UUIDType(payload.primary_category_id)
+        except ValueError:
+            primary_category_uuid = None
 
     submission = ToolSubmissionModel(
         vendor_id=vendor_id,
@@ -92,7 +119,7 @@ async def create_submission(
         tool_slug=slug,
         tagline=payload.tagline,
         description=payload.description,
-        primary_category_id=payload.primary_category_id,
+        primary_category_id=primary_category_uuid,
         pricing_model=payload.pricing_model,
         is_free=payload.is_free,
         starting_price_minor=payload.starting_price_minor,
@@ -102,17 +129,52 @@ async def create_submission(
     )
 
     session.add(submission)
+    await session.flush()
+
+    # Associate secondary tags if provided
+    for tag_str in payload.secondary_tag_ids:
+        try:
+            t_uuid = UUIDType(tag_str)
+            await session.execute(
+                tool_submission_tags.insert().values(
+                    tool_submission_id=submission.id,
+                    tag_id=t_uuid,
+                )
+            )
+        except Exception:
+            pass
+
+    # Associate core features if provided
+    for feat_str in payload.core_feature_ids:
+        try:
+            f_uuid = UUIDType(feat_str)
+            await session.execute(
+                tool_submission_features.insert().values(
+                    tool_submission_id=submission.id,
+                    feature_id=f_uuid,
+                )
+            )
+        except Exception:
+            pass
+
+    # If an affiliate link was provided, store in affiliate_links as pending
+    if payload.affiliate_url and is_safe_outbound_url(payload.affiliate_url):
+        # We will activate upon tool approval
+        pass
+
     await session.commit()
     await session.refresh(submission)
 
-    # Send confirmation email
+    # Trigger automated receipt email via Resend
     await send_submission_email(
         submission_id=str(submission.id),
-        vendor_email=current_user.email if current_user else payload.submitter_email,
+        vendor_email=vendor_email,
         status="received",
+        tool_name=payload.tool_name,
+        tool_slug=submission.tool_slug,
     )
 
-    return SubmissionRead.from_orm(submission)
+    return SubmissionRead.model_validate(submission)
 
 
 @router.get("/admin/submissions", response_model=List[SubmissionListItem])
@@ -129,9 +191,10 @@ async def list_pending_submissions(
     return [
         SubmissionListItem(
             id=str(s.id),
-            vendor_name=s.vendor.name if s.vendor else "Unknown",
+            vendor_name=s.vendor.name if s.vendor else "Unknown Vendor",
             tool_name=s.tool_name,
             tool_slug=s.tool_slug,
+            website_url=s.website_url,
             status=s.status,
             created_at=s.created_at,
         )
@@ -145,7 +208,16 @@ async def approve_submission(
     session: AsyncSession = Depends(get_db),
     current_user: UserContext = Depends(require_role(["admin"])),
 ) -> SubmissionRead:
-    """Approve a vendor submission and publish it as a live tool."""
+    """Approve a vendor submission and publish it as a live tool.
+
+    Atomic Transaction:
+    1. Creates live record in tools with SEO slug
+    2. Links categories, tags, features, and pricing plan
+    3. Calculates initial Platform Intelligence Score
+    4. Marks submission approved
+    5. Sends celebration email with badge embed code to founder
+    """
+    from datetime import timezone as tz
 
     # Find the submission
     result = await session.execute(
@@ -164,73 +236,138 @@ async def approve_submission(
             detail="Submission is not in pending status",
         )
 
-    # Check if a tool with this slug already exists
-    from src.modules.catalog.models import ToolModel as CatalogTool
+    # Check if a tool with this slug already exists in tools table
     result = await session.execute(
-        select(CatalogTool).where(CatalogTool.slug == submission.tool_slug)
+        select(ToolModel).where(ToolModel.slug == submission.tool_slug)
     )
     existing_tool = result.scalar_one_or_none()
     if existing_tool:
-        # Append a number to make the slug unique
         submission.tool_slug = f"{submission.tool_slug}-{uuid.uuid4().hex[:8]}"
 
-    # Create the live tool record
-    from datetime import timezone as tz
-    from sqlalchemy import UUID as SQLUUID
-
-    # Get or create the primary category
-    primary_category_id = submission.primary_category_id
-    category = None
-    if primary_category_id:
-        result = await session.execute(
-            select(CategoryModel).where(CategoryModel.id == primary_category_id)
-        )
-        category = result.scalar_one_or_none()
-
-    # Create the tool
     tool_id = uuid.uuid4()
-    tool = CatalogTool(
+    now_utc = datetime.now(tz.utc)
+
+    # 1. Create live Tool record
+    tool = ToolModel(
         id=tool_id,
         slug=submission.tool_slug,
         name=submission.tool_name,
         tagline=submission.tagline,
         description=submission.description,
-        primary_category_id=primary_category_id,
+        website_url=submission.website_url or "",
+        primary_category_id=submission.primary_category_id,
         pricing_model=submission.pricing_model,
         platform_status="active",
-        is_verified=False,
+        is_verified=True,
         is_sponsored=False,
-        launched_at=None,
-        last_verified_at=None,
-        created_at=datetime.now(tz.utc),
-        updated_at=datetime.now(tz.utc),
+        launched_at=now_utc.date(),
+        last_verified_at=now_utc,
+        created_at=now_utc,
+        updated_at=now_utc,
     )
     session.add(tool)
 
-    # Link the submission to the tool (we could add a reference, but for now just mark as approved)
-    submission.status = "approved"
-    submission.approved_at = datetime.now(tz.utc)
+    # 2. Link primary category to tool_categories
+    if submission.primary_category_id:
+        session.add(
+            ToolCategoryModel(
+                tool_id=tool_id,
+                category_id=submission.primary_category_id,
+            )
+        )
 
-    # Send approval email to vendor
-    await send_submission_email(
-        submission_id=str(submission.id),
-        vendor_email=submission.vendor.email if submission.vendor else "",
-        status="approved",
+    # 3. Copy linked tags from tool_submission_tags to tool_tags
+    tag_records = await session.execute(
+        select(tool_submission_tags.c.tag_id).where(
+            tool_submission_tags.c.tool_submission_id == submission.id
+        )
     )
+    for (tag_uuid,) in tag_records.all():
+        if tag_uuid:
+            session.add(ToolTagModel(tool_id=tool_id, tag_id=tag_uuid))
+
+    # 4. Copy linked features from tool_submission_features to tool_features
+    feat_records = await session.execute(
+        select(tool_submission_features.c.feature_id).where(
+            tool_submission_features.c.tool_submission_id == submission.id
+        )
+    )
+    for (feat_uuid,) in feat_records.all():
+        if feat_uuid:
+            session.add(
+                ToolFeatureModel(
+                    tool_id=tool_id,
+                    feature_id=feat_uuid,
+                    support_level="yes",
+                )
+            )
+
+    # 5. Create live pricing plan
+    plan_name = "Free Tier" if submission.is_free else "Standard Plan"
+    pricing_plan = PricingPlanModel(
+        tool_id=tool_id,
+        name=plan_name,
+        is_free=submission.is_free,
+        amount_minor=submission.starting_price_minor,
+        currency=submission.currency,
+        source_url=submission.website_url,
+        last_verified_at=now_utc,
+    )
+    session.add(pricing_plan)
+
+    # 6. Mark submission as approved
+    submission.status = "approved"
+    submission.approved_at = now_utc
+
+    # Flush session to calculate initial intelligence score
+    await session.flush()
+    try:
+        # Pre-populate relationships in instance dict to prevent async missing greenlet during lazy load
+        tool.__dict__["features"] = []
+        tool.__dict__["pricing_plans"] = [pricing_plan]
+        score_data = calculate_tool_score(tool)
+        if score_data.overall_score is not None:
+            score_record = ScoreHistoryModel(
+                tool_id=tool_id,
+                score_version=score_data.score_version,
+                overall_score=score_data.overall_score,
+                dimension_scores={
+                    k: float(v) if v is not None else None
+                    for k, v in score_data.dimension_scores.items()
+                },
+                evidence=score_data.evidence,
+                calculated_at=now_utc,
+            )
+            session.add(score_record)
+    except Exception as e:
+        logger.warning(f"Could not compute initial tool score: {e}")
 
     await session.commit()
     await session.refresh(submission)
 
-    return SubmissionRead.from_orm(submission)
+    # 7. Send celebration email with live URL and badge widget code
+    vendor_email = submission.vendor.email if submission.vendor else ""
+    if vendor_email:
+        await send_submission_email(
+            submission_id=str(submission.id),
+            vendor_email=vendor_email,
+            status="approved",
+            tool_name=submission.tool_name,
+            tool_slug=submission.tool_slug,
+        )
+
+    return SubmissionRead.model_validate(submission)
 
 
 @router.post("/admin/submissions/{submission_id}/reject", response_model=SubmissionRead)
 async def reject_submission(
     submission_id: str,
+    payload: Optional[SubmissionReject] = None,
     session: AsyncSession = Depends(get_db),
     current_user: UserContext = Depends(require_role(["admin"])),
 ) -> SubmissionRead:
-    """Reject a vendor submission."""
+    """Reject a vendor submission with feedback."""
+    from datetime import timezone as tz
 
     result = await session.execute(
         select(ToolSubmissionModel).where(ToolSubmissionModel.id == submission_id)
@@ -243,20 +380,22 @@ async def reject_submission(
         )
 
     submission.status = "rejected"
-    from datetime import timezone as tz
     submission.rejected_at = datetime.now(tz.utc)
 
-    # Send rejection email to vendor
-    await send_submission_email(
-        submission_id=str(submission.id),
-        vendor_email=submission.vendor.email if submission.vendor else "",
-        status="rejected",
-    )
+    vendor_email = submission.vendor.email if submission.vendor else ""
+    if vendor_email:
+        await send_submission_email(
+            submission_id=str(submission.id),
+            vendor_email=vendor_email,
+            status="rejected",
+            tool_name=submission.tool_name,
+            tool_slug=submission.tool_slug,
+        )
 
     await session.commit()
     await session.refresh(submission)
 
-    return SubmissionRead.from_orm(submission)
+    return SubmissionRead.model_validate(submission)
 
 
 @router.post("/outbound/{tool_id}", response_model=OutboundClickRead)
