@@ -1,7 +1,9 @@
 import React from "react";
 import Link from "next/link";
-import { Sparkles, Shield, Cpu, ExternalLink } from "lucide-react";
+import { Shield, Cpu, ExternalLink } from "lucide-react";
+import { BrandLogo } from "@/components/common/brand-logo";
 import { canonicalUrl } from "@/lib/site";
+import { NewsletterForm } from "@/components/common/newsletter-form";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -28,7 +30,7 @@ export function Footer() {
 
   const companyLinks = [
     { name: "About AIToolsFinder", href: "/about" },
-    { name: "Submit a Tool", href: "/submit" },
+    { name: "Submit SaaS (Free Backlink)", href: "/submit" },
     { name: "Vendor Claim & Verification", href: "/vendor" },
     { name: "Affiliate Transparency", href: "/transparency" },
     { name: "Privacy Policy", href: "/privacy" },
@@ -43,30 +45,36 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-5">
           {/* Brand Info */}
           <div className="lg:col-span-2">
-            <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white shadow-lavender-glow">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <span className="text-lg font-bold tracking-tight text-foreground">
-                AIToolsFinder<span className="text-accent">.cloud</span>
-              </span>
-            </Link>
+            <div className="mb-4">
+              <BrandLogo size="md" />
+            </div>
 
             <p className="text-sm text-muted-foreground leading-relaxed max-w-sm mb-6">
-              Find the best AI tool for your exact job. Daily audited pricing,
-              independent intelligence benchmarks, and side-by-side capability
-              comparisons.
+              The verified AI & SaaS intelligence directory. Discover the best software
+              for your exact job with audited pricing, side-by-side capability benchmarks,
+              and free high-authority backlinks for SaaS founders.
             </p>
 
             <div className="flex items-center gap-4 text-xs font-mono text-subtle-foreground">
               <div className="flex items-center gap-1.5">
                 <Shield className="w-4 h-4 text-emerald-400" />
-                <span>100% Unbiased Benchmarks</span>
+                <span>Evidence-Based Benchmarks</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <Cpu className="w-4 h-4 text-primary-content" />
-                <span>Daily Pricing Sync</span>
+                <span>Audited Catalog Pricing</span>
               </div>
+            </div>
+
+            <div className="mt-6 max-w-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider text-foreground mb-2 flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+                </span>
+                Tuesday AI Drop & Arbitrage
+              </p>
+              <NewsletterForm />
             </div>
           </div>
 

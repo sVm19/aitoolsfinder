@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Check, CircleHelp, Minus, X } from "lucide-react";
+import { Check, CircleHelp, Minus, X, ArrowUpRight } from "lucide-react";
+import { ToolLogo } from "@/components/tool/tool-logo";
 import type {
   CatalogPricingPlan,
   ComparisonFeatureRow,
@@ -233,16 +234,41 @@ export function ComparisonMatrixView({
               </th>
               {comparison.tools.map((tool) => (
                 <th key={tool.id} scope="col" className="sticky top-0 z-20 min-w-[220px] border-b border-l border-border bg-surface-2 px-4 py-4 align-top">
-                  <Link href={`/tools/${encodeURIComponent(tool.slug)}`} className="rounded-sm text-base font-semibold text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                    {tool.name}
-                  </Link>
+                  <div className="flex items-center gap-3 mb-2.5">
+                    <a
+                      href={tool.website_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="shrink-0 transition-transform hover:scale-105"
+                      title={`Open official ${tool.name} website`}
+                    >
+                      <ToolLogo slug={tool.slug} name={tool.name} size="sm" websiteUrl={tool.website_url} />
+                    </a>
+                    <div className="min-w-0">
+                      <Link href={`/tools/${encodeURIComponent(tool.slug)}`} className="rounded-sm text-base font-semibold text-foreground underline decoration-primary/50 underline-offset-4 transition-colors hover:text-primary-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary block truncate">
+                        {tool.name}
+                      </Link>
+                      {tool.website_url && (
+                        <a
+                          href={tool.website_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[11px] font-medium text-accent hover:underline mt-0.5"
+                          title={`Directly open official ${tool.name} website (opens in new tab)`}
+                        >
+                          <span>Visit product</span>
+                          <ArrowUpRight className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
                   {tool.primary_category && (
-                    <span className="mt-2 block text-xs font-normal text-muted-foreground">
+                    <span className="mt-1 block text-xs font-normal text-muted-foreground">
                       {tool.primary_category.name}
                     </span>
                   )}
                   {tool.is_verified && (
-                    <span className="mt-3 inline-flex rounded-full border border-primary/35 bg-primary/15 px-2 py-1 text-xs font-medium text-primary-content">
+                    <span className="mt-2 inline-flex rounded-full border border-primary/35 bg-primary/15 px-2 py-0.5 text-xs font-medium text-primary-content">
                       Verified
                     </span>
                   )}

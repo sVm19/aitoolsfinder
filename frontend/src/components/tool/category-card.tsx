@@ -5,12 +5,15 @@ import Link from "next/link";
 import { ArrowRight, Layers } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+export type PopularToolItem = string | { name: string; slug: string };
+
 interface CategoryCardProps {
   name: string;
   slug: string;
   description?: string;
   toolCount?: number;
   icon?: React.ReactNode;
+  popularTools?: PopularToolItem[];
   className?: string;
 }
 
@@ -20,11 +23,12 @@ export function CategoryCard({
   description,
   toolCount,
   icon,
+  popularTools,
   className,
 }: CategoryCardProps) {
-  const ref = useRef<HTMLAnchorElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const onMove = (event: React.PointerEvent<HTMLAnchorElement>) => {
+  const onMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const el = ref.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -45,44 +49,82 @@ export function CategoryCard({
   };
 
   return (
-    <Link
+    <div
       ref={ref}
-      href={`/categories/${slug}`}
-      prefetch={false}
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       className={cn(
-        "spotlight-card tilt-card group relative flex flex-col justify-between rounded-2xl border border-border p-5 transition-colors duration-200 hover:border-primary/60",
+        "spotlight-card tilt-card group relative flex flex-col justify-between rounded-2xl border border-border p-5 transition-colors duration-200 hover:border-primary/60 bg-surface-1/60",
         className
       )}
     >
       <div>
         <div className="flex items-center justify-between gap-3 mb-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface-3 text-primary-content group-hover:border-primary/40 group-hover:text-foreground transition-colors">
+          <Link
+            href={`/categories/${slug}`}
+            prefetch={false}
+            className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-surface-3 text-primary-content group-hover:border-primary/40 group-hover:text-foreground transition-colors"
+          >
             {icon || <Layers className="w-5 h-5" />}
-          </div>
+          </Link>
           {toolCount !== undefined && (
-            <span className="rounded border border-border/60 bg-surface-2 px-2 py-0.5 font-mono text-xs text-subtle-foreground">
+            <Link
+              href={`/categories/${slug}`}
+              prefetch={false}
+              className="rounded border border-border/60 bg-surface-2 px-2 py-0.5 font-mono text-xs text-subtle-foreground hover:text-foreground transition-colors"
+            >
               {toolCount} {toolCount === 1 ? "tool" : "tools"}
-            </span>
+            </Link>
           )}
         </div>
 
-        <h4 className="font-semibold text-foreground group-hover:text-primary-content transition-colors text-base mb-1">
+        <Link
+          href={`/categories/${slug}`}
+          prefetch={false}
+          className="font-semibold text-foreground group-hover:text-primary-content transition-colors text-base mb-1 block"
+        >
           {name}
-        </h4>
+        </Link>
         {description && (
-          <p className="text-xs text-subtle-foreground line-clamp-2 leading-relaxed">
+          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
             {description}
           </p>
         )}
+        {popularTools && popularTools.length > 0 && (
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {popularTools.map((tool) => {
+              const toolName = typeof tool === "string" ? tool : tool.name;
+              const toolSlug =
+                typeof tool === "string"
+                  ? tool.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "")
+                  : tool.slug;
+
+              return (
+                <Link
+                  key={toolSlug}
+                  href={`/tools/${toolSlug}`}
+                  prefetch={false}
+                  className="rounded-md border border-border/70 bg-surface-2 px-2 py-0.5 font-mono text-[11px] text-subtle-foreground transition-all hover:border-primary/60 hover:bg-surface-3 hover:text-foreground active:scale-95"
+                >
+                  {toolName}
+                </Link>
+              );
+            })}
+          </div>
+        )}
       </div>
 
-      <div className="mt-4 flex items-center gap-1.5 border-t border-border/40 pt-3 text-xs font-medium text-primary-content opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-visible:opacity-100">
-        <span>Browse category</span>
-        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+      <div className="mt-4 border-t border-border/40 pt-3">
+        <Link
+          href={`/categories/${slug}`}
+          prefetch={false}
+          className="flex items-center justify-between text-xs font-medium text-primary-content hover:text-white transition-colors"
+        >
+          <span>Browse {name.toLowerCase()}</span>
+          <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+        </Link>
       </div>
-    </Link>
+    </div>
   );
 }
 

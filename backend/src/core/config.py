@@ -65,10 +65,16 @@ class Settings(BaseSettings):
     GROQ_MODEL: str = "meta-llama/llama3-8b-8192"
     OPENROUTER_TIMEOUT_SECONDS: float = 10.0
     OPENROUTER_MAX_RETRIES: int = 2
+    TIUN_BASE_URL: str = "https://api.tiun.business"
     TIUN_API_KEY: Optional[str] = None
     TIUN_WEBHOOK_SECRET: Optional[str] = None
     RESEND_API_KEY: Optional[str] = None
-    EMAIL_FROM: str = "notifications@aitoolsfinder.cloud"
+    EMAIL_FROM: str = "team@aitoolsfinder.cloud"
+    SMTP_HOST: Optional[str] = None
+    SMTP_PORT: int = 465
+    SMTP_USER: Optional[str] = None
+    SMTP_PASSWORD: Optional[str] = None
+    SMTP_USE_SSL: bool = True
     POSTHOG_API_KEY: Optional[str] = None
     POSTHOG_HOST: str = "https://app.posthog.com"
 

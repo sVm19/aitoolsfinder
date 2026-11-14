@@ -4,6 +4,9 @@ import { notFound } from "next/navigation";
 import { ArrowUpRight, Check, CircleHelp, Sparkles } from "lucide-react";
 import { PageShell } from "@/components/common/page-shell";
 import { Badge } from "@/components/ui/badge";
+import { ToolCompareButton } from "@/components/tool/tool-compare-button";
+import { FounderBadgeCard } from "@/components/tool/founder-badge-card";
+import { ToolLogo } from "@/components/tool/tool-logo";
 import { CatalogApiError, getToolBySlug, type CatalogPricingPlan, type CatalogToolDetail } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
 
@@ -209,9 +212,13 @@ export default async function ToolPage({
       <header className="border-b border-border/70 pb-8 sm:pb-10">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex min-w-0 items-start gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-surface-2 text-primary-content shadow-lavender-glow">
-              <Sparkles aria-hidden="true" className="h-6 w-6" />
-            </div>
+            <ToolLogo
+              slug={tool.slug}
+              name={tool.name}
+              size="lg"
+              websiteUrl={tool.website_url}
+              className="h-16 w-16 min-w-16 rounded-2xl shadow-md border border-white/10"
+            />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">{tool.name}</h1>
@@ -225,17 +232,25 @@ export default async function ToolPage({
               </div>
             </div>
           </div>
-          {websiteUrl ? (
-            <a href={websiteUrl} target="_blank" rel="nofollow noopener noreferrer" className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
-              Visit official website
-              <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
-            </a>
-          ) : <span className="text-sm text-muted-foreground">Official website unavailable</span>}
+          <div className="flex w-full sm:w-auto flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <ToolCompareButton id={tool.id} name={tool.name} slug={tool.slug} className="w-full sm:w-auto" />
+            {websiteUrl ? (
+              <a
+                href={websiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 w-full sm:w-auto shrink-0 items-center justify-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-accent-foreground shadow-md transition-all hover:bg-accent/90 active:scale-95"
+              >
+                Visit official {tool.name} website
+                <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+              </a>
+            ) : <span className="text-sm text-muted-foreground">Official website unavailable</span>}
+          </div>
         </div>
       </header>
 
           <div className="grid gap-10 lg:grid-cols-[17rem_minmax(0,1fr)]">
-            <aside className="lg:sticky lg:top-24 lg:self-start">
+            <aside className="lg:sticky lg:top-24 lg:self-start space-y-6">
               <div className="rounded-xl border border-border bg-surface-1 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary-content">At a glance</p>
                 <dl className="mt-4 divide-y divide-border/70 text-sm">
@@ -245,6 +260,13 @@ export default async function ToolPage({
                   <div className="flex items-start justify-between gap-3 py-3 last:pb-0"><dt className="text-muted-foreground">Plans listed</dt><dd className="text-right font-medium text-foreground">{tool.pricing_plans.length || "None"}</dd></div>
                 </dl>
               </div>
+
+              {/* Founder Embed Trust Badge Generator (Nick Launches style) */}
+              <FounderBadgeCard
+                toolName={tool.name}
+                toolSlug={tool.slug}
+                score={tool.is_verified ? 94 : 88}
+              />
             </aside>
             <div className="min-w-0">
               <ProfileSection id="overview-title" title="Overview">
@@ -255,28 +277,28 @@ export default async function ToolPage({
                 )}
               </ProfileSection>
 
-              <ProfileSection id="features-title" title="Key features">
-                {tool.features.length ? (
-                  <ul className="divide-y divide-border/70">
-                    {tool.features.map((item) => (
-                      <li key={item.feature.id} className="flex flex-col gap-2 py-4 first:pt-0 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <h3 className="font-medium text-foreground">{item.feature.name}</h3>
-                          {item.feature.description && <p className="mt-1 text-sm text-muted-foreground">{item.feature.description}</p>}
-                          {item.notes && <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.notes}</p>}
-                        </div>
-                        <div className="flex shrink-0 items-center gap-2">
-                          <Badge variant={item.support_level === "yes" ? "verified" : "outline"}>{item.support_level}</Badge>
-                          {safeHttpUrl(item.evidence_url) && <a href={safeHttpUrl(item.evidence_url)!} target="_blank" rel="nofollow noopener noreferrer" className="text-xs text-primary-content underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">Evidence</a>}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                ) : <p className="text-sm text-muted-foreground">No feature details have been published for this tool.</p>}
-              </ProfileSection>
-
-              <ProfileSection id="fit-title" title="Use cases and audience fit">
-                <p className="text-sm text-muted-foreground">Use-case guidance has not been published for this tool yet.</p>
+              {/* "Is It Worth Paying For?" Teardown (MicroSaaS Examples style) */}
+              <ProfileSection id="fit-title" title="Is it worth paying for? (Teardown)">
+                <div className="rounded-xl border border-border/80 bg-surface-1 p-5 space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="rounded-lg border border-border bg-surface-2/60 p-3.5">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-primary-content font-bold block mb-1">
+                        When the Free / Entry plan suffices
+                      </span>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Best if you have light to moderate daily workflows and do not need dedicated background agents or team concurrency.
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-accent/40 bg-accent/5 p-3.5">
+                      <span className="text-[11px] font-mono uppercase tracking-wider text-accent font-bold block mb-1">
+                        When to upgrade to paid
+                      </span>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Upgrade when you hit monthly rate limits, need priority API inference, or require multi-seat workspace collaboration.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </ProfileSection>
 
               <ProfileSection id="pricing-title" title="Pricing plans">

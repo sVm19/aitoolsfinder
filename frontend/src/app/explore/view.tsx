@@ -159,7 +159,7 @@ export function ExploreView({
               variant="outline"
               size="md"
               onClick={() => setMobileFiltersOpen(!mobileFiltersOpen)}
-              className="lg:hidden flex items-center gap-1.5"
+              className="lg:hidden flex-1 sm:flex-initial flex items-center justify-center gap-1.5"
               aria-label="Toggle search filters"
             >
               <SlidersHorizontal className="h-4 w-4 text-primary-content" />

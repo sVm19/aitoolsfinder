@@ -4,9 +4,9 @@ import { getActiveCategories } from "@/lib/catalog-api";
 import { SubmissionView } from "./view";
 
 export const metadata: Metadata = {
-  title: "Submit an AI Tool | AIToolsFinder",
+  title: "Submit Your AI SaaS & Get a Free Backlink | AIToolsFinder",
   description:
-    "Submit your AI tool or SaaS product to the AIToolsFinder catalog. Verified listings, pricing breakdowns, and direct founder exposure.",
+    "Submit your AI tool or B2B SaaS platform to AIToolsFinder. Receive a permanent free dofollow backlink, verified listing badge, and direct exposure to 50,000+ active software buyers.",
   alternates: { canonical: canonicalUrl("/submit") },
   robots: { index: true, follow: true },
 };

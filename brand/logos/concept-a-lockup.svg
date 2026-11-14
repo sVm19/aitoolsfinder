@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 256" width="960" height="256" role="img" aria-labelledby="lockup-a">
+  <title id="lockup-a">AIToolsFinder Lockup a</title>
+  <defs>
+    <style>
+      .brand-title { font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 78px; font-weight: 800; letter-spacing: -2px; fill: #FFFFFF; }
+      .brand-dot { fill: #FF5E1E; }
+      .brand-tag { font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 19px; font-weight: 600; letter-spacing: 5px; fill: #9E96AF; text-transform: uppercase; }
+    </style>
+  </defs>
+  <!-- Symbol Container (180x180 at x=48, y=38) -->
+  <g id="symbol" transform="translate(48, 38) scale(0.703125)">
+    
+  <!-- Compound path: Monolith 'A' silhouette with inner aperture prism and diamond lens -->
+  <path fill="#FFFFFF" fill-rule="evenodd" d="M128 26 L232 206 L190 206 L171 173 L85 173 L66 206 L24 206 Z M128 92 L149 128 L107 128 Z M128 138 L152 162 L128 186 L104 162 Z"/>
+
+  </g>
+  <!-- Typography Lockup -->
+  <g id="wordmark" transform="translate(256, 128)">
+    <text x="0" y="0" class="brand-title">AIToolsFinder<tspan class="brand-dot">.</tspan></text>
+    <text x="4" y="42" class="brand-tag">AI TOOL INTELLIGENCE</text>
+  </g>
+</svg>

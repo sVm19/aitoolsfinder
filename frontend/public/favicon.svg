@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="fav-v" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="fav-o" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Background squircle tile for high contrast favicon visibility in browser tabs -->
+  <rect width="256" height="256" rx="56" fill="#030206"/>
+  <rect width="256" height="256" rx="56" fill="none" stroke="#2C2638" stroke-width="4"/>
+  <!-- Scaled Symbol centered -->
+  <g transform="translate(18, 18) scale(0.859375)">
+    <path fill="url(#fav-v)" d="M124 26 L24 206 L66 206 L124 104 Z"/>
+    <path fill="url(#fav-o)" d="M132 26 L132 104 L190 206 L232 206 Z"/>
+    <polygon fill="#FF5E1E" points="128,138 152,162 128,186 104,162"/>
+  </g>
+</svg>

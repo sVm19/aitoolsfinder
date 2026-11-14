@@ -59,6 +59,9 @@ Thumbs.db
 
 #skills
 .agents/
+.claude/
+logo-design-skill/
+unslop/
 
 # Agent scaffold directories
 .adal/

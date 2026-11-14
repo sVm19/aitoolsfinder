@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="AIToolsFinder Brand Symbol">
+  <defs>
+    <linearGradient id="atf-blade-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="atf-blade-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Left Vanguard Facet -->
+  <path fill="url(#atf-blade-violet)" d="M124 26 L24 206 L66 206 L124 104 Z"/>
+  <!-- Right Vanguard Facet -->
+  <path fill="url(#atf-blade-orange)" d="M132 26 L132 104 L190 206 L232 206 Z"/>
+  <!-- Diamond Focus Aperture Crossbar -->
+  <polygon fill="#FF5E1E" points="128,138 152,162 128,186 104,162"/>
+</svg>

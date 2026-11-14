@@ -540,18 +540,19 @@ export function AIFinderView({ categories }: AIFinderViewProps) {
                               )}
                             </div>
 
-                            <div className="flex items-center gap-2">
+                            <div className="flex w-full sm:w-auto items-center gap-2">
                               <Button
                                 variant={selected ? "secondary" : "outline"}
                                 size="sm"
                                 onClick={() => toggleCompare(tool)}
                                 disabled={!selected && isFull}
+                                className="flex-1 sm:flex-initial"
                               >
                                 <GitCompare aria-hidden="true" className="h-4 w-4" />
                                 {selected ? "In compare" : "Compare"}
                               </Button>
-                              <Link href={`/tools/${tool.slug}`}>
-                                <Button size="sm">
+                              <Link href={`/tools/${tool.slug}`} className="flex-1 sm:flex-initial">
+                                <Button size="sm" className="w-full">
                                   View tool
                                   <ArrowRight aria-hidden="true" className="h-4 w-4" />
                                 </Button>

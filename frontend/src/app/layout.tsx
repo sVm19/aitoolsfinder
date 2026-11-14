@@ -1,30 +1,23 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { JetBrains_Mono, Outfit } from "next/font/google";
 import "@/styles/globals.css";
 import { canonicalUrl, SITE_URL } from "@/lib/site";
 import { CompareProvider } from "@/components/comparison/compare-provider";
+import { StackProvider } from "@/components/stack/stack-provider";
+import { TiunProvider } from "@/components/providers/tiun-provider";
+import { StackDrawer } from "@/components/stack/stack-drawer";
+import { AuthModal } from "@/components/common/auth-modal";
 import { CustomCursor } from "@/components/bits/custom-cursor";
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-outfit",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-jetbrains",
-});
+import { AttributionTracker } from "@/components/common/attribution-tracker";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "AIToolsFinder — Find the Best AI Tool For Your Exact Job",
+    default: "AIToolsFinder — Find the Best AI Tool & SaaS For Your Exact Job",
     template: "%s | AIToolsFinder",
   },
   description:
-    "Discover, compare, evaluate, and choose the best AI tools, GPTs, and SaaS products. Ground-truth intelligence, pricing breakdowns, and transparent scoring.",
+    "The verified AI & SaaS intelligence directory. Discover, compare, and benchmark 1,200+ AI tools and B2B SaaS platforms. Audited pricing, capability teardowns, and free backlinks for SaaS founders.",
   alternates: {
     canonical: canonicalUrl("/"),
   },
@@ -57,11 +50,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`dark ${outfit.variable} ${jetbrains.variable}`} data-type="software">
-      <body className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-foreground">
+    <html lang="en" suppressHydrationWarning className="dark" data-type="software">
+      <body suppressHydrationWarning className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-foreground">
         <div className="site-grain" aria-hidden="true" />
         <CustomCursor />
-        <CompareProvider>{children}</CompareProvider>
+        <Suspense fallback={null}>
+          <AttributionTracker />
+        </Suspense>
+        <CompareProvider>
+          <StackProvider>
+            <TiunProvider>
+              {children}
+              <StackDrawer />
+              <AuthModal />
+            </TiunProvider>
+          </StackProvider>
+        </CompareProvider>
       </body>
     </html>
   );

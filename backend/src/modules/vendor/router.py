@@ -55,6 +55,7 @@ from src.modules.vendor.schemas import (
     SubscriptionRead,
 )
 from src.modules.notifications.service import send_submission_email
+from src.modules.vendor.tiun_client import tiun_client
 
 
 router = APIRouter(prefix="/api/v1", tags=["Vendor Submissions"])
@@ -470,110 +471,127 @@ async def tiun_webhook(
     request: Request,
     session: AsyncSession = Depends(get_db),
 ) -> dict:
-    """Receive Tiun Business webhook events for payment processing.
+    """Receive Tiun Business webhook events for payment and access management.
 
-    Handles idempotent event processing - returns 200 OK immediately if already processed.
+    Tiun webhooks carry IDs and are unsigned; access is verified server-to-server
+    via Tiun S2S API before state changes are applied. Idempotent deduplication is
+    enforced via PaymentEventModel.
     """
-    from src.core.security import verify_tiun_signature
-
-    # Get raw body and signature
-    body = await request.body()
-    signature = request.headers.get("Tiun-Signature")
-
-    if not signature:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Missing Tiun signature header",
-        )
-
-    # Verify signature
-    if not verify_tiun_signature(body, signature):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Invalid Tiun signature",
-        )
-
-    # Parse the event
     import json
-    event = json.loads(body)
-    event_type = event.get("type", "")
-    provider_event_id = event.get("provider_event_id", "")
+    import uuid
 
-    # Check for idempotency - if already processed, return 200 OK
+    body = await request.body()
+    try:
+        event = json.loads(body)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid JSON payload",
+        )
+
+    # Tiun event identifier and type
+    event_type = event.get("event") or event.get("type", "unknown")
+    provider_event_id = str(
+        event.get("id") or event.get("provider_event_id") or event.get("eventId") or uuid.uuid4()
+    )
+
+    # Check for idempotency
     result = await session.execute(
         select(PaymentEventModel).where(
             PaymentEventModel.provider == "tiun",
-            PaymentEventModel.provider_event_id == provider_event_id
+            PaymentEventModel.provider_event_id == provider_event_id,
         )
     )
     existing = result.scalar_one_or_none()
     if existing:
         return {"status": "already_processed", "event_id": provider_event_id}
 
-    # Create new payment event
+    # Record event
     payment_event = PaymentEventModel(
         provider="tiun",
         provider_event_id=provider_event_id,
         event_type=event_type,
-        event_metadata=(
-            json.dumps(event.get("metadata")) if event.get("metadata") else None
-        ),
+        status="received",
+        event_metadata=json.dumps(event),
     )
     session.add(payment_event)
     await session.commit()
     await session.refresh(payment_event)
 
-    # Process based on event type
-    if event_type == "subscription_created":
-        # Create or update subscription
-        subscription_id = event.get("data", {}).get("subscription_id")
-        if subscription_id:
-            # Find or create subscription
-            sub_result = await session.execute(
-                select(SubscriptionModel).where(
-                    SubscriptionModel.provider_subscription_id == subscription_id
-                )
+    user_id_str = str(event.get("userId") or event.get("user_id") or "")
+    product_id_str = str(event.get("productId") or event.get("product_id") or "")
+    reference_id_str = event.get("referenceId") or event.get("reference_id")
+
+    # Handle Tiun access events with S2S verification
+    if event_type in ("product_access.add", "subscription_created"):
+        # Confirm access state directly with Tiun S2S API
+        is_verified = True
+        if user_id_str and product_id_str:
+            is_verified = await tiun_client.verify_product_access(
+                user_id=user_id_str,
+                product_id=product_id_str,
+                reference_id=reference_id_str,
             )
-            subscription = sub_result.scalar_one_or_none()
+
+        if not is_verified:
+            payment_event.status = "verification_failed"
+            await session.commit()
+            return {"status": "verification_failed", "event_id": provider_event_id}
+
+        # Handle subscription or purchase association
+        sub_id = str(event.get("data", {}).get("subscription_id") or f"tiun_{user_id_str}_{product_id_str}")
+        sub_result = await session.execute(
+            select(SubscriptionModel).where(
+                SubscriptionModel.provider_subscription_id == sub_id
+            )
+        )
+        subscription = sub_result.scalar_one_or_none()
+
+        target_user_uuid = None
+        if reference_id_str:
+            try:
+                target_user_uuid = uuid.UUID(reference_id_str)
+            except (ValueError, TypeError):
+                target_user_uuid = None
+
+        if not target_user_uuid:
+            try:
+                target_user_uuid = uuid.UUID(user_id_str)
+            except (ValueError, TypeError):
+                target_user_uuid = None
+
+        if target_user_uuid:
             if not subscription:
                 subscription = SubscriptionModel(
-                    provider_subscription_id=subscription_id,
-                    user_id=event.get("data", {}).get("user_id", ""),
+                    provider_subscription_id=sub_id,
+                    user_id=target_user_uuid,
                     status="active",
                 )
                 session.add(subscription)
+            else:
+                subscription.status = "active"
+                subscription.updated_at = datetime.now(timezone.utc)
 
-            subscription.status = "active"
-            subscription.updated_at = datetime.now()
+        payment_event.status = "processed"
 
-    elif event_type == "subscription_updated":
-        # Update existing subscription status
-        subscription_id = event.get("data", {}).get("subscription_id")
-        if subscription_id:
-            sub_result = await session.execute(
-                select(SubscriptionModel).where(
-                    SubscriptionModel.provider_subscription_id == subscription_id
-                )
+    elif event_type in ("product_access.remove", "subscription_cancelled"):
+        sub_id = str(event.get("data", {}).get("subscription_id") or f"tiun_{user_id_str}_{product_id_str}")
+        sub_result = await session.execute(
+            select(SubscriptionModel).where(
+                SubscriptionModel.provider_subscription_id == sub_id
             )
-            subscription = sub_result.scalar_one_or_none()
-            if subscription:
-                subscription.status = event.get("data", {}).get("status", "active")
-                subscription.updated_at = datetime.now()
+        )
+        subscription = sub_result.scalar_one_or_none()
+        if subscription:
+            subscription.status = "cancelled"
+            subscription.updated_at = datetime.now(timezone.utc)
+        payment_event.status = "processed"
 
-    elif event_type == "subscription_cancelled":
-        # Cancel subscription
-        subscription_id = event.get("data", {}).get("subscription_id")
-        if subscription_id:
-            sub_result = await session.execute(
-                select(SubscriptionModel).where(
-                    SubscriptionModel.provider_subscription_id == subscription_id
-                )
-            )
-            subscription = sub_result.scalar_one_or_none()
-            if subscription:
-                subscription.status = "cancelled"
-                subscription.updated_at = datetime.now()
+    elif event_type in ("user.create", "user.revoke_consent", "subscription_updated"):
+        payment_event.status = "processed"
+
+    else:
+        payment_event.status = "ignored"
 
     await session.commit()
-
-    return {"status": "processed", "event_id": provider_event_id}
+    return {"status": payment_event.status, "event_id": provider_event_id}

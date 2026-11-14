@@ -1,9 +1,38 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
+import React, { Component, useEffect, useState, type ReactNode } from "react";
 
-const HeroScene = dynamic(() => import("./hero-scene"), { ssr: false });
+class SceneErrorBoundary extends Component<
+  { children: ReactNode; fallback: ReactNode },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: unknown) {
+    console.warn("Hero 3D scene fallback to 2D background:", error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
+const HeroScene = dynamic(
+  () =>
+    import("./hero-scene").catch((err) => {
+      console.warn("HeroScene dynamic import skipped:", err);
+      return () => null;
+    }),
+  { ssr: false },
+);
 
 function StaticFallback() {
   return (
@@ -38,9 +67,11 @@ export function HeroCanvas() {
     >
       <StaticFallback />
       {loadScene && (
-        <div className="scene-in absolute inset-0">
-          <HeroScene />
-        </div>
+        <SceneErrorBoundary fallback={null}>
+          <div className="scene-in absolute inset-0">
+            <HeroScene />
+          </div>
+        </SceneErrorBoundary>
       )}
     </div>
   );

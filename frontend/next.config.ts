@@ -7,7 +7,7 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isProduction ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://cdn.aitoolsfinder.cloud https://ruykzodjhxywrykodnco.supabase.co https://*.supabase.co https://*.amazonaws.com https://images.unsplash.com",
+  "img-src 'self' data: blob: https://cdn.aitoolsfinder.cloud https://ruykzodjhxywrykodnco.supabase.co https://*.supabase.co https://*.amazonaws.com https://images.unsplash.com https://www.google.com https://*.google.com https://*.gstatic.com https://unavatar.io https://logo.clearbit.com",
   "font-src 'self' data:",
   "connect-src 'self' https://aitoolsfinder.cloud https://ruykzodjhxywrykodnco.supabase.co https://*.supabase.co https://*.amazonaws.com http://localhost:8000 http://127.0.0.1:8000",
   "frame-ancestors 'none'",
@@ -41,6 +41,14 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.google.com",
+      },
+      {
+        protocol: "https",
+        hostname: "unavatar.io",
       },
     ],
   },

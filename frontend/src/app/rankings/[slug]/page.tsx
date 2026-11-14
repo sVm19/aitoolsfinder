@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Info } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Info } from "lucide-react";
 import { PageShell } from "@/components/common/page-shell";
 import { ErrorState } from "@/components/ui/error-state";
+import { ToolLogo } from "@/components/tool/tool-logo";
 import {
   CatalogApiError,
   getCategoryRankings,
@@ -129,17 +130,17 @@ export default async function RankingsPage({
             </p>
           </div>
 
-          <form action={`/rankings/${encodeURIComponent(slug)}`} method="get" className="mt-7 flex flex-wrap items-end gap-3">
+          <form action={`/rankings/${encodeURIComponent(slug)}`} method="get" className="mt-7 flex flex-col sm:flex-row sm:items-end gap-3">
             {taxonomyType === "tag" && <input type="hidden" name="taxonomy_type" value="tag" />}
-            <label className="grid gap-1.5 text-sm font-medium text-foreground">
+            <label className="grid gap-1.5 text-sm font-medium text-foreground w-full sm:w-auto">
               Pricing
-              <select name="pricing" defaultValue={pricingFilter} className="min-h-11 min-w-48 rounded-lg border border-border bg-surface-1 px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
+              <select name="pricing" defaultValue={pricingFilter} className="min-h-11 w-full sm:min-w-48 rounded-lg border border-border bg-surface-1 px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
                 <option value="all">All pricing models</option>
                 <option value="free">Free and freemium</option>
                 <option value="paid">Paid plans</option>
               </select>
             </label>
-            <button type="submit" className="inline-flex min-h-11 items-center rounded-lg border border-primary/50 bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
+            <button type="submit" className="inline-flex min-h-11 w-full sm:w-auto justify-center items-center rounded-lg border border-primary/50 bg-primary px-4 text-sm font-semibold text-white transition-colors hover:bg-primary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background">
               Apply filter
             </button>
           </form>
@@ -216,11 +217,36 @@ function RankingCard({ item, sponsored = false }: { item: RankingItem; sponsored
               #{item.rank}
             </span>
           )}
+          <a
+            href={item.tool.website_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 transition-transform hover:scale-105"
+            title={`Directly open official ${item.tool.name} website`}
+          >
+            <ToolLogo
+              slug={item.tool.slug}
+              name={item.tool.name}
+              websiteUrl={item.tool.website_url}
+            />
+          </a>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <Link href={`/tools/${encodeURIComponent(item.tool.slug)}`} className="rounded-sm text-lg font-semibold text-foreground underline decoration-primary/50 underline-offset-4 hover:text-primary-content focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
                 {item.tool.name}
               </Link>
+              {item.tool.website_url && (
+                <a
+                  href={item.tool.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-md bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent hover:bg-accent hover:text-white transition-colors"
+                  title={`Directly open official ${item.tool.name} website (opens in new tab)`}
+                >
+                  <span>Visit site</span>
+                  <ArrowUpRight className="h-3 w-3" />
+                </a>
+              )}
               {sponsored ? (
                 <span className="rounded-full border border-accent/40 bg-accent/10 px-2.5 py-1 text-[11px] font-semibold text-accent">Sponsored placement</span>
               ) : item.rank === 1 ? (

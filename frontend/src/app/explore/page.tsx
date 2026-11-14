@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   title: "Explore AI Tools",
   description: "Search and filter published AI tools by category, pricing, and verification.",
   alternates: { canonical: canonicalUrl("/explore") },
-  robots: { index: false, follow: true },
+  robots: { index: true, follow: true },
 };
 
 export default async function ExplorePage({

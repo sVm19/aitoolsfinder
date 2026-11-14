@@ -302,20 +302,21 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
       containerClassName="max-w-3xl"
     >
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
-          Founder & Creator Portal
-        </p>
+        <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold text-accent">
+          <Sparkles className="h-3.5 w-3.5" />
+          SaaS Founder & Creator Portal
+        </div>
         <h1 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-5xl">
-          Submit your product to the directory
+          Submit your AI SaaS & get a <span className="text-accent underline decoration-accent/40 underline-offset-4">free backlink</span>
         </h1>
         <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
-          Join hundreds of AI tools evaluated by active buyers and researchers daily. Every entry is independently audited before publication.
+          Get your software indexed and benchmarked against published capabilities and transparent pricing. Every approved listing receives a permanent, high-authority free backlink to accelerate domain ranking and organic buyer traffic.
         </p>
       </header>
 
       {/* Progress Stepper */}
       <nav aria-label="Submission steps" className="mt-8">
-        <ol className="grid grid-cols-2 gap-2 sm:grid-cols-5 text-xs font-medium">
+        <ol className="flex gap-2 overflow-x-auto pb-1.5 sm:pb-0 sm:grid sm:grid-cols-5 text-xs font-medium scrollbar-none">
           {STEPS.map((label, idx) => {
             const stepNum = idx + 1;
             const isCompleted = stepNum < step;
@@ -323,7 +324,7 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
             return (
               <li
                 key={label}
-                className={`flex items-center gap-2 rounded-xl p-2.5 transition-all ${
+                className={`flex shrink-0 sm:shrink items-center gap-2 rounded-xl p-2.5 transition-all ${
                   isCurrent
                     ? "bg-surface-2 border border-primary/50 text-foreground"
                     : isCompleted
@@ -342,7 +343,7 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
                 >
                   {isCompleted ? <Check className="w-3 h-3" /> : stepNum}
                 </span>
-                <span className="truncate">{label}</span>
+                <span className="whitespace-nowrap sm:truncate">{label}</span>
               </li>
             );
           })}
@@ -378,11 +379,12 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
                 </div>
                 <h3 className="text-lg font-bold text-foreground">Standard Review</h3>
                 <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                  Processed in the editorial review queue. Estimated approval in 3–5 business days.
+                  Processed in the editorial review queue. Estimated approval in 3–5 business days. Free permanent listing.
                 </p>
                 <ul className="mt-4 space-y-1.5 text-xs text-subtle-foreground">
-                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Full catalog indexation</li>
-                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Scoring benchmarks</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-accent" /> Permanent Free Backlink (dofollow)</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Full catalog & AEO indexation</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Independent benchmark score</li>
                 </ul>
               </div>
 
@@ -399,17 +401,18 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
                 </div>
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-mono uppercase tracking-wider text-accent flex items-center gap-1">
-                    <Flame className="w-3.5 h-3.5" /> Fast-Track
+                    <Flame className="w-3.5 h-3.5" /> Free During Launch · Fast-Track
                   </span>
                   {submissionType === "featured" && <Check className="w-4 h-4 text-accent" />}
                 </div>
-                <h3 className="text-lg font-bold text-foreground">Featured & Verified</h3>
+                <h3 className="text-lg font-bold text-foreground">Featured SaaS & Verified</h3>
                 <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                  Guaranteed review within 24–48 hours, instant &ldquo;Verified&rdquo; badge, and top category placement.
+                  Guaranteed review within 24–48 hours, instant &ldquo;Verified&rdquo; badge, priority backlink indexing, and top category placement.
                 </p>
                 <ul className="mt-4 space-y-1.5 text-xs text-subtle-foreground">
-                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Guaranteed 24–48h SLA</li>
-                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Verified founder badge</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-accent" /> Priority 24–48h SLA & Dofollow Backlink</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Verified Founder badge</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Top-of-category comparison spotlight</li>
                 </ul>
               </div>
             </div>
@@ -513,16 +516,18 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
                     size="sm"
                     disabled={uploadingLogo}
                     onClick={() => fileInputRef.current?.click()}
+                    className="w-full sm:w-auto"
                   >
                     {uploadingLogo ? (
                       <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" />
-                        Uploading to S3...
+                        <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5 shrink-0" />
+                        <span>Uploading...</span>
                       </>
                     ) : (
                       <>
-                        <Upload className="w-3.5 h-3.5 mr-1.5" />
-                        Choose Logo Image (SVG, PNG, JPG)
+                        <Upload className="w-3.5 h-3.5 mr-1.5 shrink-0" />
+                        <span className="sm:hidden">Choose logo</span>
+                        <span className="hidden sm:inline">Choose logo image (SVG, PNG, JPG)</span>
                       </>
                     )}
                   </Button>
@@ -781,28 +786,41 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
         )}
 
         {/* Controls */}
-        <div className="mt-8 flex items-center justify-between border-t border-border/80 pt-6">
+        <div className="mt-8 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between border-t border-border/80 pt-6">
           {step > 1 ? (
             <Button
               type="button"
               variant="outline"
               size="md"
               onClick={() => setStep((prev) => Math.max(prev - 1, 1))}
+              className="w-full sm:w-auto"
             >
               <ArrowLeft className="w-4 h-4 mr-1.5" />
               Back
             </Button>
           ) : (
-            <div />
+            <div className="hidden sm:block" />
           )}
 
           {step < 5 ? (
-            <Button type="button" variant="primary" size="md" onClick={handleNextStep}>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              onClick={handleNextStep}
+              className="w-full sm:w-auto"
+            >
               Continue to Step {step + 1}
               <ArrowRight className="w-4 h-4 ml-1.5" />
             </Button>
           ) : (
-            <Button type="submit" variant="primary" size="md" disabled={submitting}>
+            <Button
+              type="submit"
+              variant="primary"
+              size="md"
+              disabled={submitting}
+              className="w-full sm:w-auto"
+            >
               {submitting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
