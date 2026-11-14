@@ -1,6 +1,8 @@
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 import httpx
+
 from src.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -9,18 +11,18 @@ logger = logging.getLogger(__name__)
 class TiunClient:
     """Client for Tiun Business Server-to-Server (S2S) APIs."""
 
-    def __init__(self, base_url: Optional[str] = None, api_key: Optional[str] = None):
+    def __init__(self, base_url: str | None = None, api_key: str | None = None):
         self.base_url = (base_url or settings.TIUN_BASE_URL).rstrip("/")
         self.api_key = api_key or settings.TIUN_API_KEY
 
-    def _headers(self) -> Dict[str, str]:
+    def _headers(self) -> dict[str, str]:
         headers = {"Content-Type": "application/json"}
         if self.api_key:
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
 
     async def verify_product_access(
-        self, user_id: str, product_id: str, reference_id: Optional[str] = None
+        self, user_id: str, product_id: str, reference_id: str | None = None
     ) -> bool:
         """Verify whether a user has active access to a product via S2S API."""
         if not self.api_key:
@@ -29,7 +31,7 @@ class TiunClient:
             return True
 
         url = f"{self.base_url}/live_api/s2s/v1/users/{user_id}/product_access/{product_id}"
-        params: Dict[str, str] = {}
+        params: dict[str, str] = {}
         if reference_id:
             params["referenceId"] = reference_id
 
@@ -46,11 +48,11 @@ class TiunClient:
                     resp.text,
                 )
                 return False
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             logger.error("Exception during Tiun product access verification: %s", exc)
             return False
 
-    async def list_user_product_access(self, user_id: str) -> List[Dict[str, Any]]:
+    async def list_user_product_access(self, user_id: str) -> list[dict[str, Any]]:
         """List active product accesses for a given user."""
         if not self.api_key:
             return []
@@ -63,11 +65,11 @@ class TiunClient:
                     data = resp.json()
                     return data if isinstance(data, list) else data.get("items", [])
                 return []
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             logger.error("Exception listing Tiun product access: %s", exc)
             return []
 
-    async def verify_user_token(self, token: str) -> Optional[Dict[str, Any]]:
+    async def verify_user_token(self, token: str) -> dict[str, Any] | None:
         """Verify client-side verification token via v2 S2S API."""
         if not self.api_key:
             return None
@@ -82,7 +84,7 @@ class TiunClient:
                     data = resp.json()
                     return data.get("user")
                 return None
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001
             logger.error("Exception verifying Tiun user token: %s", exc)
             return None
 
