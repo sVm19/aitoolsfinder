@@ -98,16 +98,27 @@ async def get_tag(slug: str, session: AsyncSession = Depends(get_db)):
 @router.get("/tools", response_model=PaginatedResponse[ToolRead])
 @router.get("/search", response_model=PaginatedResponse[ToolRead])
 async def list_tools(
-    q: Optional[str] = Query(default=None, max_length=120, description="Search published tool names and details"),
-    category: Optional[list[str]] = Query(default=None, description="Category slug(s); repeat or comma-separate for multiple"),
-    tags: Optional[list[str]] = Query(default=None, description="Tag slug(s); repeat or comma-separate for multiple"),
+    q: Optional[str] = Query(
+        default=None,
+        max_length=120,
+        description="Search published tool names and details",
+    ),
+    category: Optional[list[str]] = Query(
+        default=None,
+        description="Category slug(s); repeat or comma-separate for multiple",
+    ),
+    tags: Optional[list[str]] = Query(
+        default=None, description="Tag slug(s); repeat or comma-separate for multiple"
+    ),
     tag: Optional[str] = Query(default=None, description="Legacy single tag slug"),
     pricing_model: Optional[str] = Query(
         default=None,
         pattern="^(free|freemium|paid|usage_based|contact_sales|unknown)$",
         description="Pricing model filter",
     ),
-    is_verified: Optional[bool] = Query(default=None, description="Verified tools only or unverified tools only"),
+    is_verified: Optional[bool] = Query(
+        default=None, description="Verified tools only or unverified tools only"
+    ),
     sort: Optional[str] = Query(
         default=None,
         pattern="^(newest|alphabetical|relevance)$",
@@ -153,7 +164,9 @@ async def list_tools(
 
 @router.get("/search/autocomplete", response_model=list[ToolAutocompleteItem])
 async def autocomplete_tools(
-    q: str = Query(min_length=2, max_length=80, description="Tool name prefix or approximate name"),
+    q: str = Query(
+        min_length=2, max_length=80, description="Tool name prefix or approximate name"
+    ),
     limit: int = Query(default=8, ge=1, le=10),
     session: AsyncSession = Depends(get_db),
 ):

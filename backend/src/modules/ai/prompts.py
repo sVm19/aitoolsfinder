@@ -76,4 +76,6 @@ def parse_recommendation_output(content: str) -> RecommendationPromptOutput:
     try:
         return RecommendationPromptOutput.model_validate_json(content)
     except ValueError as exc:
-        raise ValueError("The model response did not match the recommendation schema.") from exc
+        raise ValueError(
+            "The model response did not match the recommendation schema."
+        ) from exc

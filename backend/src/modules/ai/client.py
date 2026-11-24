@@ -302,7 +302,9 @@ class GroqClientAdapter:
                 return completion
             except Exception as exc:
                 status_code = getattr(exc, "status_code", None)
-                retryable = status_code is None or status_code in _RETRYABLE_STATUS_CODES
+                retryable = (
+                    status_code is None or status_code in _RETRYABLE_STATUS_CODES
+                )
                 if not retryable:
                     raise GroqRequestError("Groq rejected the request.") from exc
                 if attempt < max_retries:

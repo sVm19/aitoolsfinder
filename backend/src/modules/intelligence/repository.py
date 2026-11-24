@@ -33,9 +33,7 @@ class IntelligenceRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_published_comparison(
-        self, slug: str
-    ) -> Optional[ComparisonModel]:
+    async def get_published_comparison(self, slug: str) -> Optional[ComparisonModel]:
         stmt = (
             select(ComparisonModel)
             .where(ComparisonModel.slug == slug, ComparisonModel.status == "published")
@@ -82,23 +80,31 @@ class IntelligenceRepository:
         limit: int,
     ) -> List[Tuple[ToolModel, int, int]]:
         category_counts = (
-            select(
-                ToolCategoryModel.tool_id.label("tool_id"),
-                func.count().label("shared_categories"),
+            (
+                select(
+                    ToolCategoryModel.tool_id.label("tool_id"),
+                    func.count().label("shared_categories"),
+                )
+                .where(ToolCategoryModel.category_id.in_(category_ids))
+                .group_by(ToolCategoryModel.tool_id)
+                .subquery()
             )
-            .where(ToolCategoryModel.category_id.in_(category_ids))
-            .group_by(ToolCategoryModel.tool_id)
-            .subquery()
-        ) if category_ids else None
+            if category_ids
+            else None
+        )
         tag_counts = (
-            select(
-                ToolTagModel.tool_id.label("tool_id"),
-                func.count().label("shared_tags"),
+            (
+                select(
+                    ToolTagModel.tool_id.label("tool_id"),
+                    func.count().label("shared_tags"),
+                )
+                .where(ToolTagModel.tag_id.in_(tag_ids))
+                .group_by(ToolTagModel.tool_id)
+                .subquery()
             )
-            .where(ToolTagModel.tag_id.in_(tag_ids))
-            .group_by(ToolTagModel.tool_id)
-            .subquery()
-        ) if tag_ids else None
+            if tag_ids
+            else None
+        )
 
         if category_counts is None and tag_counts is None:
             return []
@@ -114,7 +120,9 @@ class IntelligenceRepository:
         stmt = select(ToolModel, shared_categories, shared_tags)
         conditions = [ToolModel.platform_status == "published", ToolModel.id != tool_id]
         if category_counts is not None:
-            stmt = stmt.outerjoin(category_counts, category_counts.c.tool_id == ToolModel.id)
+            stmt = stmt.outerjoin(
+                category_counts, category_counts.c.tool_id == ToolModel.id
+            )
         if tag_counts is not None:
             stmt = stmt.outerjoin(tag_counts, tag_counts.c.tool_id == ToolModel.id)
         if exclude_ids:
@@ -136,21 +144,18 @@ class IntelligenceRepository:
         skip: int,
         limit: int,
     ) -> Tuple[List[Tuple[ToolModel, ScoreHistoryModel, int]], int]:
-        latest_score_rows = (
-            select(
-                ScoreHistoryModel.id.label("score_id"),
-                func.row_number()
-                .over(
-                    partition_by=ScoreHistoryModel.tool_id,
-                    order_by=(
-                        ScoreHistoryModel.calculated_at.desc(),
-                        ScoreHistoryModel.id.desc(),
-                    ),
-                )
-                .label("score_number"),
+        latest_score_rows = select(
+            ScoreHistoryModel.id.label("score_id"),
+            func.row_number()
+            .over(
+                partition_by=ScoreHistoryModel.tool_id,
+                order_by=(
+                    ScoreHistoryModel.calculated_at.desc(),
+                    ScoreHistoryModel.id.desc(),
+                ),
             )
-            .subquery()
-        )
+            .label("score_number"),
+        ).subquery()
         if taxonomy_type == "tag":
             taxonomy_association = (
                 select(ToolTagModel.tool_id)
@@ -188,20 +193,26 @@ class IntelligenceRepository:
         count_stmt = (
             select(func.count(func.distinct(ToolModel.id)))
             .join(ScoreHistoryModel, ToolModel.id == ScoreHistoryModel.tool_id)
-            .join(latest_score_rows, latest_score_rows.c.score_id == ScoreHistoryModel.id)
+            .join(
+                latest_score_rows, latest_score_rows.c.score_id == ScoreHistoryModel.id
+            )
             .where(*conditions, latest_score_rows.c.score_number == 1)
         )
         total = (await self.session.execute(count_stmt)).scalar_one()
 
-        score_rank = func.row_number().over(
-            partition_by=ToolModel.is_sponsored,
-            order_by=(
-                ScoreHistoryModel.overall_score.desc(),
-                ScoreHistoryModel.calculated_at.desc(),
-                ToolModel.name.asc(),
-                ToolModel.id.asc(),
-            ),
-        ).label("rank")
+        score_rank = (
+            func.row_number()
+            .over(
+                partition_by=ToolModel.is_sponsored,
+                order_by=(
+                    ScoreHistoryModel.overall_score.desc(),
+                    ScoreHistoryModel.calculated_at.desc(),
+                    ToolModel.name.asc(),
+                    ToolModel.id.asc(),
+                ),
+            )
+            .label("rank")
+        )
         stmt = (
             select(ToolModel, ScoreHistoryModel, score_rank)
             .join(ScoreHistoryModel, ToolModel.id == ScoreHistoryModel.tool_id)

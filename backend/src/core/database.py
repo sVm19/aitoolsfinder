@@ -19,6 +19,7 @@ use_supabase = settings.ENABLE_SUPABASE
 if use_supabase:
     # Supabase requires SSL connection with self-signed pooler cert support
     import ssl
+
     ssl_ctx = ssl.create_default_context()
     ssl_ctx.check_hostname = False
     ssl_ctx.verify_mode = ssl.CERT_NONE

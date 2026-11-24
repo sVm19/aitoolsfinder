@@ -72,8 +72,12 @@ def generate_presigned_upload(
             ExpiresIn=300,  # 5 minutes
         )
     except Exception as e:
-        logger.warning(f"Could not generate S3 presigned URL ({e}), using mock/direct upload URL")
-        upload_url = f"/api/v1/media/direct-upload?key={object_key}&content_type={content_type}"
+        logger.warning(
+            f"Could not generate S3 presigned URL ({e}), using mock/direct upload URL"
+        )
+        upload_url = (
+            f"/api/v1/media/direct-upload?key={object_key}&content_type={content_type}"
+        )
 
     public_url = f"https://{cdn_domain}/{object_key}"
 

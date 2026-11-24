@@ -22,8 +22,13 @@ from src.modules.vendor.models import (
 from src.modules.vendor.router import approve_submission, create_submission
 from src.modules.vendor.schemas import SubmissionCreate
 from sqlalchemy import select, delete
+import pytest
 
 
+@pytest.mark.skipif(
+    os.getenv("RUN_E2E") != "1",
+    reason="Live PostgreSQL E2E test. Set RUN_E2E=1 to run locally against PostgreSQL.",
+)
 async def test_full_founder_submission_and_approval():
     print("[E2E TEST] Starting End-to-End Submission & Approval Flow Test...")
 
@@ -76,17 +81,23 @@ async def test_full_founder_submission_and_approval():
             current_user=None,  # Public anonymous founder submission
         )
         sub_id = submission_resp.id
-        print(f"[3/5] create_submission succeeded! Submission ID: {sub_id}, Status: {submission_resp.status}")
+        print(
+            f"[3/5] create_submission succeeded! Submission ID: {sub_id}, Status: {submission_resp.status}"
+        )
 
         # Verify Vendor was auto-created/linked in database
         sub_stmt = select(ToolSubmissionModel).where(ToolSubmissionModel.id == sub_id)
         sub_row = (await session.execute(sub_stmt)).scalar_one()
         assert sub_row.vendor_id is not None, "Vendor ID must not be null!"
-        assert sub_row.status == "pending", f"Status must be pending, got {sub_row.status}"
+        assert sub_row.status == "pending", (
+            f"Status must be pending, got {sub_row.status}"
+        )
 
         vendor_stmt = select(VendorModel).where(VendorModel.id == sub_row.vendor_id)
         vendor_row = (await session.execute(vendor_stmt)).scalar_one()
-        print(f"      Verified Vendor Profile auto-created/linked: {vendor_row.name} ({vendor_row.email})")
+        print(
+            f"      Verified Vendor Profile auto-created/linked: {vendor_row.name} ({vendor_row.email})"
+        )
 
         # 4. Execute approve_submission (Simulates /admin/submissions/{id}/approve)
         print("[4/5] Executing admin atomic approve_submission transaction...")
@@ -102,21 +113,31 @@ async def test_full_founder_submission_and_approval():
             session=session,
             current_user=admin_user,
         )
-        print(f"      approve_submission succeeded! Submission status: {approval_resp.status}")
+        print(
+            f"      approve_submission succeeded! Submission status: {approval_resp.status}"
+        )
 
         # Verify Live Tool & Related Entities
         tool_stmt = select(ToolModel).where(ToolModel.slug == sub_row.tool_slug)
         tool_row = (await session.execute(tool_stmt)).scalar_one()
         tool_id = tool_row.id
-        print(f"      Verified Live Tool record: id={tool_id}, name='{tool_row.name}', is_verified={tool_row.is_verified}, status={tool_row.platform_status}")
+        print(
+            f"      Verified Live Tool record: id={tool_id}, name='{tool_row.name}', is_verified={tool_row.is_verified}, status={tool_row.platform_status}"
+        )
 
         plan_stmt = select(PricingPlanModel).where(PricingPlanModel.tool_id == tool_id)
         plan_rows = (await session.execute(plan_stmt)).scalars().all()
-        print(f"      Verified Pricing Plans ({len(plan_rows)}): {[f'{p.name} ({p.amount_minor} cents)' for p in plan_rows]}")
+        print(
+            f"      Verified Pricing Plans ({len(plan_rows)}): {[f'{p.name} ({p.amount_minor} cents)' for p in plan_rows]}"
+        )
 
-        score_stmt = select(ScoreHistoryModel).where(ScoreHistoryModel.tool_id == tool_id)
+        score_stmt = select(ScoreHistoryModel).where(
+            ScoreHistoryModel.tool_id == tool_id
+        )
         score_rows = (await session.execute(score_stmt)).scalars().all()
-        print(f"      Verified Computed Score History ({len(score_rows)} entries): initial_score={score_rows[0].overall_score if score_rows else 'N/A'}")
+        print(
+            f"      Verified Computed Score History ({len(score_rows)} entries): initial_score={score_rows[0].overall_score if score_rows else 'N/A'}"
+        )
 
         # Verify Submission status updated to approved
         await session.refresh(sub_row)
@@ -125,16 +146,28 @@ async def test_full_founder_submission_and_approval():
 
         # 5. Clean up test records
         print("[5/5] Cleaning up test records from database...")
-        await session.execute(delete(ScoreHistoryModel).where(ScoreHistoryModel.tool_id == tool_id))
-        await session.execute(delete(PricingPlanModel).where(PricingPlanModel.tool_id == tool_id))
-        await session.execute(delete(ToolCategoryModel).where(ToolCategoryModel.tool_id == tool_id))
+        await session.execute(
+            delete(ScoreHistoryModel).where(ScoreHistoryModel.tool_id == tool_id)
+        )
+        await session.execute(
+            delete(PricingPlanModel).where(PricingPlanModel.tool_id == tool_id)
+        )
+        await session.execute(
+            delete(ToolCategoryModel).where(ToolCategoryModel.tool_id == tool_id)
+        )
         await session.execute(delete(ToolModel).where(ToolModel.id == tool_id))
-        await session.execute(delete(ToolSubmissionModel).where(ToolSubmissionModel.id == sub_id))
-        await session.execute(delete(VendorModel).where(VendorModel.id == vendor_row.id))
+        await session.execute(
+            delete(ToolSubmissionModel).where(ToolSubmissionModel.id == sub_id)
+        )
+        await session.execute(
+            delete(VendorModel).where(VendorModel.id == vendor_row.id)
+        )
         await session.commit()
         print("[CLEANUP COMPLETE] All test records cleaned up cleanly.")
 
-    print("\nSUCCESS: End-to-End Founder Submission & Admin Approval Pipeline is 100% Verified and Functional!")
+    print(
+        "\nSUCCESS: End-to-End Founder Submission & Admin Approval Pipeline is 100% Verified and Functional!"
+    )
 
 
 if __name__ == "__main__":

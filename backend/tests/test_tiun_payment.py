@@ -18,7 +18,10 @@ async def test_tiun_webhook_product_access_add(client, db_session):
         "referenceId": str(user_uuid),
     }
 
-    with patch("src.modules.vendor.router.tiun_client.verify_product_access", new=AsyncMock(return_value=True)):
+    with patch(
+        "src.modules.vendor.router.tiun_client.verify_product_access",
+        new=AsyncMock(return_value=True),
+    ):
         response = await client.post("/api/v1/webhooks/tiun", json=payload)
         assert response.status_code == 200
         data = response.json()

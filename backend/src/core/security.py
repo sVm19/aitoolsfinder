@@ -9,26 +9,23 @@ Features:
 - Standard error envelopes for unauthorized/forbidden requests
 """
 
-import json
 import time
 import asyncio
 import uuid
 from datetime import datetime, timezone
-from concurrent.futures import ThreadPoolExecutor
 from typing import Optional, List, Dict, Any, Callable
 from urllib.parse import urlparse
 
 import httpx
-from jose import jwt, JWTError, jwk  # josepy for JWK handling
-from jose.utils import base64url_decode
+from jose import jwt, JWTError  # josepy for JWK handling
+from fastapi import Request, HTTPException, Depends, status
+from pydantic import BaseModel
+from sqlalchemy import select
 
-from src.core.database import get_db, async_session_factory, AsyncSession
+from src.core.database import async_session_factory
 from src.core.config import settings
-from src.core.database import Base
-from src.modules.catalog.models import ToolModel
 from src.modules.identity.models import UserModel
-from sqlalchemy.ext.asyncio import AsyncSession as SAAsyncSession
-from sqlalchemy import select, UUID
+
 
 def is_safe_outbound_url(url: str) -> bool:
     """Allow only absolute HTTP(S) URLs without embedded credentials."""
@@ -70,7 +67,9 @@ async def _fetch_cognito_jwks() -> Dict[str, Any]:
     if not pool_id:
         raise ValueError("COGNITO_USER_POOL_ID must be configured")
 
-    jwks_url = f"https://cognito-idp.{region}.amazonaws.com/{pool_id}/.well-known/jwks.json"
+    jwks_url = (
+        f"https://cognito-idp.{region}.amazonaws.com/{pool_id}/.well-known/jwks.json"
+    )
 
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.get(jwks_url)
@@ -96,12 +95,14 @@ async def _get_cached_jwks() -> Dict[str, Any]:
 # JWT Helpers
 # ---------------------------------------------------------------------------
 
+
 def _extract_jwk_key(jwks: Dict[str, Any], kid: str) -> Any:
     """Extract an RSA public key from JWKS by key ID (kid)."""
     for jwk_dict in jwks.get("keys", []):
         if jwk_dict.get("kid") == kid:
             # josepy JWK construction
             from jose import JWK
+
             return JWK.from_dict(jwk_dict)
     raise JWTError(f"Key ID '{kid}' not found in JWKS")
 
@@ -159,13 +160,6 @@ def _verify_token_sub(
 # FastAPI Security Dependencies
 # ---------------------------------------------------------------------------
 
-import asyncio
-
-from fastapi import Request, HTTPException, Depends, status
-from fastapi.security import OAuth2AuthorizationCodeBearer
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-
 CognitoUser = Dict[str, Any]
 
 
@@ -179,7 +173,9 @@ class UserContext(BaseModel):
     is_email_verified: bool = False
 
 
-def create_session_token(user_id: str, email: str, cognito_sub: str, role: str = "user") -> str:
+def create_session_token(
+    user_id: str, email: str, cognito_sub: str, role: str = "user"
+) -> str:
     """Create a signed JWT session token for authenticated users."""
     payload = {
         "sub": cognito_sub,
@@ -210,7 +206,7 @@ async def _get_current_user_from_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    token = auth_header[len("Bearer "):].strip()
+    token = auth_header[len("Bearer ") :].strip()
     if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -276,9 +272,7 @@ async def get_current_user(request: Request) -> UserContext:
     name: Optional[str] = payload.get("name")
 
     # Build display name
-    display_name: Optional[str] = (
-        name or given_name or family_name or cognito_sub
-    )
+    display_name: Optional[str] = name or given_name or family_name or cognito_sub
 
     # JIT user creation / lookup in PostgreSQL
     async with async_session_factory() as session:
@@ -335,7 +329,9 @@ def require_role(
     Raises HTTP 403 if the user's role is not in allowed_roles.
     """
 
-    async def _check_role(current_user: UserContext = Depends(get_current_user)) -> UserContext:
+    async def _check_role(
+        current_user: UserContext = Depends(get_current_user),
+    ) -> UserContext:
         if current_user.role not in allowed_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -349,6 +345,7 @@ def require_role(
 # ---------------------------------------------------------------------------
 # Utility: Role checks for common patterns
 # ---------------------------------------------------------------------------
+
 
 def is_user(current_user: UserContext = Depends(get_current_user)) -> UserContext:
     """Shortcut dependency: current user must have role 'user'."""

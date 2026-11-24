@@ -2,7 +2,15 @@
 
 import uuid
 from datetime import datetime, timezone
-from typing import List, Optional
+from typing import TYPE_CHECKING, List, Optional
+
+if TYPE_CHECKING:
+    from src.modules.catalog.models import (
+        CategoryModel,
+        FeatureModel,
+        PricingPlanModel,
+        ToolModel,
+    )
 
 from sqlalchemy import (
     String,
@@ -18,7 +26,7 @@ from sqlalchemy import (
     Integer,
     UniqueConstraint,
 )
-from sqlalchemy.orm import Mapped, mapped_column, Relationship, registry
+from sqlalchemy.orm import Mapped, mapped_column, Relationship
 
 from src.core.database import Base
 
@@ -27,8 +35,18 @@ from src.core.database import Base
 tool_submission_tags = Table(
     "tool_submissions_tags",
     Base.metadata,
-    Column("tool_submission_id", Uuid(as_uuid=True), ForeignKey("tool_submissions.id", ondelete="CASCADE"), primary_key=True),
-    Column("tag_id", Uuid(as_uuid=True), ForeignKey("tags.id", ondelete="SET NULL"), nullable=True),
+    Column(
+        "tool_submission_id",
+        Uuid(as_uuid=True),
+        ForeignKey("tool_submissions.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "tag_id",
+        Uuid(as_uuid=True),
+        ForeignKey("tags.id", ondelete="SET NULL"),
+        nullable=True,
+    ),
 )
 
 
@@ -36,8 +54,18 @@ tool_submission_tags = Table(
 tool_submission_features = Table(
     "tool_submission_features",
     Base.metadata,
-    Column("tool_submission_id", Uuid(as_uuid=True), ForeignKey("tool_submissions.id", ondelete="CASCADE"), primary_key=True),
-    Column("feature_id", Uuid(as_uuid=True), ForeignKey("features.id", ondelete="SET NULL"), nullable=True),
+    Column(
+        "tool_submission_id",
+        Uuid(as_uuid=True),
+        ForeignKey("tool_submissions.id", ondelete="CASCADE"),
+        primary_key=True,
+    ),
+    Column(
+        "feature_id",
+        Uuid(as_uuid=True),
+        ForeignKey("features.id", ondelete="SET NULL"),
+        nullable=True,
+    ),
 )
 
 
@@ -97,24 +125,33 @@ class ToolSubmissionModel(Base):
     )
     tool_name: Mapped[str] = mapped_column(String(254), nullable=False)
     tool_slug: Mapped[str] = mapped_column(
-        String(128), nullable=False,
-        comment="Generated slug, must be unique when published"
+        String(128),
+        nullable=False,
+        comment="Generated slug, must be unique when published",
     )
     tagline: Mapped[str] = mapped_column(String(500), nullable=False)
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     primary_category_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        Uuid(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"), nullable=True
+        Uuid(as_uuid=True),
+        ForeignKey("categories.id", ondelete="SET NULL"),
+        nullable=True,
     )
-    pricing_model: Mapped[str] = mapped_column(String(50), nullable=False, server_default="free")
+    pricing_model: Mapped[str] = mapped_column(
+        String(50), nullable=False, server_default="free"
+    )
     is_free: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("true")
     )
     starting_price_minor: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
-    currency: Mapped[str] = mapped_column(String(3), nullable=False, server_default="USD")
+    currency: Mapped[str] = mapped_column(
+        String(3), nullable=False, server_default="USD"
+    )
     website_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     status: Mapped[str] = mapped_column(
-        String(20), nullable=False, server_default="pending",
-        comment="pending | under_review | approved | rejected"
+        String(20),
+        nullable=False,
+        server_default="pending",
+        comment="pending | under_review | approved | rejected",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -210,15 +247,22 @@ class PaymentEventModel(Base):
     )
     provider: Mapped[str] = mapped_column(String(50), nullable=False, default="tiun")
     provider_event_id: Mapped[str] = mapped_column(
-        String(128), nullable=False,
-        comment="Unique ID from the provider, used for deduplication"
+        String(128),
+        nullable=False,
+        comment="Unique ID from the provider, used for deduplication",
     )
-    event_type: Mapped[str] = mapped_column(String(50), nullable=False, default="subscription_created")
+    event_type: Mapped[str] = mapped_column(
+        String(50), nullable=False, default="subscription_created"
+    )
     status: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="processed",
-        comment="processed | completed | failed"
+        String(20),
+        nullable=False,
+        default="processed",
+        comment="processed | completed | failed",
     )
-    event_metadata: Mapped[Optional[str]] = mapped_column("metadata", Text, nullable=True)
+    event_metadata: Mapped[Optional[str]] = mapped_column(
+        "metadata", Text, nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
@@ -242,7 +286,6 @@ class PaymentEventModel(Base):
     )
 
 
-
 class SubscriptionModel(Base):
     """A user subscription status, linked to a payment event."""
 
@@ -255,15 +298,18 @@ class SubscriptionModel(Base):
         Uuid(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     provider_subscription_id: Mapped[str] = mapped_column(
-        String(128), nullable=False,
-        comment="ID from the provider (Tiun Business)"
+        String(128), nullable=False, comment="ID from the provider (Tiun Business)"
     )
     status: Mapped[str] = mapped_column(
-        String(20), nullable=False, default="active",
-        comment="active | cancelled | past_due | completed"
+        String(20),
+        nullable=False,
+        default="active",
+        comment="active | cancelled | past_due | completed",
     )
     pricing_plan_id: Mapped[Optional[uuid.UUID]] = mapped_column(
-        Uuid(as_uuid=True), ForeignKey("pricing_plans.id", ondelete="SET NULL"), nullable=True
+        Uuid(as_uuid=True),
+        ForeignKey("pricing_plans.id", ondelete="SET NULL"),
+        nullable=True,
     )
     current_period_start: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True), nullable=True

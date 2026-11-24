@@ -22,9 +22,14 @@ async def test_health_live(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_health_ready_disconnected(client: AsyncClient):
+async def test_health_ready_disconnected(client: AsyncClient, monkeypatch):
+    import src.modules.operations.router as op_router
+
+    async def mock_unhealthy():
+        return False
+
+    monkeypatch.setattr(op_router, "check_database_health", mock_unhealthy)
     response = await client.get("/api/v1/health/ready")
-    # When PostgreSQL is not connected locally, readiness returns 503
     assert response.status_code == 503
     data = response.json()
     assert data["status"] == "unhealthy"

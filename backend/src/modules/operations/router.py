@@ -63,7 +63,7 @@ async def subscribe_newsletter(
     # Send confirmation welcome email if email credentials are configured
     try:
         subject = "Welcome to Tuesday AI Drop & Pricing Arbitrage"
-        html = f"""
+        html = """
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1a1722;">
             <h1 style="color: #7022fc; margin-bottom: 16px;">You're on the list! 🎉</h1>
             <p style="font-size: 16px; line-height: 1.6;">Welcome to the <strong>Tuesday AI Drop</strong> by AIToolsFinder.cloud.</p>

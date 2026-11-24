@@ -49,13 +49,15 @@ class AIRecommendationRepository:
         candidate_ids: Sequence[uuid.UUID] = [tool.id for tool in matches]
         statement = (
             select(ToolModel)
-            .where(ToolModel.id.in_(candidate_ids), ToolModel.platform_status == "published")
+            .where(
+                ToolModel.id.in_(candidate_ids),
+                ToolModel.platform_status == "published",
+            )
             .options(
                 selectinload(ToolModel.primary_category),
                 selectinload(ToolModel.features).selectinload(ToolFeatureModel.feature),
                 selectinload(ToolModel.pricing_plans),
-                selectinload(ToolModel.tags)
-                .selectinload(ToolTagModel.tag),
+                selectinload(ToolModel.tags).selectinload(ToolTagModel.tag),
             )
         )
         hydrated = (await self.session.execute(statement)).scalars().all()

@@ -30,7 +30,9 @@ router = APIRouter(prefix="/api/v1", tags=["User Identity"])
 
 
 @router.post("/auth/magic-code/send", response_model=MagicCodeSendResponse)
-async def send_magic_code_endpoint(payload: MagicCodeSendRequest) -> MagicCodeSendResponse:
+async def send_magic_code_endpoint(
+    payload: MagicCodeSendRequest,
+) -> MagicCodeSendResponse:
     """Send an official AWS Cognito authentication code to the specified email."""
     try:
         result = send_cognito_code(payload.email)
@@ -125,7 +127,6 @@ async def verify_magic_code_endpoint(
     )
 
 
-
 @router.get("/users/me", response_model=UserRead)
 async def get_current_user_endpoint(
     current_user: UserContext = Depends(get_current_user),
@@ -209,11 +210,20 @@ async def get_saved_tools(
                 tool_name=tool.name,
                 tool_tagline=tool.tagline,
                 tool_description=tool.description[:100] if tool.description else None,
-                tool_category=tool.primary_category.name if tool.primary_category else None,
+                tool_category=tool.primary_category.name
+                if tool.primary_category
+                else None,
                 tool_pricing={  # simplified pricing snapshot
                     "is_free": any(p.is_free for p in (tool.pricing_plans or [])),
                     "amount_minor": (
-                        min((p.amount_minor for p in (tool.pricing_plans or []) if p.amount_minor is not None), default=None)
+                        min(
+                            (
+                                p.amount_minor
+                                for p in (tool.pricing_plans or [])
+                                if p.amount_minor is not None
+                            ),
+                            default=None,
+                        )
                     ),
                 },
                 saved_at=st.created_at,

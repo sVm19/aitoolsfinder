@@ -5,7 +5,11 @@ import os
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 
-from src.common.s3 import generate_presigned_upload, ALLOWED_CONTENT_TYPES, MAX_FILE_SIZE_BYTES
+from src.common.s3 import (
+    generate_presigned_upload,
+    ALLOWED_CONTENT_TYPES,
+    MAX_FILE_SIZE_BYTES,
+)
 from src.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -14,8 +18,12 @@ router = APIRouter(prefix="/media", tags=["Media"])
 
 
 class PresignedUrlRequest(BaseModel):
-    content_type: str = Field(description="MIME type, e.g. image/png, image/jpeg, image/webp, image/svg+xml")
-    folder: str = Field(default="logos", description="Target folder: logos | screenshots")
+    content_type: str = Field(
+        description="MIME type, e.g. image/png, image/jpeg, image/webp, image/svg+xml"
+    )
+    folder: str = Field(
+        default="logos", description="Target folder: logos | screenshots"
+    )
 
 
 class PresignedUrlResponse(BaseModel):
@@ -26,7 +34,9 @@ class PresignedUrlResponse(BaseModel):
 
 
 @router.post("/presigned-url", response_model=PresignedUrlResponse)
-async def get_presigned_upload_url(payload: PresignedUrlRequest) -> PresignedUrlResponse:
+async def get_presigned_upload_url(
+    payload: PresignedUrlRequest,
+) -> PresignedUrlResponse:
     """Generate a 5-minute AWS S3 presigned upload URL for direct browser uploads."""
     if payload.content_type not in ALLOWED_CONTENT_TYPES:
         raise HTTPException(
@@ -65,9 +75,14 @@ async def direct_upload_fallback(
         raise HTTPException(status_code=413, detail="File too large (max 5MB)")
 
     # Try uploading to Supabase Storage if configured
-    if settings.ENABLE_SUPABASE and settings.SUPABASE_URL and settings.SUPABASE_SERVICE_ROLE_KEY:
+    if (
+        settings.ENABLE_SUPABASE
+        and settings.SUPABASE_URL
+        and settings.SUPABASE_SERVICE_ROLE_KEY
+    ):
         try:
             import httpx
+
             headers = {
                 "Authorization": f"Bearer {settings.SUPABASE_SERVICE_ROLE_KEY}",
                 "Content-Type": content_type,
@@ -81,7 +96,11 @@ async def direct_upload_fallback(
                     content=body,
                 )
                 if res.status_code in (200, 201):
-                    return {"status": "uploaded", "key": key, "url": f"{supabase_url}/storage/v1/object/public/{bucket}/{key}"}
+                    return {
+                        "status": "uploaded",
+                        "key": key,
+                        "url": f"{supabase_url}/storage/v1/object/public/{bucket}/{key}",
+                    }
         except Exception as e:
             logger.warning(f"Supabase storage upload fallback failed: {e}")
 

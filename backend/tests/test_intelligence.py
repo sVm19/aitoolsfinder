@@ -54,9 +54,7 @@ async def test_tool_cannot_be_its_own_alternative(db_session: AsyncSession):
             website_url="https://example.test",
         )
     )
-    db_session.add(
-        ToolAlternativeModel(tool_id=tool_id, alternative_tool_id=tool_id)
-    )
+    db_session.add(ToolAlternativeModel(tool_id=tool_id, alternative_tool_id=tool_id))
 
     with pytest.raises(IntegrityError):
         await db_session.flush()

@@ -34,11 +34,12 @@ class IntelligenceService:
         if comparison is None:
             raise NotFoundError(f"Comparison '{slug}' not found")
 
-        associations = sorted(comparison.tool_associations, key=lambda row: row.position)
+        associations = sorted(
+            comparison.tool_associations, key=lambda row: row.position
+        )
         tools = [row.tool for row in associations]
-        if (
-            not 2 <= len(tools) <= 4
-            or any(tool.platform_status != "published" for tool in tools)
+        if not 2 <= len(tools) <= 4 or any(
+            tool.platform_status != "published" for tool in tools
         ):
             raise NotFoundError(f"Comparison '{slug}' not found")
         return self._build_matrix(
@@ -48,7 +49,9 @@ class IntelligenceService:
             summary=comparison.summary,
         )
 
-    async def get_alternatives(self, slug: str, limit: int = 10) -> AlternativesResponse:
+    async def get_alternatives(
+        self, slug: str, limit: int = 10
+    ) -> AlternativesResponse:
         tool = await self.catalog.get_published_tool(slug)
         curated_rows = await self.repo.get_curated_alternatives(tool.id, limit)
         curated: List[AlternativeItem] = []
@@ -185,9 +188,7 @@ class IntelligenceService:
             summary=summary,
             tools=summaries,
             features=feature_rows,
-            pricing_by_tool={
-                tool.slug: tool.pricing_plans for tool in tools
-            },
+            pricing_by_tool={tool.slug: tool.pricing_plans for tool in tools},
         )
 
     @staticmethod

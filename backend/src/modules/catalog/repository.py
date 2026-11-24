@@ -145,7 +145,9 @@ class CatalogRepository:
             conditions.append(
                 ToolModel.id.in_(
                     select(ToolCategoryModel.tool_id)
-                    .join(CategoryModel, CategoryModel.id == ToolCategoryModel.category_id)
+                    .join(
+                        CategoryModel, CategoryModel.id == ToolCategoryModel.category_id
+                    )
                     .where(
                         CategoryModel.slug.in_(category_slugs),
                         CategoryModel.is_active.is_(True),
@@ -205,14 +207,13 @@ class CatalogRepository:
         stmt = select(ToolModel).where(ToolModel.platform_status == "published")
         if self.session.get_bind().dialect.name == "postgresql":
             trigram_match = ToolModel.name.op("%")(query)
-            stmt = (
-                stmt.where(
-                    or_(
-                        ToolModel.name.ilike(f"{query}%"),
-                        trigram_match,
-                    )
+            stmt = stmt.where(
+                or_(
+                    ToolModel.name.ilike(f"{query}%"),
+                    trigram_match,
                 )
-                .order_by(desc(func.similarity(ToolModel.name, query)), ToolModel.name.asc())
+            ).order_by(
+                desc(func.similarity(ToolModel.name, query)), ToolModel.name.asc()
             )
         else:
             stmt = stmt.where(ToolModel.name.ilike(f"%{query}%")).order_by(

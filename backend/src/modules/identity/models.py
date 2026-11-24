@@ -28,36 +28,42 @@ class UserModel(Base):
         Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     cognito_sub: Mapped[str] = mapped_column(
-        String(128), nullable=False, unique=True, index=True,
-        comment="Stable Cognito User Pool sub identifier"
+        String(128),
+        nullable=False,
+        unique=True,
+        index=True,
+        comment="Stable Cognito User Pool sub identifier",
     )
     email: Mapped[str] = mapped_column(
         String(254), nullable=False, unique=True, index=True
     )
     display_name: Mapped[Optional[str]] = mapped_column(
-        String(128), nullable=True,
-        comment="Display name shown in dashboard"
+        String(128), nullable=True, comment="Display name shown in dashboard"
     )
     role: Mapped[str] = mapped_column(
-        String(20), nullable=False, server_default="user",
-        comment="Role: user | vendor | admin"
+        String(20),
+        nullable=False,
+        server_default="user",
+        comment="Role: user | vendor | admin",
     )
     is_email_verified: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, server_default=text("false"),
-        comment="Email verification status"
+        Boolean,
+        nullable=False,
+        server_default=text("false"),
+        comment="Email verification status",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         server_default=func.now(),
         onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False
+        nullable=False,
     )
 
     # Relationships
@@ -88,7 +94,9 @@ class FounderProfileModel(Base):
         index=True,
     )
     founder_name: Mapped[str] = mapped_column(String(128), nullable=False)
-    handle: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, index=True)
+    handle: Mapped[str] = mapped_column(
+        String(64), nullable=False, unique=True, index=True
+    )
     headline: Mapped[str] = mapped_column(String(160), nullable=False)
     bio: Mapped[str] = mapped_column(Text, nullable=False)
     avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
@@ -146,10 +154,8 @@ class SavedToolModel(Base):
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         server_default=func.now(),
-        nullable=False
+        nullable=False,
     )
 
     # Relationship back to user
-    user: Mapped["UserModel"] = Relationship(
-        back_populates="saved_tools"
-    )
+    user: Mapped["UserModel"] = Relationship(back_populates="saved_tools")

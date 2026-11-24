@@ -18,7 +18,9 @@ logger = logging.getLogger(__name__)
 def calculate_secret_hash(username: str) -> str:
     """Calculate the HMAC-SHA256 SECRET_HASH required by AWS Cognito."""
     if not settings.COGNITO_CLIENT_SECRET or not settings.COGNITO_APP_CLIENT_ID:
-        raise ValueError("COGNITO_CLIENT_SECRET and COGNITO_APP_CLIENT_ID must be configured")
+        raise ValueError(
+            "COGNITO_CLIENT_SECRET and COGNITO_APP_CLIENT_ID must be configured"
+        )
 
     msg = username + settings.COGNITO_APP_CLIENT_ID
     dig = hmac.new(
@@ -63,7 +65,9 @@ def _call_cognito_api(target: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         raise CognitoError(err_type, err_msg) from exc
     except Exception as exc:
         logger.error(f"[Cognito Network Error] {target}: {exc}")
-        raise CognitoError("NetworkError", f"Failed to connect to Cognito: {exc}") from exc
+        raise CognitoError(
+            "NetworkError", f"Failed to connect to Cognito: {exc}"
+        ) from exc
 
 
 class CognitoError(Exception):
@@ -106,7 +110,9 @@ def send_cognito_code(email: str) -> Dict[str, Any]:
         }
     except CognitoError as err:
         if err.error_type == "UsernameExistsException":
-            logger.info(f"User {clean_email} already exists in Cognito, triggering ForgotPassword code")
+            logger.info(
+                f"User {clean_email} already exists in Cognito, triggering ForgotPassword code"
+            )
         else:
             logger.warning(f"SignUp failed with {err.error_type}: {err.message}")
 
@@ -129,9 +135,15 @@ def send_cognito_code(email: str) -> Dict[str, Any]:
         }
     except CognitoError as err:
         if err.error_type == "UserNotFoundException":
-            raise CognitoError("UserNotFound", "Account could not be found or registered. Please verify your email.")
+            raise CognitoError(
+                "UserNotFound",
+                "Account could not be found or registered. Please verify your email.",
+            )
         if err.error_type == "LimitExceededException":
-            raise CognitoError("RateLimitExceeded", "Too many attempts. Please wait a few minutes before requesting another code.")
+            raise CognitoError(
+                "RateLimitExceeded",
+                "Too many attempts. Please wait a few minutes before requesting another code.",
+            )
         raise
 
 
@@ -144,21 +156,36 @@ def verify_cognito_code(email: str, code: str) -> Dict[str, Any]:
 
     # 1. Try ConfirmSignUp (if newly registered)
     try:
-        _call_cognito_api("ConfirmSignUp", {
-            "ClientId": client_id,
-            "SecretHash": secret_hash,
-            "Username": clean_email,
-            "ConfirmationCode": clean_code,
-        })
+        _call_cognito_api(
+            "ConfirmSignUp",
+            {
+                "ClientId": client_id,
+                "SecretHash": secret_hash,
+                "Username": clean_email,
+                "ConfirmationCode": clean_code,
+            },
+        )
         return {"success": True, "email": clean_email, "mode": "signup_confirmed"}
     except CognitoError as err:
         # If user is already confirmed or was an existing user, try ConfirmForgotPassword
-        if err.error_type in ("NotAuthorizedException", "UserNotFoundException", "InvalidParameterException"):
-            logger.info(f"ConfirmSignUp skipped ({err.error_type}), trying ConfirmForgotPassword")
+        if err.error_type in (
+            "NotAuthorizedException",
+            "UserNotFoundException",
+            "InvalidParameterException",
+        ):
+            logger.info(
+                f"ConfirmSignUp skipped ({err.error_type}), trying ConfirmForgotPassword"
+            )
         elif err.error_type == "CodeMismatchException":
-            raise CognitoError("CodeMismatch", "Invalid verification code. Please check your email and try again.")
+            raise CognitoError(
+                "CodeMismatch",
+                "Invalid verification code. Please check your email and try again.",
+            )
         elif err.error_type == "ExpiredCodeException":
-            raise CognitoError("ExpiredCode", "Verification code has expired. Please request a new code.")
+            raise CognitoError(
+                "ExpiredCode",
+                "Verification code has expired. Please request a new code.",
+            )
         else:
             logger.warning(f"ConfirmSignUp failed: {err.error_type} - {err.message}")
 
@@ -166,19 +193,35 @@ def verify_cognito_code(email: str, code: str) -> Dict[str, Any]:
     # Reset internal password to new secure token
     new_password = f"P@{uuid.uuid4().hex[:14]}Bb2!"
     try:
-        _call_cognito_api("ConfirmForgotPassword", {
-            "ClientId": client_id,
-            "SecretHash": secret_hash,
-            "Username": clean_email,
-            "ConfirmationCode": clean_code,
-            "Password": new_password,
-        })
-        return {"success": True, "email": clean_email, "mode": "forgot_password_confirmed"}
+        _call_cognito_api(
+            "ConfirmForgotPassword",
+            {
+                "ClientId": client_id,
+                "SecretHash": secret_hash,
+                "Username": clean_email,
+                "ConfirmationCode": clean_code,
+                "Password": new_password,
+            },
+        )
+        return {
+            "success": True,
+            "email": clean_email,
+            "mode": "forgot_password_confirmed",
+        }
     except CognitoError as err:
         if err.error_type == "CodeMismatchException":
-            raise CognitoError("CodeMismatch", "Invalid verification code. Please check your email and try again.")
+            raise CognitoError(
+                "CodeMismatch",
+                "Invalid verification code. Please check your email and try again.",
+            )
         if err.error_type == "ExpiredCodeException":
-            raise CognitoError("ExpiredCode", "Verification code has expired. Please request a new code.")
+            raise CognitoError(
+                "ExpiredCode",
+                "Verification code has expired. Please request a new code.",
+            )
         if err.error_type == "LimitExceededException":
-            raise CognitoError("RateLimitExceeded", "Too many attempts. Please request a new code in a few minutes.")
+            raise CognitoError(
+                "RateLimitExceeded",
+                "Too many attempts. Please request a new code in a few minutes.",
+            )
         raise

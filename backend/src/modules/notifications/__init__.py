@@ -1,2 +1,5 @@
 """Email notification service for Phase 7 monetization features."""
+
 from .service import send_submission_email
+
+__all__ = ["send_submission_email"]

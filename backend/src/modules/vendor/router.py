@@ -3,16 +3,13 @@
 import logging
 import uuid
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, Request, Response, status, HTTPException
+from fastapi import APIRouter, Depends, Request, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, or_
+from sqlalchemy import select
 from typing import List, Optional
-
-logger = logging.getLogger(__name__)
 
 from src.core.database import get_db
 from src.core.security import (
-    get_current_user,
     get_optional_current_user,
     UserContext,
     require_role,
@@ -30,9 +27,6 @@ from src.modules.vendor.models import (
 )
 from src.modules.catalog.models import (
     ToolModel,
-    CategoryModel,
-    FeatureModel,
-    TagModel,
     ToolCategoryModel,
     ToolTagModel,
     ToolFeatureModel,
@@ -42,28 +36,22 @@ from src.modules.intelligence.scoring import calculate_tool_score
 from src.modules.intelligence.models import ScoreHistoryModel
 from src.modules.vendor.schemas import (
     SubmissionCreate,
-    SubmissionApprove,
     SubmissionReject,
     SubmissionRead,
     SubmissionListItem,
-    UserSubmissionDetail,
-    UserSubmissionTag,
-    AffiliateLinkCreate,
-    AffiliateLinkRead,
-    OutboundClickCreate,
     OutboundClickRead,
-    PaymentEventCreate,
-    PaymentEventRead,
-    SubscriptionRead,
 )
 from src.modules.notifications.service import send_submission_email
 from src.modules.vendor.tiun_client import tiun_client
 
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["Vendor Submissions"])
 
 
-@router.post("/submissions", response_model=SubmissionRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/submissions", response_model=SubmissionRead, status_code=status.HTTP_201_CREATED
+)
 async def create_submission(
     payload: SubmissionCreate,
     session: AsyncSession = Depends(get_db),
@@ -91,8 +79,16 @@ async def create_submission(
         slug = f"{slug}-{uuid.uuid4().hex[:8]}"
 
     # Vendor Profile Resolution: Guarantee vendor_id is never NULL
-    vendor_email = (current_user.email if current_user else payload.submitter_email).strip().lower()
-    vendor_name = (current_user.display_name if current_user else payload.submitter_name or payload.tool_name).strip()
+    vendor_email = (
+        (current_user.email if current_user else payload.submitter_email)
+        .strip()
+        .lower()
+    )
+    vendor_name = (
+        current_user.display_name
+        if current_user
+        else payload.submitter_name or payload.tool_name
+    ).strip()
 
     result = await session.execute(
         select(VendorModel).where(VendorModel.email == vendor_email)
@@ -205,7 +201,9 @@ async def list_pending_submissions(
     ]
 
 
-@router.post("/admin/submissions/{submission_id}/approve", response_model=SubmissionRead)
+@router.post(
+    "/admin/submissions/{submission_id}/approve", response_model=SubmissionRead
+)
 async def approve_submission(
     submission_id: str,
     session: AsyncSession = Depends(get_db),
@@ -420,9 +418,7 @@ async def record_outbound_click(
         )
 
     # Find the tool and its affiliate link
-    result = await session.execute(
-        select(ToolModel).where(ToolModel.id == tool_uuid)
-    )
+    result = await session.execute(select(ToolModel).where(ToolModel.id == tool_uuid))
     tool = result.scalar_one_or_none()
     if not tool:
         raise HTTPException(
@@ -494,7 +490,10 @@ async def tiun_webhook(
     # Tiun event identifier and type
     event_type = event.get("event") or event.get("type", "unknown")
     provider_event_id = str(
-        event.get("id") or event.get("provider_event_id") or event.get("eventId") or uuid.uuid4()
+        event.get("id")
+        or event.get("provider_event_id")
+        or event.get("eventId")
+        or uuid.uuid4()
     )
 
     # Check for idempotency
@@ -541,7 +540,10 @@ async def tiun_webhook(
             return {"status": "verification_failed", "event_id": provider_event_id}
 
         # Handle subscription or purchase association
-        sub_id = str(event.get("data", {}).get("subscription_id") or f"tiun_{user_id_str}_{product_id_str}")
+        sub_id = str(
+            event.get("data", {}).get("subscription_id")
+            or f"tiun_{user_id_str}_{product_id_str}"
+        )
         sub_result = await session.execute(
             select(SubscriptionModel).where(
                 SubscriptionModel.provider_subscription_id == sub_id
@@ -577,7 +579,10 @@ async def tiun_webhook(
         payment_event.status = "processed"
 
     elif event_type in ("product_access.remove", "subscription_cancelled"):
-        sub_id = str(event.get("data", {}).get("subscription_id") or f"tiun_{user_id_str}_{product_id_str}")
+        sub_id = str(
+            event.get("data", {}).get("subscription_id")
+            or f"tiun_{user_id_str}_{product_id_str}"
+        )
         sub_result = await session.execute(
             select(SubscriptionModel).where(
                 SubscriptionModel.provider_subscription_id == sub_id

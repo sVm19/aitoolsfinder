@@ -69,9 +69,7 @@ def calculate_tool_score(
                 support_values[getattr(feature, "support_level")]
                 for feature in known_features
             )
-            dimensions["feature_breadth"] = _percent(
-                points, len(known_features) * 2
-            )
+            dimensions["feature_breadth"] = _percent(points, len(known_features) * 2)
         evidence.append(f"feature_records_known:{len(known_features)}")
 
     if plans:
@@ -108,8 +106,7 @@ def calculate_tool_score(
             else Decimal("0")
         )
         dimensions["verification_freshness"] = (
-            verification_score * Decimal("0.6")
-            + freshness_score * Decimal("0.4")
+            verification_score * Decimal("0.6") + freshness_score * Decimal("0.4")
         ).quantize(_CENT, rounding=ROUND_HALF_UP)
         evidence.append(f"last_verified_age_days:{age_days}")
     else:

@@ -44,9 +44,7 @@ class RecommendationOutcome:
 
 
 class AIRecommendationService:
-    def __init__(
-        self, session: AsyncSession, *, client_factory=None
-    ) -> None:
+    def __init__(self, session: AsyncSession, *, client_factory=None) -> None:
         self.repository = AIRecommendationRepository(session)
         self.client_factory = client_factory or get_client
 
@@ -85,7 +83,9 @@ class AIRecommendationService:
                 items=_apply_match_scores(items), personalized=True
             )
         except OpenRouterUnavailable:
-            logger.info("Serving catalog search results because OpenRouter is unavailable")
+            logger.info(
+                "Serving catalog search results because OpenRouter is unavailable"
+            )
             return self._fallback(candidates)
         except OpenRouterError:
             logger.warning("Serving catalog results after an OpenRouter request error")
@@ -116,7 +116,9 @@ class AIRecommendationService:
         )
 
 
-def _apply_match_scores(items: List[RecommendationResult]) -> List[RecommendationResult]:
+def _apply_match_scores(
+    items: List[RecommendationResult],
+) -> List[RecommendationResult]:
     """Assign a relative, rank-based score; never claim measured benchmark accuracy."""
     total = len(items)
     if total == 0:
@@ -135,11 +137,12 @@ def _apply_match_scores(items: List[RecommendationResult]) -> List[Recommendatio
 
 def _bind_candidate(tool: ToolModel) -> dict:
     """Expose only bounded, relevant public catalog fields to the model."""
-    features = sorted(
-        tool.features or [], key=lambda row: row.feature.name.casefold()
-    )[:20]
+    features = sorted(tool.features or [], key=lambda row: row.feature.name.casefold())[
+        :20
+    ]
     plans = sorted(
-        tool.pricing_plans or [], key=lambda plan: (not plan.is_free, plan.name.casefold())
+        tool.pricing_plans or [],
+        key=lambda plan: (not plan.is_free, plan.name.casefold()),
     )[:5]
     tags = sorted(
         (association.tag for association in tool.tags or []),
@@ -200,7 +203,9 @@ def _verify_and_hydrate(
         if choice.tool_id in seen_ids:
             raise UngroundedRecommendationError("Model returned a duplicate tool ID.")
         seen_ids.add(choice.tool_id)
-        features_by_slug = {row.feature.slug: row.feature for row in tool.features or []}
+        features_by_slug = {
+            row.feature.slug: row.feature for row in tool.features or []
+        }
         if any(slug not in features_by_slug for slug in choice.relevant_feature_slugs):
             raise UngroundedRecommendationError("Model selected an unknown feature.")
         results.append(

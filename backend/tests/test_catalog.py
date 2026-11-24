@@ -1,6 +1,21 @@
 import pytest
 from httpx import AsyncClient
 
+from src.core.security import get_current_user, UserContext
+from src.main import app
+
+
+@pytest.fixture(autouse=True)
+def override_admin_auth():
+    app.dependency_overrides[get_current_user] = lambda: UserContext(
+        id="test-admin-id",
+        email="admin@aitoolsfinder.cloud",
+        role="admin",
+        is_email_verified=True,
+    )
+    yield
+    app.dependency_overrides.pop(get_current_user, None)
+
 
 @pytest.mark.asyncio
 async def test_category_lifecycle(client: AsyncClient):
@@ -181,4 +196,3 @@ async def test_tool_publish_validation_failure(client: AsyncClient):
     pub_res = await client.post(f"/api/v1/admin/tools/{tool_id}/publish")
     assert pub_res.status_code == 422
     assert "category" in pub_res.json()["error"]["message"]
-

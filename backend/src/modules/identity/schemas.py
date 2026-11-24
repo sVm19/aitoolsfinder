@@ -75,7 +75,9 @@ class FounderProfileUpdate(BaseModel):
     """Payload to update an existing founder profile."""
 
     founder_name: Optional[str] = Field(default=None, min_length=2, max_length=128)
-    handle: Optional[str] = Field(default=None, min_length=3, max_length=64, pattern=r"^[a-zA-Z0-9_]{3,30}$")
+    handle: Optional[str] = Field(
+        default=None, min_length=3, max_length=64, pattern=r"^[a-zA-Z0-9_]{3,30}$"
+    )
     headline: Optional[str] = Field(default=None, min_length=3, max_length=160)
     bio: Optional[str] = Field(default=None, min_length=10, max_length=2000)
     avatar_url: Optional[str] = Field(default=None, max_length=500)

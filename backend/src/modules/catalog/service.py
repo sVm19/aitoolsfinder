@@ -60,7 +60,6 @@ class CatalogService:
             name=payload.name,
             slug=slug,
             description=payload.description,
-            parent_id=payload.parent_id,
             seo_title=payload.seo_title,
             seo_description=payload.seo_description,
             is_active=payload.is_active,
@@ -228,9 +227,8 @@ class CatalogService:
                 currency=p.currency,
                 billing_interval=p.billing_interval,
                 is_free=p.is_free,
-                pricing_url=p.pricing_url,
                 limitations=p.limitations,
-                source_url=p.source_url,
+                source_url=p.source_url or p.pricing_url,
             )
             self.session.add(plan)
 

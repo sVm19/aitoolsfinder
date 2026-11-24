@@ -15,18 +15,28 @@ class SubmissionCreate(BaseModel):
         description="Standard (free review) or featured (fast-track 24-48h review + verified badge)",
     )
     tool_name: str = Field(min_length=1, max_length=254, description="Name of the tool")
-    tagline: str = Field(min_length=1, max_length=120, description="Short tagline describing the tool (max 120 chars)")
+    tagline: str = Field(
+        min_length=1,
+        max_length=120,
+        description="Short tagline describing the tool (max 120 chars)",
+    )
     description: Optional[str] = Field(
         default=None, max_length=2000, description="Detailed description of the tool"
     )
     website_url: str = Field(
-        max_length=500, pattern="^https?://", description="Official website URL of the tool"
+        max_length=500,
+        pattern="^https?://",
+        description="Official website URL of the tool",
     )
     logo_object_key: Optional[str] = Field(
-        default=None, max_length=500, description="S3 or storage object key for tool logo"
+        default=None,
+        max_length=500,
+        description="S3 or storage object key for tool logo",
     )
     screenshot_url: Optional[str] = Field(
-        default=None, max_length=500, description="S3 or storage URL for product screenshot"
+        default=None,
+        max_length=500,
+        description="S3 or storage URL for product screenshot",
     )
     primary_category_id: Optional[str] = Field(
         default=None, max_length=36, description="UUID of the primary category"
@@ -44,19 +54,23 @@ class SubmissionCreate(BaseModel):
     )
     is_free: bool = Field(default=True, description="Whether the tool has a free tier")
     starting_price_minor: Optional[int] = Field(
-        default=None, ge=0, le=999999,
-        description="Starting price in minor units (cents), e.g. 2900 = $29.00"
+        default=None,
+        ge=0,
+        le=999999,
+        description="Starting price in minor units (cents), e.g. 2900 = $29.00",
     )
-    currency: str = Field(default="USD", pattern="^[A-Z]{3}$", description="ISO 4217 currency code")
+    currency: str = Field(
+        default="USD", pattern="^[A-Z]{3}$", description="ISO 4217 currency code"
+    )
     pricing_url: Optional[str] = Field(
-        default=None, max_length=500, description="Direct URL to public pricing page for audit proof"
+        default=None,
+        max_length=500,
+        description="Direct URL to public pricing page for audit proof",
     )
     submitter_name: Optional[str] = Field(
         default=None, max_length=254, description="Name of the submitter"
     )
-    submitter_email: str = Field(
-        max_length=254, description="Email of the submitter"
-    )
+    submitter_email: str = Field(max_length=254, description="Email of the submitter")
     relationship: str = Field(
         default="founder",
         pattern="^(founder|team|advocate)$",
@@ -152,10 +166,13 @@ class UserSubmissionDetail(BaseModel):
 class AffiliateLinkCreate(BaseModel):
     """Request schema for creating an affiliate link."""
 
-    provider: str = Field(default="resend", max_length=100, description="Affiliate provider")
+    provider: str = Field(
+        default="resend", max_length=100, description="Affiliate provider"
+    )
     provider_url: str = Field(
-        min_length=1, max_length=500,
-        description="The affiliate or official destination URL"
+        min_length=1,
+        max_length=500,
+        description="The affiliate or official destination URL",
     )
 
 
@@ -193,15 +210,18 @@ class PaymentEventCreate(BaseModel):
 
     provider: str = Field(default="tiun", max_length=50, description="Payment provider")
     provider_event_id: str = Field(
-        min_length=1, max_length=128,
-        description="Unique event ID from the provider for deduplication"
+        min_length=1,
+        max_length=128,
+        description="Unique event ID from the provider for deduplication",
     )
     event_type: str = Field(
         default="subscription_created",
         max_length=50,
-        description="Type of event: subscription_created, subscription_updated, subscription_cancelled"
+        description="Type of event: subscription_created, subscription_updated, subscription_cancelled",
     )
-    metadata: Optional[Dict] = Field(default=None, description="Additional event metadata")
+    metadata: Optional[Dict] = Field(
+        default=None, description="Additional event metadata"
+    )
 
 
 class PaymentEventRead(BaseModel):

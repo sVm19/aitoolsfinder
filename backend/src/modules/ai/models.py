@@ -45,7 +45,5 @@ class RecommendationFeedbackModel(Base):
         CheckConstraint(
             "rating BETWEEN 1 AND 5", name="ck_recommendation_feedback_rating"
         ),
-        Index(
-            "ix_recommendation_feedback_tool_created", "tool_id", "created_at"
-        ),
+        Index("ix_recommendation_feedback_tool_created", "tool_id", "created_at"),
     )

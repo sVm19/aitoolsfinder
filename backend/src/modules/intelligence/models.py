@@ -70,7 +70,9 @@ class ComparisonModel(Base):
 class ComparisonToolModel(Base):
     __tablename__ = "comparison_tools"
     __table_args__ = (
-        UniqueConstraint("comparison_id", "position", name="uq_comparison_tools_position"),
+        UniqueConstraint(
+            "comparison_id", "position", name="uq_comparison_tools_position"
+        ),
     )
 
     comparison_id: Mapped[uuid.UUID] = mapped_column(
@@ -92,7 +94,9 @@ class ComparisonToolModel(Base):
 class ToolAlternativeModel(Base):
     __tablename__ = "tool_alternatives"
     __table_args__ = (
-        CheckConstraint("tool_id <> alternative_tool_id", name="ck_tool_alternatives_not_self"),
+        CheckConstraint(
+            "tool_id <> alternative_tool_id", name="ck_tool_alternatives_not_self"
+        ),
     )
 
     tool_id: Mapped[uuid.UUID] = mapped_column(
