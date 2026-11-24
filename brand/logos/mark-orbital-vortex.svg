@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="vortex-title">
+  <title id="vortex-title">AIToolsFinder — Orbital Vortex</title>
+  <defs>
+    <linearGradient id="vortex-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#4F46E5"/>
+    </linearGradient>
+    <linearGradient id="vortex-spark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer Interlocking S-Loop / Vortex -->
+  <path fill="url(#vortex-grad)" fill-rule="evenodd" d="M128 24 C185.438 24 232 70.562 232 128 C232 185.438 185.438 232 128 232 C70.562 232 24 185.438 24 128 C24 70.562 70.562 24 128 24 Z M128 60 C90.445 60 60 90.445 60 128 C60 165.555 90.445 196 128 196 C165.555 196 196 165.555 196 128 C196 90.445 165.555 60 128 60 Z"/>
+  <!-- Dynamic Velocity Slash & Focal Lens -->
+  <path fill="url(#vortex-spark)" d="M86 170 L170 86 C176 80 186 86 182 94 L146 174 C142 182 130 184 124 178 L86 170 Z"/>
+  <!-- Central Aperture Iris -->
+  <circle cx="128" cy="128" r="16" fill="#030206"/>
+  <circle cx="128" cy="128" r="10" fill="url(#vortex-spark)"/>
+</svg>

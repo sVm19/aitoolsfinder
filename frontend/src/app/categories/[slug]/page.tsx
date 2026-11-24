@@ -11,6 +11,7 @@ import {
   type CatalogCategory,
 } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
+import { buildItemListJsonLd } from "@/lib/seo-schema";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -84,6 +85,20 @@ export default async function CategoryPage({
     getActiveCategories(),
   ]);
 
+  const itemListJsonLd =
+    toolsResult.status === "fulfilled"
+      ? buildItemListJsonLd(
+          `${category.name} AI Tools`,
+          category.description || category.seo_description,
+          toolsResult.value.items.map((t, idx) => ({
+            name: t.name,
+            url: `/tools/${encodeURIComponent(t.slug)}`,
+            description: t.tagline || t.description,
+            position: (page - 1) * 24 + idx + 1,
+          })),
+        )
+      : null;
+
   return (
     <PageShell
       breadcrumbs={[{ label: "Home", href: "/" }, { label: "Categories", href: "/categories" }, { label: category.name }]}
@@ -107,6 +122,9 @@ export default async function CategoryPage({
           />
         )}
       </div>
+      {itemListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: itemListJsonLd }} />
+      )}
     </PageShell>
   );
 }

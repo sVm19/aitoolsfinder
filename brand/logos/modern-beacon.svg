@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="prism-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#FF5E1E"/>
+    </linearGradient>
+    <linearGradient id="ray-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer Precision Rounded Badge -->
+  <rect x="28" y="28" width="200" height="200" rx="48" fill="#0D0914" stroke="#2D2240" stroke-width="4"/>
+  <!-- Optical Refraction Triad -->
+  <!-- Top Apex Beam -->
+  <path d="M128 54 C134 54 140 58 144 64 L188 140 C192 148 186 156 178 156 L78 156 C70 156 64 148 68 140 L112 64 C116 58 122 54 128 54 Z" fill="url(#prism-grad)"/>
+  <!-- Forward Velocity Ray -->
+  <path d="M128 96 L158 146 L98 146 Z" fill="#0D0914"/>
+  <!-- High Intensity Core Spark -->
+  <circle cx="128" cy="180" r="12" fill="url(#ray-grad)"/>
+  <circle cx="128" cy="128" r="8" fill="url(#ray-grad)"/>
+</svg>

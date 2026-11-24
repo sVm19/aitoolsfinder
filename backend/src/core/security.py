@@ -179,12 +179,27 @@ class UserContext(BaseModel):
     is_email_verified: bool = False
 
 
+def create_session_token(user_id: str, email: str, cognito_sub: str, role: str = "user") -> str:
+    """Create a signed JWT session token for authenticated users."""
+    payload = {
+        "sub": cognito_sub,
+        "user_id": str(user_id),
+        "email": email,
+        "role": role,
+        "exp": int(time.time()) + 30 * 86400,  # 30-day session
+        "iat": int(time.time()),
+        "iss": "aitoolsfinder",
+    }
+    return jwt.encode(payload, settings.APP_SECRET_KEY, algorithm="HS256")
+
+
 async def _get_current_user_from_token(
     request: Request,
 ) -> CognitoUser:
-    """Extract and verify Cognito JWT from Authorization header.
+    """Extract and verify JWT from Authorization header.
 
-    Expected: Authorization: Bearer <id_token>
+    Expected: Authorization: Bearer <token>
+    Supports both app-issued HS256 tokens and Cognito RS256 ID tokens.
     Returns the decoded payload dict, or raises HTTPException.
     """
     auth_header = request.headers.get("Authorization", "")
@@ -203,7 +218,16 @@ async def _get_current_user_from_token(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    # Build expected issuer and audience
+    # 1. Try decoding as app-issued HS256 session token
+    try:
+        unverified_header = jwt.get_unverified_header(token)
+        if unverified_header.get("alg") == "HS256":
+            payload = jwt.decode(token, settings.APP_SECRET_KEY, algorithms=["HS256"])
+            return payload
+    except Exception:
+        pass
+
+    # 2. Decode as Cognito RS256 token
     region = settings.COGNITO_REGION or "us-east-1"
     pool_id = settings.COGNITO_USER_POOL_ID or ""
     app_client_id = settings.COGNITO_APP_CLIENT_ID or ""

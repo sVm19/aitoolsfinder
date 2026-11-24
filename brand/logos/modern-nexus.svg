@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="nexus-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="45%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#FF5E1E"/>
+    </linearGradient>
+    <linearGradient id="core-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer Finder Orbit Ring -->
+  <circle cx="128" cy="128" r="92" fill="none" stroke="url(#nexus-grad)" stroke-width="14" stroke-dasharray="140 18 36 18" stroke-linecap="round"/>
+  <!-- Central Luminous AI Astroid/Nexus -->
+  <path d="M128 38 C128 88 168 128 218 128 C168 128 128 168 128 218 C128 168 88 128 38 128 C88 128 128 88 128 38 Z" fill="url(#nexus-grad)"/>
+  <!-- Inner Precision Focal Core -->
+  <circle cx="128" cy="128" r="22" fill="#0E0A1A"/>
+  <circle cx="128" cy="128" r="14" fill="url(#core-grad)"/>
+</svg>

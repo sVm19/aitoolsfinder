@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="40" viewBox="0 0 180 40" fill="none">
+  <defs>
+    <linearGradient id="glow-featured" x1="0" y1="0" x2="180" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FD8F32" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#010102" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="icon-featured-grad" x1="12" y1="12" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FD8F32"/>
+      <stop offset="1" stop-color="#FF6B00"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="40" rx="10" fill="#0B0A0F" stroke="#FD8F32" stroke-width="1.2"/>
+  <rect x="0.6" y="0.6" width="178.8" height="38.8" rx="9.4" fill="url(#glow-featured)"/>
+  
+  <!-- Trophy / Sparkle Icon -->
+  <rect x="10" y="10" width="20" height="20" rx="6" fill="url(#icon-featured-grad)"/>
+  <path d="M15 15H25V18C25 20.8 22.8 23 20 23C17.2 23 15 20.8 15 18V15Z" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M17 23V25H23V23" stroke="#000000" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Text hierarchy -->
+  <text x="37" y="16.5" fill="#FD8F32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="700" letter-spacing="0.12em">FEATURED ON</text>
+  <text x="37" y="28.5" fill="#F7F5FA" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600" letter-spacing="-0.01em">AIToolsFinder</text>
+  
+  <!-- Star Rating -->
+  <path d="M158 17L159.2 19.5L162 19.9L160 21.8L160.5 24.5L158 23.2L155.5 24.5L156 21.8L154 19.9L156.8 19.5L158 17Z" fill="#FD8F32"/>
+</svg>

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 256" width="960" height="256" role="img" aria-labelledby="lock-1-title">
+  <title id="lock-1-title">AIToolsFinder — Quantum Nexus Lockup</title>
+  <defs>
+    <style>
+      .brand-title { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 72px; font-weight: 700; letter-spacing: -2px; fill: #FFFFFF; }
+      .brand-dot { fill: #FF5E1E; }
+      .brand-tag { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 17px; font-weight: 600; letter-spacing: 5px; fill: #A78BFA; text-transform: uppercase; }
+    </style>
+    <linearGradient id="l1-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="l1-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Symbol Container (180x180 at x=48, y=38) -->
+  <g id="symbol" transform="translate(48, 38) scale(0.703125)">
+    <path fill="url(#l1-violet)" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
+    <path fill="url(#l1-violet)" d="M128 48 C128 92 164 128 208 128 C164 128 128 164 128 208 C128 164 92 128 48 128 C92 128 128 92 128 48 Z"/>
+    <polygon points="128,104 152,128 128,152 104,128" fill="url(#l1-orange)"/>
+  </g>
+  <!-- Typography Lockup -->
+  <g id="wordmark" transform="translate(256, 128)">
+    <text x="0" y="0" class="brand-title">aiToolsFinder<tspan class="brand-dot">.</tspan></text>
+    <text x="4" y="42" class="brand-tag">AI TOOL INTELLIGENCE PLATFORM</text>
+  </g>
+</svg>

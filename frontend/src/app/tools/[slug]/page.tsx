@@ -5,10 +5,12 @@ import { ArrowUpRight, Check, CircleHelp, Sparkles } from "lucide-react";
 import { PageShell } from "@/components/common/page-shell";
 import { Badge } from "@/components/ui/badge";
 import { ToolCompareButton } from "@/components/tool/tool-compare-button";
+import { ToolSaveButton } from "@/components/tool/tool-save-button";
 import { FounderBadgeCard } from "@/components/tool/founder-badge-card";
 import { ToolLogo } from "@/components/tool/tool-logo";
 import { CatalogApiError, getToolBySlug, type CatalogPricingPlan, type CatalogToolDetail } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
+import { buildSoftwareApplicationJsonLd } from "@/lib/seo-schema";
 
 function safeHttpUrl(value: string | null | undefined): string | null {
   if (!value) return null;
@@ -70,38 +72,6 @@ function hasUsefulContent(tool: CatalogToolDetail): boolean {
       tool.features.length ||
       tool.pricing_plans.length,
   );
-}
-
-function buildSoftwareApplicationJsonLd(tool: CatalogToolDetail) {
-  const websiteUrl = safeHttpUrl(tool.website_url);
-  const offers = tool.pricing_plans
-    .filter((plan) => plan.is_free || plan.amount_minor !== null)
-    .map((plan) => ({
-      "@type": "Offer",
-      name: plan.name,
-      price: plan.is_free
-        ? "0"
-        : (plan.amount_minor! / 10 ** (new Intl.NumberFormat("en-US", {
-            style: "currency",
-            currency: plan.currency ?? "USD",
-          }).resolvedOptions().maximumFractionDigits ?? 2)).toString(),
-      priceCurrency: plan.currency ?? "USD",
-      ...(safeHttpUrl(plan.pricing_url) ? { url: safeHttpUrl(plan.pricing_url) } : {}),
-    }));
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    name: tool.name,
-    ...(websiteUrl ? { url: websiteUrl } : {}),
-    ...(tool.tagline || tool.description
-      ? { description: tool.description || tool.tagline }
-      : {}),
-    ...(tool.primary_category?.name
-      ? { applicationCategory: tool.primary_category.name }
-      : {}),
-    ...(offers.length ? { offers } : {}),
-  };
-  return JSON.stringify(data).replace(/</g, "\\u003c");
 }
 
 function ProfileSection({
@@ -233,6 +203,21 @@ export default async function ToolPage({
             </div>
           </div>
           <div className="flex w-full sm:w-auto flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <ToolSaveButton
+              tool={{
+                id: tool.id,
+                name: tool.name,
+                slug: tool.slug,
+                tagline: tool.tagline || tool.description || "",
+                category: category?.name || "AI Tool",
+                categorySlug: category?.slug || "",
+                pricingModel: tool.pricing_model,
+                websiteUrl: websiteUrl || undefined,
+                isVerified: tool.is_verified,
+                isSponsored: tool.is_sponsored,
+              }}
+              className="w-full sm:w-auto"
+            />
             <ToolCompareButton id={tool.id} name={tool.name} slug={tool.slug} className="w-full sm:w-auto" />
             {websiteUrl ? (
               <a
@@ -336,9 +321,22 @@ export default async function ToolPage({
               <ProfileSection id="alternatives-title" title="Alternatives">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-sm text-muted-foreground">Review curated and related alternatives using published catalog details.</p>
-                  <Link href={`/alternatives/${encodeURIComponent(tool.slug)}`} className="inline-flex min-h-10 w-fit items-center gap-2 rounded-lg border border-border bg-surface-1 px-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary">
-                    Explore alternatives <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
-                  </Link>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {category && (
+                      <Link
+                        href={`/rankings/${encodeURIComponent(category.slug)}`}
+                        className="inline-flex min-h-10 w-fit items-center gap-2 rounded-lg border border-border bg-surface-1 px-3 text-sm font-medium text-foreground transition-colors hover:bg-surface-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                      >
+                        {category.name} rankings <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+                      </Link>
+                    )}
+                    <Link
+                      href={`/alternatives/${encodeURIComponent(tool.slug)}`}
+                      className="inline-flex min-h-10 w-fit items-center gap-2 rounded-lg border border-primary/40 bg-primary/10 px-3 text-sm font-medium text-primary-content transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                    >
+                      Explore alternatives <ArrowUpRight aria-hidden="true" className="h-4 w-4" />
+                    </Link>
+                  </div>
                 </div>
               </ProfileSection>
 

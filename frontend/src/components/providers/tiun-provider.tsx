@@ -52,14 +52,23 @@ export function TiunProvider({ children }: { children: React.ReactNode }) {
 
       const unsubscribe = tiun.on("userChange", handleUserChange);
 
-      tiun.waitForReady().then(() => {
-        setIsReady(true);
-        setUser(tiun.user || null);
-      });
+      tiun
+        .waitForReady()
+        .then(() => {
+          setIsReady(true);
+          setUser(tiun.user || null);
+        })
+        .catch((err) => {
+          console.warn("[TiunProvider] SDK initialization failed or timed out:", err);
+        });
 
       return () => {
-        unsubscribe();
-        tiun.destroy();
+        try {
+          unsubscribe();
+          tiun.destroy();
+        } catch {
+          // ignore cleanup errors
+        }
       };
     } catch (err) {
       console.error("[TiunProvider] Failed to initialize Tiun SDK:", err);
@@ -71,19 +80,44 @@ export function TiunProvider({ children }: { children: React.ReactNode }) {
       isReady,
       user,
       checkout: async (params) => {
-        return tiun.checkout(params);
+        try {
+          return await tiun.checkout(params);
+        } catch (err) {
+          console.warn("[TiunProvider] checkout error:", err);
+          return null;
+        }
       },
       checkProductAccess: async (productId, options) => {
-        return tiun.checkProductAccess(productId, options || {});
+        try {
+          return await tiun.checkProductAccess(productId, options || {});
+        } catch (err) {
+          console.warn("[TiunProvider] checkProductAccess error:", err);
+          return { hasAccess: false, access: null };
+        }
       },
       listProductAccess: async () => {
-        return tiun.listProductAccess();
+        try {
+          return await tiun.listProductAccess();
+        } catch (err) {
+          console.warn("[TiunProvider] listProductAccess error:", err);
+          return [];
+        }
       },
       listProducts: async () => {
-        return tiun.listProducts();
+        try {
+          return await tiun.listProducts();
+        } catch (err) {
+          console.warn("[TiunProvider] listProducts error:", err);
+          return [];
+        }
       },
       getUserVerificationToken: async () => {
-        return tiun.getUserVerificationToken();
+        try {
+          return await tiun.getUserVerificationToken();
+        } catch (err) {
+          console.warn("[TiunProvider] getUserVerificationToken error:", err);
+          return null;
+        }
       },
     }),
     [isReady, user]

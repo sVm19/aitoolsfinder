@@ -1,0 +1,25 @@
+# AIToolsFinder.cloud
+
+> Find the best AI tool for your exact job.
+
+AIToolsFinder is a verified AI Tool Intelligence Platform that helps professionals, developers, and teams discover, compare, and benchmark AI tools and B2B SaaS platforms. Every listing includes verified pricing tiers, capability teardowns, alternatives, and explainable intelligence scores.
+
+## Primary Taxonomy Categories
+
+- [Developer Tools](https://aitoolsfinder.cloud/categories/developer-tools): AI code editors, terminal agents, copilot extensions, and code review assistants.
+- [Productivity](https://aitoolsfinder.cloud/categories/productivity): AI workspace copilots, task automation, meeting transcription, and document synthesis.
+- [Marketing](https://aitoolsfinder.cloud/categories/marketing): Ad creative generators, audience intelligence, campaign copywriters, and conversion optimization.
+- [Writing & SEO](https://aitoolsfinder.cloud/categories/writing): Long-form content generators, programmatic SEO platforms, grammar and style engines.
+- [AI & Models](https://aitoolsfinder.cloud/categories/ai): Foundation models, LLM APIs, open-source weights, and multimodal inference gateways.
+- [Business & Sales](https://aitoolsfinder.cloud/categories/business): AI CRM copilots, cold outbound automation, sales call recorders, and lead enrichment.
+- [Design & UI](https://aitoolsfinder.cloud/categories/design): Generative UI scaffolders, vector illustration tools, and design system assistants.
+- [Video & Animation](https://aitoolsfinder.cloud/categories/video): Text-to-video generators, AI video editors, realistic avatar creators, and caption tools.
+- [Audio & Speech](https://aitoolsfinder.cloud/categories/audio): Voice cloning, podcast mastering, AI speech-to-text, and background noise removal.
+- [Image & Generative Art](https://aitoolsfinder.cloud/categories/image): Text-to-image models, photo enhancers, canvas editors, and brand asset generators.
+- [Automation & Workflows](https://aitoolsfinder.cloud/categories/automation): Agentic orchestration, webhook pipelines, and browser automation agents.
+
+## Rankings & Intelligence Data
+
+- [Rankings Directory](https://aitoolsfinder.cloud/rankings): Real-time ranking index organized by taxonomy and job-to-be-done.
+- [Methodology](https://aitoolsfinder.cloud/methodology): Complete scoring breakdown across capability, value, and reliability dimensions.
+- [Transparency & Advertising](https://aitoolsfinder.cloud/transparency): Disclosure of affiliate monetization and sponsored placement standards.

@@ -8,6 +8,8 @@ coverage/
 .pytest_cache/
 .coverage
 htmlcov/
+test-results/
+frontend/test-results/
 
 # Next.js
 .next/

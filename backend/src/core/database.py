@@ -23,22 +23,14 @@ if use_supabase:
     ssl_ctx.check_hostname = False
     ssl_ctx.verify_mode = ssl.CERT_NONE
     connect_args["ssl"] = ssl_ctx
-    engine = create_async_engine(
-        settings.DATABASE_URL,
-        echo=(settings.APP_ENV == "development" and settings.LOG_LEVEL == "DEBUG"),
-        pool_pre_ping=True,
-        pool_size=10,
-        max_overflow=20,
-        connect_args=connect_args,
-    )
-else:
-    engine = create_async_engine(
-        settings.DATABASE_URL,
-        echo=(settings.APP_ENV == "development" and settings.LOG_LEVEL == "DEBUG"),
-        pool_pre_ping=True,
-        pool_size=10,
-        max_overflow=20,
-        connect_args=connect_args,
+
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=(settings.APP_ENV == "development" and settings.LOG_LEVEL == "DEBUG"),
+    pool_pre_ping=True,
+    pool_size=10,
+    max_overflow=20,
+    connect_args=connect_args,
 )
 
 

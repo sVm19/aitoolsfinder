@@ -1,0 +1,352 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1600" height="984" viewBox="0 0 1600 984"><rect width="1600" height="984" fill="#f7f7f4"/><text x="60" y="78" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="40" font-weight="700" fill="#161616">AIToolsFinder — Creative Modern Identities</text><text x="60" y="116" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="20" fill="#6b6b6b">Concepts for review — pick a direction (or tell me what you like in each).</text><rect x="60" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#161616" stroke-width="2"/><g><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nexus-title" viewBox="0 0 256 256" x="90" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <title id="c0-nexus-title">AIToolsFinder — Quantum Nexus</title>
+  <defs>
+    <linearGradient id="c0-nexus-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="c0-nexus-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Compound Outer Orbit Ring with 4 Optical Notches (Filled paths, 0 strokes) -->
+  <path fill="url(#c0-nexus-violet)" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
+  <!-- Central Luminous AI Astroid Spark -->
+  <path fill="url(#c0-nexus-violet)" d="M128 48 C128 92 164 128 208 128 C164 128 128 164 128 208 C128 164 92 128 48 128 C92 128 128 92 128 48 Z"/>
+  <!-- Precision Focal Diamond Core -->
+  <polygon points="128,104 152,128 128,152 104,128" fill="url(#c0-nexus-orange)"/>
+</svg></g><g><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="lock-1-title" viewBox="0 0 960 256" x="90" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <title id="l0-lock-1-title">AIToolsFinder — Quantum Nexus Lockup</title>
+  <defs>
+    <style>
+      .brand-title { font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 76px; font-weight: 800; letter-spacing: -2px; fill: #FFFFFF; }
+      .brand-dot { fill: #FF5E1E; }
+      .brand-tag { font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 18px; font-weight: 600; letter-spacing: 5px; fill: #A78BFA; text-transform: uppercase; }
+    </style>
+    <linearGradient id="l0-l1-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="l0-l1-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Symbol Container (180x180 at x=48, y=38) -->
+  <g id="l0-symbol" transform="translate(48, 38) scale(0.703125)">
+    <path fill="url(#l0-l1-violet)" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
+    <path fill="url(#l0-l1-violet)" d="M128 48 C128 92 164 128 208 128 C164 128 128 164 128 208 C128 164 92 128 48 128 C92 128 128 92 128 48 Z"/>
+    <polygon points="128,104 152,128 128,152 104,128" fill="url(#l0-l1-orange)"/>
+  </g>
+  <!-- Typography Lockup -->
+  <g id="l0-wordmark" transform="translate(256, 128)">
+    <text x="0" y="0" class="brand-title">AIToolsFinder<tspan class="brand-dot">.</tspan></text>
+    <text x="4" y="42" class="brand-tag">AI TOOL INTELLIGENCE PLATFORM</text>
+  </g>
+</svg></g><g><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nexus-title" viewBox="0 0 256 256" x="90" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <title id="s064-nexus-title">AIToolsFinder — Quantum Nexus</title>
+  <defs>
+    <linearGradient id="s064-nexus-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="s064-nexus-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Compound Outer Orbit Ring with 4 Optical Notches (Filled paths, 0 strokes) -->
+  <path fill="url(#s064-nexus-violet)" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
+  <!-- Central Luminous AI Astroid Spark -->
+  <path fill="url(#s064-nexus-violet)" d="M128 48 C128 92 164 128 208 128 C164 128 128 164 128 208 C128 164 92 128 48 128 C92 128 128 92 128 48 Z"/>
+  <!-- Precision Focal Diamond Core -->
+  <polygon points="128,104 152,128 128,152 104,128" fill="url(#s064-nexus-orange)"/>
+</svg></g><text x="122" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nexus-title" viewBox="0 0 256 256" x="180" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <title id="s032-nexus-title">AIToolsFinder — Quantum Nexus</title>
+  <defs>
+    <linearGradient id="s032-nexus-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="s032-nexus-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Compound Outer Orbit Ring with 4 Optical Notches (Filled paths, 0 strokes) -->
+  <path fill="url(#s032-nexus-violet)" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
+  <!-- Central Luminous AI Astroid Spark -->
+  <path fill="url(#s032-nexus-violet)" d="M128 48 C128 92 164 128 208 128 C164 128 128 164 128 208 C128 164 92 128 48 128 C92 128 128 92 128 48 Z"/>
+  <!-- Precision Focal Diamond Core -->
+  <polygon points="128,104 152,128 128,152 104,128" fill="url(#s032-nexus-orange)"/>
+</svg></g><text x="196" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="nexus-title" viewBox="0 0 256 256" x="238" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <title id="s016-nexus-title">AIToolsFinder — Quantum Nexus</title>
+  <defs>
+    <linearGradient id="s016-nexus-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <linearGradient id="s016-nexus-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Compound Outer Orbit Ring with 4 Optical Notches (Filled paths, 0 strokes) -->
+  <path fill="url(#s016-nexus-violet)" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
+  <!-- Central Luminous AI Astroid Spark -->
+  <path fill="url(#s016-nexus-violet)" d="M128 48 C128 92 164 128 208 128 C164 128 128 164 128 208 C128 164 92 128 48 128 C92 128 128 92 128 48 Z"/>
+  <!-- Precision Focal Diamond Core -->
+  <polygon points="128,104 152,128 128,152 104,128" fill="url(#s016-nexus-orange)"/>
+</svg></g><text x="246" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="90.0" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">A · Quantum Nexus</text><text x="90.0" y="808" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="15" font-weight="700" fill="#161616" letter-spacing="1.5">RECOMMENDED</text><text x="90.0" y="842" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">Luminous 4-point AI astroid enclosed in a</text><text x="90.0" y="868" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">precision radar orbit with diamond focal</text><text x="90.0" y="894" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">core.</text><rect x="562.667" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="592.667" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Facet 1: Violet to Indigo (Ascending West Wing) -->
+    <linearGradient id="c1-facet-west" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <!-- Facet 2: Violet to Coral (Apex Crest to East) -->
+    <linearGradient id="c1-facet-apex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#FF5E1E"/>
+    </linearGradient>
+    <!-- Facet 3: Solar Orange to Gold (Under-loop Crossbar) -->
+    <linearGradient id="c1-facet-core" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Under Layer: Base Loop Bridge -->
+  <path d="M72 176 C96 196 160 196 184 176 C194 168 188 152 174 152 C154 152 102 152 82 152 C68 152 62 168 72 176 Z" fill="url(#c1-facet-core)"/>
+  
+  <!-- Left Ascending Ribbon: Curves up to Apex -->
+  <path d="M64 184 C52 172 60 144 84 100 L114 46 C120 36 136 36 142 46 L154 68 C144 68 118 108 98 144 C88 162 76 178 64 184 Z" fill="url(#c1-facet-west)"/>
+  
+  <!-- Right Descending Ribbon: Sweeps down and twists into foreground -->
+  <path d="M128 38 C134 38 140 42 144 50 L196 148 C206 166 200 186 184 192 C172 196 160 188 154 174 L138 136 C138 116 150 78 138 58 C134 50 130 42 128 38 Z" fill="url(#c1-facet-apex)"/>
+  
+  <!-- Floating Optical Diamond Core in the Center Aperture -->
+  <polygon points="128,102 144,118 128,134 112,118" fill="#FFFFFF"/>
+</svg></g><g><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="lock-2-title" viewBox="0 0 960 256" x="592.667" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <title id="l1-lock-2-title">AIToolsFinder — Prismatic Möbius Lockup</title>
+  <defs>
+    <style>
+      .brand-title { font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 76px; font-weight: 800; letter-spacing: -2px; fill: #FFFFFF; }
+      .brand-dot { fill: #FF5E1E; }
+      .brand-tag { font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 18px; font-weight: 600; letter-spacing: 5px; fill: #EC4899; text-transform: uppercase; }
+    </style>
+    <linearGradient id="l1-l2-west" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="l1-l2-apex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#FF5E1E"/>
+    </linearGradient>
+    <linearGradient id="l1-l2-core" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <g id="l1-symbol" transform="translate(48, 38) scale(0.703125)">
+    <path d="M72 176 C96 196 160 196 184 176 C194 168 188 152 174 152 C154 152 102 152 82 152 C68 152 62 168 72 176 Z" fill="url(#l1-l2-core)"/>
+    <path d="M64 184 C52 172 60 144 84 100 L114 46 C120 36 136 36 142 46 L154 68 C144 68 118 108 98 144 C88 162 76 178 64 184 Z" fill="url(#l1-l2-west)"/>
+    <path d="M128 38 C134 38 140 42 144 50 L196 148 C206 166 200 186 184 192 C172 196 160 188 154 174 L138 136 C138 116 150 78 138 58 C134 50 130 42 128 38 Z" fill="url(#l1-l2-apex)"/>
+    <polygon points="128,102 144,118 128,134 112,118" fill="#FFFFFF"/>
+  </g>
+  <g id="l1-wordmark" transform="translate(256, 128)">
+    <text x="0" y="0" class="brand-title">AIToolsFinder<tspan class="brand-dot">.</tspan></text>
+    <text x="4" y="42" class="brand-tag">DISCOVERY &amp; BENCHMARK RADAR</text>
+  </g>
+</svg></g><g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="592.667" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Facet 1: Violet to Indigo (Ascending West Wing) -->
+    <linearGradient id="s164-facet-west" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <!-- Facet 2: Violet to Coral (Apex Crest to East) -->
+    <linearGradient id="s164-facet-apex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#FF5E1E"/>
+    </linearGradient>
+    <!-- Facet 3: Solar Orange to Gold (Under-loop Crossbar) -->
+    <linearGradient id="s164-facet-core" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Under Layer: Base Loop Bridge -->
+  <path d="M72 176 C96 196 160 196 184 176 C194 168 188 152 174 152 C154 152 102 152 82 152 C68 152 62 168 72 176 Z" fill="url(#s164-facet-core)"/>
+  
+  <!-- Left Ascending Ribbon: Curves up to Apex -->
+  <path d="M64 184 C52 172 60 144 84 100 L114 46 C120 36 136 36 142 46 L154 68 C144 68 118 108 98 144 C88 162 76 178 64 184 Z" fill="url(#s164-facet-west)"/>
+  
+  <!-- Right Descending Ribbon: Sweeps down and twists into foreground -->
+  <path d="M128 38 C134 38 140 42 144 50 L196 148 C206 166 200 186 184 192 C172 196 160 188 154 174 L138 136 C138 116 150 78 138 58 C134 50 130 42 128 38 Z" fill="url(#s164-facet-apex)"/>
+  
+  <!-- Floating Optical Diamond Core in the Center Aperture -->
+  <polygon points="128,102 144,118 128,134 112,118" fill="#FFFFFF"/>
+</svg></g><text x="624.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="682.667" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Facet 1: Violet to Indigo (Ascending West Wing) -->
+    <linearGradient id="s132-facet-west" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <!-- Facet 2: Violet to Coral (Apex Crest to East) -->
+    <linearGradient id="s132-facet-apex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#FF5E1E"/>
+    </linearGradient>
+    <!-- Facet 3: Solar Orange to Gold (Under-loop Crossbar) -->
+    <linearGradient id="s132-facet-core" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Under Layer: Base Loop Bridge -->
+  <path d="M72 176 C96 196 160 196 184 176 C194 168 188 152 174 152 C154 152 102 152 82 152 C68 152 62 168 72 176 Z" fill="url(#s132-facet-core)"/>
+  
+  <!-- Left Ascending Ribbon: Curves up to Apex -->
+  <path d="M64 184 C52 172 60 144 84 100 L114 46 C120 36 136 36 142 46 L154 68 C144 68 118 108 98 144 C88 162 76 178 64 184 Z" fill="url(#s132-facet-west)"/>
+  
+  <!-- Right Descending Ribbon: Sweeps down and twists into foreground -->
+  <path d="M128 38 C134 38 140 42 144 50 L196 148 C206 166 200 186 184 192 C172 196 160 188 154 174 L138 136 C138 116 150 78 138 58 C134 50 130 42 128 38 Z" fill="url(#s132-facet-apex)"/>
+  
+  <!-- Floating Optical Diamond Core in the Center Aperture -->
+  <polygon points="128,102 144,118 128,134 112,118" fill="#FFFFFF"/>
+</svg></g><text x="698.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="740.667" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Facet 1: Violet to Indigo (Ascending West Wing) -->
+    <linearGradient id="s116-facet-west" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <!-- Facet 2: Violet to Coral (Apex Crest to East) -->
+    <linearGradient id="s116-facet-apex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#FF5E1E"/>
+    </linearGradient>
+    <!-- Facet 3: Solar Orange to Gold (Under-loop Crossbar) -->
+    <linearGradient id="s116-facet-core" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Under Layer: Base Loop Bridge -->
+  <path d="M72 176 C96 196 160 196 184 176 C194 168 188 152 174 152 C154 152 102 152 82 152 C68 152 62 168 72 176 Z" fill="url(#s116-facet-core)"/>
+  
+  <!-- Left Ascending Ribbon: Curves up to Apex -->
+  <path d="M64 184 C52 172 60 144 84 100 L114 46 C120 36 136 36 142 46 L154 68 C144 68 118 108 98 144 C88 162 76 178 64 184 Z" fill="url(#s116-facet-west)"/>
+  
+  <!-- Right Descending Ribbon: Sweeps down and twists into foreground -->
+  <path d="M128 38 C134 38 140 42 144 50 L196 148 C206 166 200 186 184 192 C172 196 160 188 154 174 L138 136 C138 116 150 78 138 58 C134 50 130 42 128 38 Z" fill="url(#s116-facet-apex)"/>
+  
+  <!-- Floating Optical Diamond Core in the Center Aperture -->
+  <polygon points="128,102 144,118 128,134 112,118" fill="#FFFFFF"/>
+</svg></g><text x="748.667" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="592.6666666666667" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">B · Prismatic Möbius</text><text x="592.6666666666667" y="814" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">Continuous dimensional ribbon loop twisting</text><text x="592.6666666666667" y="840" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">through an optical prism aperture.</text><rect x="1065.33" y="150" width="474.667" height="774" rx="18" fill="#fff" stroke="#e4e4e0" stroke-width="1"/><g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="1095.33" y="190" width="414.667" height="300" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="c2-stream-body" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="c2-stream-accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <!-- Aerodynamic 'A' Loop with Continuous Bezier Curves -->
+  <path d="M128 32 C138 32 146 40 152 50 L216 178 C224 194 216 210 198 210 C186 210 178 202 172 190 L158 160 L98 160 L84 190 C78 202 70 210 58 210 C40 210 32 194 40 178 L104 50 C110 40 118 32 128 32 Z M128 86 L110 128 L146 128 Z" fill="url(#c2-stream-body)"/>
+  <!-- Floating Optical Diamond Core -->
+  <path d="M128 144 L142 158 L128 172 L114 158 Z" fill="url(#c2-stream-accent)"/>
+</svg></g><g><svg xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="lock-3-title" viewBox="0 0 960 256" x="1095.33" y="514" width="414.667" height="120" preserveAspectRatio="xMidYMid meet">
+  <title id="l2-lock-3-title">AIToolsFinder — Aerodynamic Streamline Lockup</title>
+  <defs>
+    <style>
+      .brand-title { font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 76px; font-weight: 800; letter-spacing: -2px; fill: #FFFFFF; }
+      .brand-dot { fill: #FF5E1E; }
+      .brand-tag { font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 18px; font-weight: 600; letter-spacing: 5px; fill: #60A5FA; text-transform: uppercase; }
+    </style>
+    <linearGradient id="l2-l3-body" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="l2-l3-accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <g id="l2-symbol" transform="translate(48, 38) scale(0.703125)">
+    <path d="M128 32 C138 32 146 40 152 50 L216 178 C224 194 216 210 198 210 C186 210 178 202 172 190 L158 160 L98 160 L84 190 C78 202 70 210 58 210 C40 210 32 194 40 178 L104 50 C110 40 118 32 128 32 Z M128 86 L110 128 L146 128 Z" fill="url(#l2-l3-body)"/>
+    <path d="M128 144 L142 158 L128 172 L114 158 Z" fill="url(#l2-l3-accent)"/>
+  </g>
+  <g id="l2-wordmark" transform="translate(256, 128)">
+    <text x="0" y="0" class="brand-title">AIToolsFinder<tspan class="brand-dot">.</tspan></text>
+    <text x="4" y="42" class="brand-tag">CURATED SAAS &amp; AI DIRECTORY</text>
+  </g>
+</svg></g><g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="1095.33" y="660" width="64" height="64" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="s264-stream-body" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="s264-stream-accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <!-- Aerodynamic 'A' Loop with Continuous Bezier Curves -->
+  <path d="M128 32 C138 32 146 40 152 50 L216 178 C224 194 216 210 198 210 C186 210 178 202 172 190 L158 160 L98 160 L84 190 C78 202 70 210 58 210 C40 210 32 194 40 178 L104 50 C110 40 118 32 128 32 Z M128 86 L110 128 L146 128 Z" fill="url(#s264-stream-body)"/>
+  <!-- Floating Optical Diamond Core -->
+  <path d="M128 144 L142 158 L128 172 L114 158 Z" fill="url(#s264-stream-accent)"/>
+</svg></g><text x="1127.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">64px</text><g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="1185.33" y="692" width="32" height="32" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="s232-stream-body" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="s232-stream-accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <!-- Aerodynamic 'A' Loop with Continuous Bezier Curves -->
+  <path d="M128 32 C138 32 146 40 152 50 L216 178 C224 194 216 210 198 210 C186 210 178 202 172 190 L158 160 L98 160 L84 190 C78 202 70 210 58 210 C40 210 32 194 40 178 L104 50 C110 40 118 32 128 32 Z M128 86 L110 128 L146 128 Z" fill="url(#s232-stream-body)"/>
+  <!-- Floating Optical Diamond Core -->
+  <path d="M128 144 L142 158 L128 172 L114 158 Z" fill="url(#s232-stream-accent)"/>
+</svg></g><text x="1201.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">32px</text><g><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" x="1243.33" y="708" width="16" height="16" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="s216-stream-body" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="s216-stream-accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <!-- Aerodynamic 'A' Loop with Continuous Bezier Curves -->
+  <path d="M128 32 C138 32 146 40 152 50 L216 178 C224 194 216 210 198 210 C186 210 178 202 172 190 L158 160 L98 160 L84 190 C78 202 70 210 58 210 C40 210 32 194 40 178 L104 50 C110 40 118 32 128 32 Z M128 86 L110 128 L146 128 Z" fill="url(#s216-stream-body)"/>
+  <!-- Floating Optical Diamond Core -->
+  <path d="M128 144 L142 158 L128 172 L114 158 Z" fill="url(#s216-stream-accent)"/>
+</svg></g><text x="1251.33" y="744" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="12" fill="#8a8a8a" text-anchor="middle">16px</text><text x="1095.3333333333335" y="780" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="26" font-weight="700" fill="#161616">C · Aerodynamic Streamline</text><text x="1095.3333333333335" y="814" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">Aerodynamic continuous-curve letterform</text><text x="1095.3333333333335" y="840" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">with smooth rounded corners and floating</text><text x="1095.3333333333335" y="866" font-family="system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif" font-size="19" fill="#555">beacon.</text></svg>

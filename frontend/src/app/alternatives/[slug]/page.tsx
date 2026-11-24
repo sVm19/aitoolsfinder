@@ -13,6 +13,7 @@ import {
   type ComparisonMatrix,
 } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
+import { buildItemListJsonLd } from "@/lib/seo-schema";
 
 export async function generateMetadata({
   params,
@@ -72,14 +73,28 @@ export default async function AlternativesPage({
     }
   }
 
+  const breadcrumbItems = [
+    { label: "Home", href: "/" },
+    { label: "Explore", href: "/explore" },
+    { label: `Alternatives to ${data.tool.name}` },
+  ] as const;
+
+  const itemListJsonLd =
+    data.alternatives.length > 0
+      ? buildItemListJsonLd(
+          `Alternatives to ${data.tool.name}`,
+          `Published alternatives to ${data.tool.name} on AIToolsFinder`,
+          data.alternatives.map((item, idx) => ({
+            name: item.tool.name,
+            url: `/tools/${encodeURIComponent(item.tool.slug)}`,
+            description: item.tool.tagline,
+            position: idx + 1,
+          })),
+        )
+      : null;
+
   return (
-    <PageShell
-      breadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Alternatives", href: "/explore" },
-        { label: `Alternatives to ${data.tool.name}` },
-      ]}
-    >
+    <PageShell breadcrumbs={breadcrumbItems}>
       <header className="max-w-4xl">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
           Tool alternatives
@@ -178,6 +193,9 @@ export default async function AlternativesPage({
               )}
             </section>
           )}
+      {itemListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: itemListJsonLd }} />
+      )}
     </PageShell>
   );
 }

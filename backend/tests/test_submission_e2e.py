@@ -2,7 +2,6 @@ import asyncio
 import os
 import sys
 import uuid
-from datetime import datetime
 
 # Set up path to backend
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -12,17 +11,13 @@ from src.core.security import UserContext
 from src.modules.catalog.models import (
     CategoryModel,
     PricingPlanModel,
-    TagModel,
     ToolCategoryModel,
     ToolModel,
-    ToolTagModel,
 )
 from src.modules.intelligence.models import ScoreHistoryModel
 from src.modules.vendor.models import (
     ToolSubmissionModel,
     VendorModel,
-    tool_submission_features,
-    tool_submission_tags,
 )
 from src.modules.vendor.router import approve_submission, create_submission
 from src.modules.vendor.schemas import SubmissionCreate

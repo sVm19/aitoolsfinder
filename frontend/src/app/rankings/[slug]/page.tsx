@@ -12,6 +12,7 @@ import {
   type RankingResponse,
 } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
+import { buildItemListJsonLd } from "@/lib/seo-schema";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 type PricingFilter = "all" | "free" | "paid";
@@ -105,14 +106,28 @@ export default async function RankingsPage({
     : `Best ${result.taxonomy_name} AI tools`;
   const description = result.taxonomy_description;
 
+  const breadcrumbItems = [
+    { label: "Home", href: "/" },
+    { label: "Rankings", href: "/rankings" },
+    { label: result.taxonomy_name },
+  ] as const;
+
+  const itemListJsonLd =
+    result.items.length > 0
+      ? buildItemListJsonLd(
+          title,
+          description,
+          result.items.map((item) => ({
+            name: item.tool.name,
+            url: `/tools/${encodeURIComponent(item.tool.slug)}`,
+            description: item.tool.tagline,
+            position: item.rank,
+          })),
+        )
+      : null;
+
   return (
-    <PageShell
-      breadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Rankings", href: "/rankings" },
-        { label: result.taxonomy_name },
-      ]}
-    >
+    <PageShell breadcrumbs={breadcrumbItems}>
       <header className="max-w-4xl">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
           Category rankings
@@ -203,6 +218,9 @@ export default async function RankingsPage({
               )}
             </>
           )}
+      {itemListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: itemListJsonLd }} />
+      )}
     </PageShell>
   );
 }

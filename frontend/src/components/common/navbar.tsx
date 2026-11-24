@@ -16,8 +16,16 @@ import {
   Menu,
   X,
   ArrowRight,
+  FolderGit2,
+  ChevronDown,
+  LayoutDashboard,
+  Settings,
+  LogOut,
+  ShieldCheck,
+  Heart,
 } from "lucide-react";
 import { useStack } from "@/components/stack/stack-provider";
+import { useAuth } from "@/lib/auth-context";
 
 const NAV_LINKS = [
   { name: "Explore", href: "/explore", icon: Compass },
@@ -29,12 +37,27 @@ const NAV_LINKS = [
 
 export function Navbar() {
   const { saveCount, openDrawer, openAuthModal } = useStack();
+  const { user, isAuthenticated, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    if (!profileMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [profileMenuOpen]);
 
   // Subtle scroll styling toggle (scrolled state)
   useEffect(() => {
@@ -81,16 +104,17 @@ export function Navbar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Close drawer on route change
+  // Close drawer & profile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
+    setProfileMenuOpen(false);
   }, [pathname]);
 
   return (
     <>
       <header
         ref={headerRef}
-        className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl transition-[background-color,box-shadow] duration-300 relative"
+        className="sticky top-0 z-50 w-full bg-background/90 backdrop-blur-xl transition-[background-color,box-shadow] duration-300 relative"
       >
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand Identity & Primary Nav */}
@@ -122,12 +146,12 @@ export function Navbar() {
           </div>
 
           {/* Desktop Right Actions */}
-          <div className="hidden lg:flex items-center gap-2">
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
             {/* Quick Search */}
             <Link
               href="/explore"
               prefetch={false}
-              className="flex items-center gap-2 h-8 px-2.5 rounded-md border border-border bg-surface-1 text-xs text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors"
+              className="flex items-center gap-2 h-8 px-2.5 rounded-md border border-border bg-surface-1 text-xs text-muted-foreground hover:text-foreground hover:border-border/80 transition-colors shrink-0"
             >
               <Search className="w-3.5 h-3.5 opacity-70" />
               <span>Search directory</span>
@@ -140,20 +164,31 @@ export function Navbar() {
             <button
               type="button"
               onClick={openDrawer}
-              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-border bg-surface-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors"
+              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-border bg-surface-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors shrink-0"
               aria-label="Open My AI Stack"
             >
-              <Layers className="w-3.5 h-3.5 opacity-70" />
+              <Heart className="w-3.5 h-3.5 opacity-80 text-rose-400" />
               <span>My Stack</span>
               {saveCount > 0 && (
-                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-black">
+                <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white shadow-sm">
                   {saveCount}
                 </span>
               )}
             </button>
 
+            {/* Submitted Tools / SaaS button */}
+            <Link
+              href="/dashboard?tab=submissions"
+              prefetch={false}
+              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border border-border bg-surface-1 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors shrink-0"
+              title="View your submitted AI tools & SaaS status"
+            >
+              <FolderGit2 className="w-3.5 h-3.5 opacity-80 text-accent" />
+              <span>Submissions</span>
+            </Link>
+
             {/* Submit SaaS CTA */}
-            <Link href="/submit" prefetch={false}>
+            <Link href="/submit" prefetch={false} className="shrink-0">
               <Button variant="secondary" size="sm" className="h-8 px-3 rounded-md text-xs font-medium flex items-center gap-1.5 border-border hover:border-accent/40">
                 <span>Submit SaaS</span>
                 <span className="rounded bg-accent/15 px-1 py-0.2 text-[10px] font-semibold text-accent">
@@ -162,15 +197,127 @@ export function Navbar() {
               </Button>
             </Link>
 
-            {/* Sign in Trigger */}
-            <button
-              type="button"
-              onClick={() => openAuthModal("Sign in to track price drops, upvote tools, and sync your stack.")}
-              className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-surface-1 transition-colors"
-            >
-              <User className="w-3.5 h-3.5 opacity-70" />
-              <span>Sign in</span>
-            </button>
+            {/* User Account State / Profile Dropdown / Sign In */}
+            {isAuthenticated && user ? (
+              <div className="relative shrink-0" ref={profileMenuRef}>
+                {/* Circular Avatar Button */}
+                <button
+                  type="button"
+                  onClick={() => setProfileMenuOpen((prev) => !prev)}
+                  className="relative flex h-8 w-8 items-center justify-center rounded-full border border-emerald-500/40 bg-emerald-500/15 text-xs font-bold text-emerald-300 hover:border-emerald-400 hover:bg-emerald-500/25 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50 shadow-sm"
+                  aria-expanded={profileMenuOpen}
+                  aria-haspopup="true"
+                  aria-label="User account menu"
+                  title={`Account: ${user.email}`}
+                >
+                  <span className="uppercase select-none">
+                    {user.name ? user.name.charAt(0) : user.email ? user.email.charAt(0) : "U"}
+                  </span>
+                  <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-background" />
+                </button>
+
+                {/* Profile Dropdown Menu - Solid, completely opaque, zero background bleed-through */}
+                {profileMenuOpen && (
+                  <div className="absolute right-0 top-11 z-[100] w-64 rounded-2xl border border-white/15 bg-[#0e0e11] p-2 shadow-[0_24px_60px_rgba(0,0,0,0.95),0_0_0_1px_rgba(255,255,255,0.08)] animate-in fade-in zoom-in-95 duration-100">
+                    {/* User Info Header */}
+                    <div className="px-2.5 py-2.5 border-b border-border/80 mb-1 bg-surface-1/60 rounded-xl">
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 text-xs font-bold text-emerald-300 border border-emerald-500/40">
+                          {user.name ? user.name.charAt(0).toUpperCase() : user.email ? user.email.charAt(0).toUpperCase() : "U"}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-semibold text-foreground truncate">{user.name || "Founder"}</p>
+                          <p className="text-[11px] text-muted-foreground truncate">{user.email}</p>
+                        </div>
+                      </div>
+                      <div className="mt-2 flex items-center gap-1.5">
+                        <span className="inline-flex items-center gap-1 rounded bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-medium text-emerald-400 border border-emerald-500/25">
+                          <ShieldCheck className="w-3 h-3" />
+                          Verified Member
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Nav Links */}
+                    <div className="flex flex-col gap-0.5 text-xs">
+                      <Link
+                        href="/dashboard?tab=profile"
+                        onClick={() => setProfileMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors"
+                      >
+                        <User className="w-4 h-4 opacity-70" />
+                        <span>Founder Profile</span>
+                      </Link>
+
+                      <Link
+                        href="/dashboard?tab=submissions"
+                        onClick={() => setProfileMenuOpen(false)}
+                        className="flex items-center justify-between px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <FolderGit2 className="w-4 h-4 opacity-70 text-accent" />
+                          <span>Submitted Tools / SaaS</span>
+                        </div>
+                        <span className="rounded bg-accent/15 px-1.5 py-0.5 text-[10px] font-semibold text-accent">
+                          Active
+                        </span>
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          openDrawer();
+                        }}
+                        className="flex items-center justify-between px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <Heart className="w-4 h-4 opacity-70 text-rose-400" />
+                          <span>My AI Stack</span>
+                        </div>
+                        {saveCount > 0 && (
+                          <span className="rounded-full bg-rose-500/20 px-1.5 py-0.2 text-[10px] font-bold text-rose-300">
+                            {saveCount}
+                          </span>
+                        )}
+                      </button>
+
+                      <Link
+                        href="/onboarding"
+                        onClick={() => setProfileMenuOpen(false)}
+                        className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-surface-2 transition-colors"
+                      >
+                        <Settings className="w-4 h-4 opacity-70" />
+                        <span>Edit Founder Links & Bio</span>
+                      </Link>
+                    </div>
+
+                    <div className="mt-1 pt-1 border-t border-border/70">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          signOut();
+                        }}
+                        className="flex w-full items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors"
+                      >
+                        <LogOut className="w-4 h-4 opacity-70" />
+                        <span>Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                prefetch={false}
+                className="inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-surface-1 transition-colors"
+              >
+                <User className="w-3.5 h-3.5 opacity-70" />
+                <span>Sign In</span>
+              </Link>
+            )}
           </div>
 
           {/* Mobile / Tablet Compact Action Bar */}
@@ -325,7 +472,7 @@ export function Navbar() {
               </Link>
             </div>
 
-            {/* 4. ACTIONS: MY STACK & SIGN IN */}
+            {/* 4. ACTIONS: MY STACK, SUBMISSIONS, & PROFILE */}
             <div className="mt-auto pt-3 border-t border-border flex flex-col gap-2">
               <button
                 type="button"
@@ -336,11 +483,11 @@ export function Navbar() {
                 className="flex w-full items-center justify-between px-3.5 py-2.5 rounded-lg border border-border bg-surface-1 text-xs font-medium text-foreground hover:bg-surface-2 transition-colors"
               >
                 <div className="flex items-center gap-2.5">
-                  <Layers className="w-4 h-4 opacity-70" />
+                  <Heart className="w-4 h-4 opacity-70 text-rose-400" />
                   <span>My AI Stack</span>
                 </div>
                 {saveCount > 0 ? (
-                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-black">
+                  <span className="flex h-4 min-w-4 items-center justify-center rounded-full bg-rose-500 px-1 text-[10px] font-bold text-white">
                     {saveCount}
                   </span>
                 ) : (
@@ -348,17 +495,55 @@ export function Navbar() {
                 )}
               </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  openAuthModal("Sign in to track price drops, upvote tools, and sync your stack.");
-                }}
-                className="flex w-full items-center justify-center gap-2 h-9 rounded-lg border border-border bg-surface-1 text-xs font-medium text-foreground hover:bg-surface-2 transition-colors"
+              <Link
+                href="/dashboard?tab=submissions"
+                prefetch={false}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex w-full items-center justify-between px-3.5 py-2.5 rounded-lg border border-border bg-surface-1 text-xs font-medium text-foreground hover:bg-surface-2 transition-colors"
               >
-                <User className="w-3.5 h-3.5 opacity-70" />
-                <span>Sign in / Account</span>
-              </button>
+                <div className="flex items-center gap-2.5">
+                  <FolderGit2 className="w-4 h-4 opacity-70 text-accent" />
+                  <span>Submitted Tools / SaaS</span>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 opacity-40" />
+              </Link>
+
+              {isAuthenticated && user ? (
+                <div className="flex flex-col gap-2 w-full pt-1">
+                  <Link
+                    href="/dashboard?tab=profile"
+                    prefetch={false}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3.5 py-2.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-xs text-emerald-400 font-medium"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="truncate">{user.name || "Founder Profile"}</span>
+                    </div>
+                    <span className="text-[10px] uppercase tracking-wider text-emerald-500 font-semibold">View</span>
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      signOut();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="h-9 px-3 rounded-lg border border-rose-500/20 bg-rose-500/10 text-xs text-rose-400 font-medium hover:bg-rose-500/20 transition-colors w-full text-center"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  prefetch={false}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex w-full items-center justify-center gap-2 h-9 rounded-lg border border-border bg-surface-1 text-xs font-medium text-foreground hover:bg-surface-2 transition-colors"
+                >
+                  <User className="w-3.5 h-3.5 opacity-70" />
+                  <span>Sign In to Account</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

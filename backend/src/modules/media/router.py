@@ -2,7 +2,6 @@
 
 import logging
 import os
-from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 

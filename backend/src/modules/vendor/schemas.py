@@ -3,7 +3,7 @@
 from datetime import datetime
 import uuid
 from typing import Optional, List, Dict, Union
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 
 class SubmissionCreate(BaseModel):
@@ -113,6 +113,37 @@ class SubmissionListItem(BaseModel):
     website_url: Optional[str] = None
     status: str
     created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class UserSubmissionTag(BaseModel):
+    id: str
+    name: str
+    slug: str
+
+
+class UserSubmissionDetail(BaseModel):
+    """Rich schema for vendor dashboard showing their submitted tools."""
+
+    id: Union[str, uuid.UUID]
+    tool_name: str
+    tool_slug: str
+    tagline: str
+    description: Optional[str] = None
+    category_id: Optional[Union[str, uuid.UUID]] = None
+    category_name: Optional[str] = None
+    category_slug: Optional[str] = None
+    tags: List[UserSubmissionTag] = []
+    pricing_model: str = "free"
+    is_free: bool = True
+    starting_price_minor: Optional[int] = None
+    currency: str = "USD"
+    website_url: Optional[str] = None
+    status: str = "pending"
+    created_at: datetime
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

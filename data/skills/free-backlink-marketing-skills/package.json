@@ -1,0 +1,44 @@
+{
+  "name": "free-backlink-marketing-skills",
+  "version": "1.0.0",
+  "description": "The Ultimate Free Dofollow Backlink Engine & 56+ Full-Stack Marketing Agent Skills for Founders, Indie Hackers, and Vibe Coders.",
+  "main": "scripts/submit.js",
+  "bin": {
+    "free-backlink": "scripts/submit.js",
+    "aitoolsfinder-submit": "scripts/submit.js"
+  },
+  "keywords": [
+    "seo",
+    "seo-audit",
+    "backlink",
+    "free-backlink",
+    "dofollow-backlink",
+    "ai-seo",
+    "aeo",
+    "geo",
+    "marketing",
+    "copywriting",
+    "cro",
+    "cold-email",
+    "growth-hacking",
+    "agent-skills",
+    "antigravity",
+    "cursor",
+    "claude-code",
+    "aitoolsfinder",
+    "vibe-coding"
+  ],
+  "author": "AIToolsFinder.cloud",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aitoolsfinder/free-backlink-marketing-skills.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aitoolsfinder/free-backlink-marketing-skills/issues"
+  },
+  "homepage": "https://aitoolsfinder.cloud",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

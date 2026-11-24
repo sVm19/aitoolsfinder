@@ -50,6 +50,7 @@ class Settings(BaseSettings):
     COGNITO_REGION: str = "us-east-1"
     COGNITO_USER_POOL_ID: Optional[str] = None
     COGNITO_APP_CLIENT_ID: Optional[str] = None
+    COGNITO_CLIENT_SECRET: Optional[str] = None
     COGNITO_DOMAIN: Optional[str] = None
 
     # AWS S3 & Media CDN (Cloudflare or CloudFront)

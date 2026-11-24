@@ -32,9 +32,9 @@ def upgrade() -> None:
             sa.ForeignKey("tools.id", ondelete="CASCADE"),
             nullable=False,
         ),
-        sa.Column("query", postgresql.Text, nullable=True),
+        sa.Column("query", sa.Text(), nullable=True),
         sa.Column("rating", sa.Integer(), nullable=False),
-        sa.Column("comment", postgresql.String(500), nullable=True),
+        sa.Column("comment", sa.String(500), nullable=True),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),

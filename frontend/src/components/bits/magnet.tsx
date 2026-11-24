@@ -7,10 +7,12 @@ import { cn } from "@/lib/utils";
 export function Magnet({
   children,
   className,
+  innerClassName,
   strength = 0.32,
 }: {
   children: React.ReactNode;
   className?: string;
+  innerClassName?: string;
   strength?: number;
 }) {
   const zoneRef = useRef<HTMLDivElement>(null);
@@ -48,7 +50,14 @@ export function Magnet({
 
   return (
     <div ref={zoneRef} className={cn("inline-flex", className)}>
-      <div ref={targetRef} className="inline-flex">
+      <div
+        ref={targetRef}
+        className={cn(
+          "inline-flex",
+          className?.includes("w-full") && "w-full justify-center",
+          innerClassName
+        )}
+      >
         {children}
       </div>
     </div>

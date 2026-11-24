@@ -1,23 +1,129 @@
 """User identity, authentication, and bookmarks API endpoints for Phase 6."""
 
+import uuid
 from datetime import datetime, timezone
 from typing import List
-from fastapi import APIRouter, Depends, Request, Response, status, HTTPException
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from src.core.database import get_db
-from src.core.security import get_current_user, UserContext
-from src.modules.identity.models import UserModel, SavedToolModel
+from src.core.security import get_current_user, UserContext, create_session_token
+from src.modules.identity.models import UserModel, SavedToolModel, FounderProfileModel
+from src.modules.identity.cognito_service import (
+    send_cognito_code,
+    verify_cognito_code,
+    CognitoError,
+)
 from src.modules.identity.schemas import (
     UserRead,
     UserUpdate,
     SavedToolRead,
-    SaveToolRequest,
     BookmarkToggleResponse,
+    MagicCodeSendRequest,
+    MagicCodeSendResponse,
+    MagicCodeVerifyRequest,
+    MagicCodeVerifyResponse,
 )
 
 router = APIRouter(prefix="/api/v1", tags=["User Identity"])
+
+
+@router.post("/auth/magic-code/send", response_model=MagicCodeSendResponse)
+async def send_magic_code_endpoint(payload: MagicCodeSendRequest) -> MagicCodeSendResponse:
+    """Send an official AWS Cognito authentication code to the specified email."""
+    try:
+        result = send_cognito_code(payload.email)
+        return MagicCodeSendResponse(
+            success=True,
+            message=result["message"],
+            destination=result.get("destination"),
+            is_new_user=result.get("is_new_user", False),
+        )
+    except CognitoError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=exc.message,
+        )
+
+
+@router.post("/auth/magic-code/verify", response_model=MagicCodeVerifyResponse)
+async def verify_magic_code_endpoint(
+    payload: MagicCodeVerifyRequest,
+    session: AsyncSession = Depends(get_db),
+) -> MagicCodeVerifyResponse:
+    """Verify Cognito code, authenticate user, and return session token."""
+    try:
+        verify_cognito_code(payload.email, payload.code)
+    except CognitoError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=exc.message,
+        )
+
+    clean_email = payload.email.strip().lower()
+
+    # Look up or JIT-create user in PostgreSQL database
+    result = await session.execute(
+        select(UserModel).where(UserModel.email == clean_email)
+    )
+    user = result.scalar_one_or_none()
+
+    now = datetime.now(timezone.utc)
+    if not user:
+        cognito_sub = f"cognito_{clean_email.replace('@', '_').replace('.', '_')}"
+        display_name = clean_email.split("@")[0].capitalize()
+        user = UserModel(
+            id=uuid.uuid4(),
+            cognito_sub=cognito_sub,
+            email=clean_email,
+            display_name=display_name,
+            role="user",
+            is_email_verified=True,
+            created_at=now,
+            updated_at=now,
+        )
+        session.add(user)
+        await session.commit()
+        await session.refresh(user)
+    else:
+        if not user.is_email_verified:
+            user.is_email_verified = True
+            user.updated_at = now
+            await session.commit()
+            await session.refresh(user)
+
+    # Check if founder profile exists
+    f_res = await session.execute(
+        select(FounderProfileModel).where(FounderProfileModel.user_id == user.id)
+    )
+    founder_profile = f_res.scalar_one_or_none()
+
+    token = create_session_token(
+        user_id=str(user.id),
+        email=user.email,
+        cognito_sub=user.cognito_sub,
+        role=user.role,
+    )
+
+    user_read = UserRead(
+        id=str(user.id),
+        cognito_sub=user.cognito_sub,
+        email=user.email,
+        display_name=user.display_name,
+        role=user.role,
+        is_email_verified=user.is_email_verified,
+        created_at=user.created_at,
+        updated_at=user.updated_at,
+    )
+
+    return MagicCodeVerifyResponse(
+        success=True,
+        token=token,
+        user=user_read,
+        has_founder_profile=founder_profile is not None,
+    )
+
 
 
 @router.get("/users/me", response_model=UserRead)

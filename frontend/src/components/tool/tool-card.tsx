@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { ScoreBadge } from "@/components/tool/score-badge";
 import { ToolLogo } from "@/components/tool/tool-logo";
-import { Bookmark, GitCompare, ArrowRight, ArrowUpRight } from "lucide-react";
+import { Heart, GitCompare, ArrowRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCompare } from "@/components/comparison/compare-provider";
 import { useStack } from "@/components/stack/stack-provider";
@@ -28,6 +28,7 @@ export interface ToolCardData {
   upvotes?: number;
   bestFor?: string;
   alternativeTo?: { name: string; slug: string };
+  replacesAnchoring?: string;
   cohort?: string;
 }
 
@@ -122,6 +123,19 @@ export function ToolCard({
       : tool.category === "AI & Models"
       ? "Developers benchmarking foundation models & API inference speeds"
       : "Professionals seeking verified software with published pricing");
+
+  const anchoringTag =
+    tool.replacesAnchoring ||
+    (tool.alternativeTo ? `Replaces ${tool.alternativeTo.name}` : null) ||
+    (tool.slug === "cursor"
+      ? "Replaces GitHub Copilot ($19/mo)"
+      : tool.slug === "v0"
+      ? "Replaces manual React scaffolding"
+      : tool.slug === "perplexity"
+      ? "Replaces multi-tab Google search"
+      : tool.slug === "claude-code"
+      ? "Replaces $500/mo autonomous agent tools"
+      : null);
 
   return (
     <div
@@ -264,24 +278,30 @@ export function ToolCard({
               <GitCompare aria-hidden="true" className="h-4 w-4" />
             </button>
 
-            {/* Bookmark to My Stack Toggle */}
+            {/* Favorite / Like Heart Button -> Saves to My AI Stack */}
             <button
               type="button"
               onClick={handleSaveClick}
               aria-pressed={isSaved}
               className={cn(
-                "rounded-lg p-1.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                "group/fav flex items-center gap-1.5 rounded-lg px-2 py-1 text-xs font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500",
                 isSaved
-                  ? "bg-primary/20 text-accent hover:bg-primary/30"
-                  : "text-subtle-foreground hover:bg-surface-3 hover:text-foreground"
+                  ? "bg-rose-500/15 text-rose-400 border border-rose-500/30 shadow-[0_0_12px_rgba(244,63,94,0.25)]"
+                  : "text-neutral-400 hover:text-rose-400 hover:bg-rose-500/10 border border-transparent"
               )}
-              aria-label={isSaved ? `Remove ${tool.name} from My Stack` : `Save ${tool.name} to My Stack`}
-              title={isSaved ? "Saved in My Stack" : "Save to My AI Stack"}
+              aria-label={isSaved ? `Remove ${tool.name} from My AI Stack` : `Save ${tool.name} to My AI Stack`}
+              title={isSaved ? "Saved in My AI Stack (Click to remove)" : "Favorite & Save to My AI Stack"}
             >
-              <Bookmark
+              <Heart
                 aria-hidden="true"
-                className={cn("h-4 w-4", isSaved && "fill-accent text-accent")}
+                className={cn(
+                  "h-4 w-4 transition-transform group-hover/fav:scale-110",
+                  isSaved ? "fill-rose-500 text-rose-500" : "text-neutral-400 group-hover/fav:text-rose-400"
+                )}
               />
+              <span className={cn("hidden sm:inline text-[11px]", isSaved ? "font-semibold text-rose-400" : "text-neutral-400")}>
+                {isSaved ? "Saved" : "Save"}
+              </span>
             </button>
           </div>
         </div>
@@ -290,6 +310,14 @@ export function ToolCard({
         <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed mb-3 min-h-[40px]">
           {tool.tagline}
         </p>
+
+        {/* Competitor Price Anchoring / Value Tag */}
+        {anchoringTag && (
+          <div className="mb-2.5 flex items-center gap-1.5 text-[11px] text-emerald-400 font-medium">
+            <span className="flex h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
+            <span className="truncate">{anchoringTag}</span>
+          </div>
+        )}
 
         {/* Micro-Teardown Insight Box (MicroSaaS Examples style) */}
         <div className="mb-4 rounded-lg border border-border/60 bg-surface-2/40 px-3 py-1.5 text-xs text-muted-foreground flex items-center gap-2">

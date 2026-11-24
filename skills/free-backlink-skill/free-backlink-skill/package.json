@@ -1,0 +1,28 @@
+{
+  "name": "free-backlink-skill",
+  "version": "1.0.0",
+  "description": "Full-stack SEO audit, automated code fixer, AI Search (AEO/GEO) optimizer, and free dofollow backlink submitter for modern web applications.",
+  "main": "scripts/submit.js",
+  "bin": {
+    "free-backlink": "scripts/submit.js"
+  },
+  "keywords": [
+    "seo",
+    "seo-audit",
+    "ai-seo",
+    "geo",
+    "aeo",
+    "backlink",
+    "growth",
+    "nextjs",
+    "react",
+    "agent-skill",
+    "aitoolsfinder",
+    "vibe-coding"
+  ],
+  "author": "AIToolsFinder.cloud",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

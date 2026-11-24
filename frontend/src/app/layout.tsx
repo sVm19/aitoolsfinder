@@ -5,6 +5,7 @@ import { canonicalUrl, SITE_URL } from "@/lib/site";
 import { CompareProvider } from "@/components/comparison/compare-provider";
 import { StackProvider } from "@/components/stack/stack-provider";
 import { TiunProvider } from "@/components/providers/tiun-provider";
+import { AuthProvider } from "@/lib/auth-context";
 import { StackDrawer } from "@/components/stack/stack-drawer";
 import { AuthModal } from "@/components/common/auth-modal";
 import { CustomCursor } from "@/components/bits/custom-cursor";
@@ -34,6 +35,18 @@ export const metadata: Metadata = {
     title: "AIToolsFinder — AI Tool Intelligence Platform",
     description: "Find the best AI tool for your exact job in under 60 seconds.",
   },
+  manifest: "/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/favicon-48x48.png", sizes: "48x48", type: "image/png" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   robots: {
     index: true,
     follow: true,
@@ -57,15 +70,17 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <AttributionTracker />
         </Suspense>
-        <CompareProvider>
-          <StackProvider>
-            <TiunProvider>
-              {children}
-              <StackDrawer />
-              <AuthModal />
-            </TiunProvider>
-          </StackProvider>
-        </CompareProvider>
+        <AuthProvider>
+          <CompareProvider>
+            <StackProvider>
+              <TiunProvider>
+                {children}
+                <StackDrawer />
+                <AuthModal />
+              </TiunProvider>
+            </StackProvider>
+          </CompareProvider>
+        </AuthProvider>
       </body>
     </html>
   );

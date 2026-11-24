@@ -230,11 +230,17 @@ export function StackDrawer() {
               <Button
                 variant="primary"
                 size="sm"
+                disabled={savedTools.length < 2}
                 onClick={handleCompareAll}
-                className="justify-center text-xs shadow-lavender-glow"
+                className="justify-center text-xs shadow-lavender-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                title={
+                  savedTools.length < 2
+                    ? "Add at least 2 tools to compare"
+                    : "Compare shortlisted tools side-by-side"
+                }
               >
                 <GitCompare className="h-3.5 w-3.5 mr-1.5" />
-                Compare All
+                {savedTools.length < 2 ? "Compare (2+ required)" : "Compare All"}
               </Button>
             </div>
           </div>

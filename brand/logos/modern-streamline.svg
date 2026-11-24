@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <linearGradient id="stream-body" x1="20%" y1="0%" x2="80%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#3B82F6"/>
+    </linearGradient>
+    <linearGradient id="stream-accent" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <!-- Aerodynamic 'A' Loop with Continuous Bezier Curves -->
+  <path d="M128 32 C138 32 146 40 152 50 L216 178 C224 194 216 210 198 210 C186 210 178 202 172 190 L158 160 L98 160 L84 190 C78 202 70 210 58 210 C40 210 32 194 40 178 L104 50 C110 40 118 32 128 32 Z M128 86 L110 128 L146 128 Z" fill="url(#stream-body)"/>
+  <!-- Floating Optical Diamond Core -->
+  <path d="M128 144 L142 158 L128 172 L114 158 Z" fill="url(#stream-accent)"/>
+</svg>

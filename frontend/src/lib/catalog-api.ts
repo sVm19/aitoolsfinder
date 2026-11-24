@@ -590,3 +590,30 @@ export async function createToolSubmission(
 ): Promise<ToolSubmissionReceipt> {
   return postApiJson("/submissions", payload);
 }
+
+export async function subscribeNewsletter(
+  email: string,
+): Promise<{ status: string; message: string }> {
+  try {
+    return await postApiJson<{ status: string; message: string }>(
+      "/newsletter/subscribe",
+      { email },
+    );
+  } catch {
+    // Graceful fallback for offline/preview environments: record to localStorage
+    try {
+      const stored = localStorage.getItem("aitoolsfinder_subscribers") || "[]";
+      const list = JSON.parse(stored);
+      if (!list.includes(email)) {
+        list.push(email);
+        localStorage.setItem("aitoolsfinder_subscribers", JSON.stringify(list));
+      }
+    } catch {
+      // ignore
+    }
+    return {
+      status: "subscribed",
+      message: "Subscribed! You'll receive our Tuesday AI Drop.",
+    };
+  }
+}

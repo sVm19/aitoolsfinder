@@ -46,6 +46,8 @@ from src.modules.vendor.schemas import (
     SubmissionReject,
     SubmissionRead,
     SubmissionListItem,
+    UserSubmissionDetail,
+    UserSubmissionTag,
     AffiliateLinkCreate,
     AffiliateLinkRead,
     OutboundClickCreate,

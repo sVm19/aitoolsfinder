@@ -1,7 +1,6 @@
 """AWS S3 & CloudFront media storage engine with presigned upload URLs."""
 
 import logging
-import os
 import uuid
 from typing import Dict, Any, Optional
 

@@ -16,36 +16,42 @@ export function BrandSymbol({
 }) {
   return (
     <svg
-      viewBox="0 0 256 256"
+      viewBox="16 16 224 224"
       className={className}
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
       <defs>
-        <linearGradient id="brand-grad-violet" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#8B5CF6" />
-          <stop offset="100%" stopColor="#6D28D9" />
+        <linearGradient id="orbit-violet" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#A78BFA" />
+          <stop offset="100%" stopColor="#7C3AED" />
         </linearGradient>
-        <linearGradient id="brand-grad-orange" x1="0%" y1="100%" x2="100%" y2="0%">
+        <linearGradient id="stack-orange" x1="0%" y1="100%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#FF5E1E" />
           <stop offset="100%" stopColor="#FFA043" />
         </linearGradient>
       </defs>
-      {/* Left Vanguard Blade */}
+      {/* Outer Precision Circular Orbit Ring */}
       <path
-        d="M124 26 L24 206 L66 206 L124 104 Z"
-        fill="url(#brand-grad-violet)"
+        fill="url(#orbit-violet)"
+        fillRule="evenodd"
+        d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"
       />
-      {/* Right Vanguard Blade */}
+      {/* Tier 1: Top Floating Stack Plate (Active Tool Tier - Radiant Orange) */}
       <path
-        d="M132 26 L132 104 L190 206 L232 206 Z"
-        fill="url(#brand-grad-orange)"
+        fill="url(#stack-orange)"
+        d="M128 64 L180 94 L128 124 L76 94 Z"
       />
-      {/* Precision Diamond Aperture */}
-      <polygon
-        points="128,138 152,162 128,186 104,162"
-        fill="#FF5E1E"
+      {/* Tier 2: Middle Stack Plate (Intelligence Workflow Tier - Electric Violet) */}
+      <path
+        fill="url(#orbit-violet)"
+        d="M76 118 L128 148 L180 118 L180 134 L128 164 L76 134 Z"
+      />
+      {/* Tier 3: Bottom Foundation Plate (Infrastructure Tier - Electric Violet) */}
+      <path
+        fill="url(#orbit-violet)"
+        d="M76 152 L128 182 L180 152 L180 168 L128 198 L76 168 Z"
       />
     </svg>
   );
@@ -61,19 +67,19 @@ export function BrandLogo({
   const sizeMap = {
     sm: {
       box: "h-7 w-7 rounded-md",
-      icon: "w-4 h-4",
+      icon: "w-[23px] h-[23px]",
       title: "text-sm",
       sub: "text-[8px] tracking-[0.2em] -mt-0.5",
     },
     md: {
       box: "h-9 w-9 rounded-lg",
-      icon: "w-5 h-5",
+      icon: "w-[30px] h-[30px]",
       title: "text-base",
       sub: "text-[9.5px] tracking-[0.24em] -mt-1",
     },
     lg: {
       box: "h-11 w-11 rounded-xl",
-      icon: "w-6 h-6",
+      icon: "w-[37px] h-[37px]",
       title: "text-lg",
       sub: "text-[11px] tracking-[0.26em] -mt-0.5",
     },
@@ -97,15 +103,15 @@ export function BrandLogo({
       {showWordmark && (
         <div className="flex flex-col text-left select-none">
           <span
-            className={`${currentSize.title} font-extrabold tracking-[-0.035em] text-foreground transition-colors duration-200 group-hover:text-white`}
+            className={`${currentSize.title} font-mono font-bold tracking-tight text-foreground transition-colors duration-200 group-hover:text-white`}
           >
-            AIToolsFinder
+            aiToolsFinder
             <span className="text-accent font-black">.</span>
           </span>
           <span
-            className={`${currentSize.sub} font-mono font-semibold text-subtle-foreground uppercase`}
+            className={`${currentSize.sub} font-mono font-semibold text-subtle-foreground uppercase tracking-[0.24em]`}
           >
-            Intelligence
+            Cloud
           </span>
         </div>
       )}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="180" height="40" viewBox="0 0 180 40" fill="none">
+  <defs>
+    <linearGradient id="glow-dark" x1="0" y1="0" x2="180" y2="40" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7022FC" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#010102" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="icon-grad" x1="12" y1="12" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7022FC"/>
+      <stop offset="1" stop-color="#8F4BFE"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="40" rx="10" fill="#0B0A0F" stroke="#7022FC" stroke-width="1.2"/>
+  <rect x="0.6" y="0.6" width="178.8" height="38.8" rx="9.4" fill="url(#glow-dark)"/>
+  
+  <!-- Shield/Checkmark Icon -->
+  <rect x="10" y="10" width="20" height="20" rx="6" fill="url(#icon-grad)"/>
+  <path d="M16 20.2L18.8 23L24 17" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Text hierarchy -->
+  <text x="37" y="16.5" fill="#FD8F32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="8.5" font-weight="700" letter-spacing="0.12em">VERIFIED</text>
+  <text x="37" y="28.5" fill="#F7F5FA" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="600" letter-spacing="-0.01em">AIToolsFinder</text>
+  
+  <!-- Star Rating -->
+  <circle cx="163" cy="20" r="1.5" fill="#FD8F32"/>
+  <path d="M153 17L154.2 19.5L157 19.9L155 21.8L155.5 24.5L153 23.2L150.5 24.5L151 21.8L149 19.9L151.8 19.5L153 17Z" fill="#FD8F32"/>
+</svg>

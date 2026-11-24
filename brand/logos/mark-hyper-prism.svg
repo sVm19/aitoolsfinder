@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-labelledby="prism-title">
+  <title id="prism-title">AIToolsFinder — Hyper-Prism</title>
+  <defs>
+    <linearGradient id="prism-v" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="prism-o" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <!-- Fluid Aerodynamic Monolith: Left Ascending Wing -->
+  <path fill="url(#prism-v)" d="M122 28 C116 28 110 32 106 38 L28 182 C22 194 30 208 44 208 L82 208 C90 208 98 202 102 194 L122 152 L122 28 Z"/>
+  <!-- Fluid Aerodynamic Monolith: Right Descending Wing with Crossbar Horizon -->
+  <path fill="url(#prism-v)" d="M134 28 L134 152 L154 194 C158 202 166 208 174 208 L212 208 C226 208 234 194 228 182 L150 38 C146 32 140 28 134 28 Z"/>
+  <!-- Precision Refraction Beacon (Floating Aperture Diamond) -->
+  <polygon points="128,88 148,112 128,136 108,112" fill="url(#prism-o)"/>
+</svg>

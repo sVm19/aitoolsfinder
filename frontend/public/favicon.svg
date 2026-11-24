@@ -14,8 +14,9 @@
   <rect width="256" height="256" rx="56" fill="none" stroke="#2C2638" stroke-width="4"/>
   <!-- Scaled Symbol centered -->
   <g transform="translate(18, 18) scale(0.859375)">
-    <path fill="url(#fav-v)" d="M124 26 L24 206 L66 206 L124 104 Z"/>
-    <path fill="url(#fav-o)" d="M132 26 L132 104 L190 206 L232 206 Z"/>
-    <polygon fill="#FF5E1E" points="128,138 152,162 128,186 104,162"/>
+    <path fill="url(#fav-v)" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
+    <path fill="url(#fav-o)" d="M128 64 L180 94 L128 124 L76 94 Z"/>
+    <path fill="url(#fav-v)" d="M76 118 L128 148 L180 118 L180 134 L128 164 L76 134 Z"/>
+    <path fill="url(#fav-v)" d="M76 152 L128 182 L180 152 L180 168 L128 198 L76 168 Z"/>
   </g>
 </svg>

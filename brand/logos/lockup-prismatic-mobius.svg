@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 256" width="960" height="256" role="img" aria-labelledby="lock-2-title">
+  <title id="lock-2-title">AIToolsFinder — Prismatic Möbius Lockup</title>
+  <defs>
+    <style>
+      .brand-title { font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif; font-size: 76px; font-weight: 800; letter-spacing: -2px; fill: #FFFFFF; }
+      .brand-dot { fill: #FF5E1E; }
+      .brand-tag { font-family: 'JetBrains Mono', 'SF Mono', monospace; font-size: 18px; font-weight: 600; letter-spacing: 5px; fill: #EC4899; text-transform: uppercase; }
+    </style>
+    <linearGradient id="l2-west" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#A855F7"/>
+    </linearGradient>
+    <linearGradient id="l2-apex" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#A855F7"/>
+      <stop offset="50%" stop-color="#EC4899"/>
+      <stop offset="100%" stop-color="#FF5E1E"/>
+    </linearGradient>
+    <linearGradient id="l2-core" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF5E1E"/>
+      <stop offset="100%" stop-color="#FFA043"/>
+    </linearGradient>
+  </defs>
+  <g id="symbol" transform="translate(48, 38) scale(0.703125)">
+    <path d="M72 176 C96 196 160 196 184 176 C194 168 188 152 174 152 C154 152 102 152 82 152 C68 152 62 168 72 176 Z" fill="url(#l2-core)"/>
+    <path d="M64 184 C52 172 60 144 84 100 L114 46 C120 36 136 36 142 46 L154 68 C144 68 118 108 98 144 C88 162 76 178 64 184 Z" fill="url(#l2-west)"/>
+    <path d="M128 38 C134 38 140 42 144 50 L196 148 C206 166 200 186 184 192 C172 196 160 188 154 174 L138 136 C138 116 150 78 138 58 C134 50 130 42 128 38 Z" fill="url(#l2-apex)"/>
+    <polygon points="128,102 144,118 128,134 112,118" fill="#FFFFFF"/>
+  </g>
+  <g id="wordmark" transform="translate(256, 128)">
+    <text x="0" y="0" class="brand-title">AIToolsFinder<tspan class="brand-dot">.</tspan></text>
+    <text x="4" y="42" class="brand-tag">DISCOVERY &amp; BENCHMARK RADAR</text>
+  </g>
+</svg>

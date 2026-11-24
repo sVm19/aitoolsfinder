@@ -15,7 +15,10 @@ from src.core.logging import setup_logging, request_id_ctx
 from src.core.ratelimit import limiter
 from src.common.exceptions import AppError
 from src.common.schemas import ErrorResponse, ErrorDetail
-from src.modules.operations.router import router as operations_router
+from src.modules.operations.router import (
+    router as operations_router,
+    newsletter_router as operations_newsletter_router,
+)
 from src.modules.catalog.router import (
     router as catalog_router,
     admin_router as catalog_admin_router,
@@ -44,9 +47,9 @@ def create_application() -> FastAPI:
         title="AIToolsFinder API",
         description="Core Intelligence and Catalog API for https://aitoolsfinder.cloud",
         version="1.0.0",
-        docs_url="/docs" if settings.APP_ENV != "production" else None,
-        redoc_url="/redoc" if settings.APP_ENV != "production" else None,
-        openapi_url="/openapi.json" if settings.APP_ENV != "production" else None,
+        docs_url="/docs",
+        redoc_url="/redoc",
+        openapi_url="/openapi.json",
         lifespan=lifespan,
     )
 
@@ -153,6 +156,7 @@ def create_application() -> FastAPI:
     # 5. Route Registration
     # Core API v1 router
     app.include_router(operations_router, prefix="/api/v1")
+    app.include_router(operations_newsletter_router, prefix="/api/v1")
     app.include_router(catalog_router, prefix="/api/v1")
     app.include_router(intelligence_router, prefix="/api/v1")
     app.include_router(catalog_admin_router, prefix="/api/v1")

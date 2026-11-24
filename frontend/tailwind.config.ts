@@ -41,6 +41,9 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sans)", "Plus Jakarta Sans", "Outfit", "sans-serif"],
         display: ["var(--font-display)", "Plus Jakarta Sans", "Outfit", "sans-serif"],
+        outfit: ["Outfit", "sans-serif"],
+        space: ["'Space Grotesk'", "sans-serif"],
+        sora: ["Sora", "sans-serif"],
         mono: ["var(--font-mono)", "ui-monospace", "monospace"],
       },
       borderRadius: {

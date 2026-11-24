@@ -1,78 +1,18 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import React, { Component, useEffect, useState, type ReactNode } from "react";
-
-class SceneErrorBoundary extends Component<
-  { children: ReactNode; fallback: ReactNode },
-  { hasError: boolean }
-> {
-  state = { hasError: false };
-
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error: unknown) {
-    console.warn("Hero 3D scene fallback to 2D background:", error);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return this.props.fallback;
-    }
-    return this.props.children;
-  }
-}
-
-const HeroScene = dynamic(
-  () =>
-    import("./hero-scene").catch((err) => {
-      console.warn("HeroScene dynamic import skipped:", err);
-      return () => null;
-    }),
-  { ssr: false },
-);
-
-function StaticFallback() {
-  return (
-    <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-      <div className="aurora-blob aurora-blob-a" />
-      <div className="aurora-blob aurora-blob-b" />
-      <div className="absolute right-[12%] top-1/2 hidden h-56 w-56 -translate-y-1/2 md:block">
-        <div className="h-full w-full rounded-full bg-gradient-to-tr from-primary/30 via-accent/20 to-transparent blur-3xl" />
-      </div>
-    </div>
-  );
-}
+import React from "react";
 
 export function HeroCanvas() {
-  const [loadScene, setLoadScene] = useState(false);
-
-  useEffect(() => {
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    const smallViewport = window.matchMedia("(max-width: 767px)").matches;
-    if (reducedMotion || smallViewport) return;
-
-    const timer = window.setTimeout(() => setLoadScene(true), 180);
-    return () => window.clearTimeout(timer);
-  }, []);
-
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden"
     >
-      <StaticFallback />
-      {loadScene && (
-        <SceneErrorBoundary fallback={null}>
-          <div className="scene-in absolute inset-0">
-            <HeroScene />
-          </div>
-        </SceneErrorBoundary>
-      )}
+      <div className="aurora-blob aurora-blob-a" />
+      <div className="aurora-blob aurora-blob-b" />
+      <div className="absolute right-[8%] top-1/2 -translate-y-1/2 hidden lg:block h-96 w-96">
+        <div className="h-full w-full rounded-full bg-gradient-to-tr from-primary/20 via-accent/15 to-transparent blur-3xl opacity-75" />
+      </div>
     </div>
   );
 }

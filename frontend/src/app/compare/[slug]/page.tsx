@@ -10,6 +10,7 @@ import {
   type ComparisonMatrix,
 } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
+import { buildItemListJsonLd } from "@/lib/seo-schema";
 
 export async function generateMetadata({
   params,
@@ -63,14 +64,28 @@ export default async function ComparisonPage({
     );
   }
 
+  const breadcrumbItems = [
+    { label: "Home", href: "/" },
+    { label: "Compare", href: "/compare" },
+    { label: comparison.title },
+  ] as const;
+
+  const itemListJsonLd =
+    comparison.tools.length > 0
+      ? buildItemListJsonLd(
+          comparison.title,
+          comparison.summary,
+          comparison.tools.map((tool, idx) => ({
+            name: tool.name,
+            url: `/tools/${encodeURIComponent(tool.slug)}`,
+            description: tool.tagline,
+            position: idx + 1,
+          })),
+        )
+      : null;
+
   return (
-    <PageShell
-      breadcrumbs={[
-        { label: "Home", href: "/" },
-        { label: "Compare", href: "/compare" },
-        { label: comparison.title },
-      ]}
-    >
+    <PageShell breadcrumbs={breadcrumbItems}>
       <header className="max-w-4xl">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary-content">
           Published comparison
@@ -123,6 +138,9 @@ export default async function ComparisonPage({
       <div className="mt-8">
         <ComparisonMatrixView comparison={comparison} />
       </div>
+      {itemListJsonLd && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: itemListJsonLd }} />
+      )}
     </PageShell>
   );
 }

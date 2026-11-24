@@ -87,10 +87,14 @@ export function AIFinderView({ categories }: AIFinderViewProps) {
   const [feedback, setFeedback] = useState<Record<string, FeedbackState>>({});
   const { tools: compareTools, addTool, removeTool, isFull } = useCompare();
 
-  async function runSearch(event?: FormEvent<HTMLFormElement>) {
+  async function runSearch(event?: FormEvent<HTMLFormElement>, overrideQuery?: string) {
     event?.preventDefault();
-    const trimmed = query.trim();
-    if (!trimmed || status === "loading") return;
+    const targetQuery = (overrideQuery ?? query).trim();
+    if (!targetQuery || status === "loading") return;
+
+    if (overrideQuery) {
+      setQuery(overrideQuery);
+    }
 
     setStatus("loading");
     setError(null);
@@ -98,7 +102,7 @@ export function AIFinderView({ categories }: AIFinderViewProps) {
 
     try {
       const response = await getAIRecommendations({
-        query: trimmed,
+        query: targetQuery,
         pricing_model: pricing || undefined,
         category_slugs: category ? [category] : undefined,
       });
@@ -254,7 +258,7 @@ export function AIFinderView({ categories }: AIFinderViewProps) {
               <button
                 key={example}
                 type="button"
-                onClick={() => setQuery(example)}
+                onClick={() => runSearch(undefined, example)}
                 className="rounded-full border border-border/70 bg-surface-1 px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 {example}

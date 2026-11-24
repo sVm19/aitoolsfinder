@@ -12,3 +12,12 @@ class ReadinessResponse(BaseModel):
     database: str
     app: str
     environment: str
+
+
+class NewsletterSubscribeRequest(BaseModel):
+    email: str
+
+
+class NewsletterSubscribeResponse(BaseModel):
+    status: str
+    message: str

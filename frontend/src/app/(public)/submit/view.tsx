@@ -157,14 +157,17 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
     if (step === 2) {
       if (!toolName.trim()) {
         setError("Please provide a tool name.");
+        window.scrollTo({ top: 140, behavior: "smooth" });
         return;
       }
       if (!websiteUrl.trim() || !websiteUrl.startsWith("http")) {
         setError("Please enter a valid website URL starting with https:// or http://");
+        window.scrollTo({ top: 140, behavior: "smooth" });
         return;
       }
       if (!tagline.trim()) {
         setError("Please provide a short tagline pitch.");
+        window.scrollTo({ top: 140, behavior: "smooth" });
         return;
       }
     }
@@ -178,11 +181,13 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
     if (step === 4) {
       if (!pricingUrl.trim() && !isFree) {
         setError("Please provide a public pricing URL for audit verification proof.");
+        window.scrollTo({ top: 140, behavior: "smooth" });
         return;
       }
     }
 
     setStep((prev) => Math.min(prev + 1, 5));
+    window.scrollTo({ top: 140, behavior: "smooth" });
   };
 
   const handleSubmit = async (event: FormEvent) => {
@@ -279,15 +284,34 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
             </div>
           </div>
 
+          {/* Next Step Callout: Complete Founder Profile & Claim Verified Badge */}
+          <div className="mt-6 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-5">
+            <div className="flex items-start gap-3.5">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-white">
+                  Next Step: Claim Your Verified Founder Badge
+                </h3>
+                <p className="text-xs text-neutral-300 mt-1 leading-relaxed">
+                  Complete your Founder Profile to attach your Substack, X, and professional credentials directly to {receipt.tool_name}.
+                </p>
+              </div>
+            </div>
+          </div>
+
           <div className="mt-8 flex flex-wrap gap-4">
-            <Link href="/explore">
-              <Button variant="primary" size="md">
-                Browse Live Catalog
+            <Link href="/onboarding">
+              <Button variant="primary" size="md" className="bg-[#E8FF54] text-neutral-950 hover:bg-[#d8ef45] font-bold">
+                Complete Founder Profile & Claim Badge
                 <ArrowRight className="w-4 h-4 ml-1.5" />
               </Button>
             </Link>
-            <Link href="/">
-              <Button variant="outline" size="md">Return Home</Button>
+            <Link href="/explore">
+              <Button variant="outline" size="md">
+                Browse Live Catalog
+              </Button>
             </Link>
           </div>
         </div>
@@ -312,6 +336,32 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
         <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
           Get your software indexed and benchmarked against published capabilities and transparent pricing. Every approved listing receives a permanent, high-authority free backlink to accelerate domain ranking and organic buyer traffic.
         </p>
+
+        {/* Terminal 1-Liner Callout for Vibe Coders & Developers */}
+        <div className="mt-6 rounded-2xl border border-white/10 bg-surface-1/90 p-4 sm:p-5 shadow-sm backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary/20 text-primary-content border border-primary/30 font-mono text-sm font-bold">
+              &gt;_
+            </span>
+            <div>
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-foreground">
+                  Building with Cursor, Claude Code, or Antigravity?
+                </p>
+                <span className="rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-semibold text-accent font-mono">
+                  1-Line CLI
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Skip the web form. Inspect and submit your app directly from your terminal in 5 seconds:
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-xl border border-border bg-background px-3.5 py-2 font-mono text-xs shadow-inner self-start sm:self-center">
+            <span className="text-accent select-none font-bold">$</span>
+            <code className="text-foreground font-semibold">npx aitoolsfinder-submit</code>
+          </div>
+        </div>
       </header>
 
       {/* Progress Stepper */}
@@ -364,10 +414,19 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
               <Sparkles className="w-5 h-5 text-accent" />
               Choose review speed & visibility
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2" role="radiogroup" aria-label="Review speed options">
               <div
+                role="radio"
+                aria-checked={submissionType === "standard"}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSubmissionType("standard");
+                  }
+                }}
                 onClick={() => setSubmissionType("standard")}
-                className={`cursor-pointer rounded-2xl border p-5 transition-all ${
+                className={`cursor-pointer rounded-2xl border p-5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                   submissionType === "standard"
                     ? "border-primary bg-primary/10 shadow-lavender-glow"
                     : "border-border bg-surface-2 hover:border-primary/40"
@@ -389,8 +448,17 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
               </div>
 
               <div
+                role="radio"
+                aria-checked={submissionType === "featured"}
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setSubmissionType("featured");
+                  }
+                }}
                 onClick={() => setSubmissionType("featured")}
-                className={`cursor-pointer rounded-2xl border p-5 transition-all relative overflow-hidden ${
+                className={`cursor-pointer rounded-2xl border p-5 transition-all relative overflow-hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   submissionType === "featured"
                     ? "border-accent bg-accent/10 shadow-orange-glow"
                     : "border-border bg-surface-2 hover:border-accent/40"
@@ -633,15 +701,25 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
 
             <div>
               <label className={LABEL_CLASS}>Pricing Model *</label>
-              <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Pricing Model">
                 {PRICING_OPTIONS.map((opt) => (
                   <div
                     key={opt.value}
+                    role="radio"
+                    aria-checked={pricingModel === opt.value}
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setPricingModel(opt.value);
+                        setIsFree(opt.value === "free");
+                      }
+                    }}
                     onClick={() => {
                       setPricingModel(opt.value);
                       setIsFree(opt.value === "free");
                     }}
-                    className={`cursor-pointer rounded-xl border p-3 text-sm transition-all ${
+                    className={`cursor-pointer rounded-xl border p-3 text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                       pricingModel === opt.value
                         ? "border-primary bg-primary/10 text-foreground"
                         : "border-border bg-surface-2 text-muted-foreground hover:border-primary/40"

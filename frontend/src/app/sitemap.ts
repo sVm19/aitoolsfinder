@@ -1,8 +1,10 @@
 import type { MetadataRoute } from "next";
 import {
   getActiveCategoriesPage,
+  getActiveTags,
   getExploreTools,
   type CatalogCategory,
+  type CatalogTag,
   type CatalogTool,
 } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
@@ -56,9 +58,10 @@ function lastModified(value: string | undefined): Date {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [categoriesResult, toolsResult] = await Promise.allSettled([
+  const [categoriesResult, toolsResult, tagsResult] = await Promise.allSettled([
     allActiveCategories(),
     allPublishedTools(),
+    getActiveTags().catch(() => [] as CatalogTag[]),
   ]);
 
   const entries: MetadataRoute.Sitemap = [
@@ -72,10 +75,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: canonicalUrl("/rankings"),
       lastModified: new Date(),
       changeFrequency: "weekly",
-      priority: 0.7,
+      priority: 0.8,
+    },
+    {
+      url: canonicalUrl("/categories"),
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: canonicalUrl("/about"),
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
     },
     {
       url: canonicalUrl("/methodology"),
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: canonicalUrl("/transparency"),
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: canonicalUrl("/vendor"),
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: canonicalUrl("/submit"),
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
@@ -95,29 +128,52 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   if (categoriesResult.status === "fulfilled" && categoriesResult.value.length) {
-    entries.push({
-      url: canonicalUrl("/categories"),
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 0.8,
-    });
     for (const category of categoriesResult.value) {
+      const modDate = lastModified(category.updated_at);
+      // Category hub
       entries.push({
         url: canonicalUrl(`/categories/${encodeURIComponent(category.slug)}`),
-        lastModified: lastModified(category.updated_at),
+        lastModified: modDate,
+        changeFrequency: "weekly",
+        priority: 0.8,
+      });
+      // Category rankings
+      entries.push({
+        url: canonicalUrl(`/rankings/${encodeURIComponent(category.slug)}`),
+        lastModified: modDate,
         changeFrequency: "weekly",
         priority: 0.7,
       });
     }
   }
 
-  if (toolsResult.status === "fulfilled") {
+  if (toolsResult.status === "fulfilled" && toolsResult.value.length) {
     for (const tool of toolsResult.value) {
+      const modDate = lastModified(tool.updated_at);
+      // Tool detail
       entries.push({
         url: canonicalUrl(`/tools/${encodeURIComponent(tool.slug)}`),
-        lastModified: lastModified(tool.updated_at),
+        lastModified: modDate,
         changeFrequency: "weekly",
         priority: 0.7,
+      });
+      // Alternatives page
+      entries.push({
+        url: canonicalUrl(`/alternatives/${encodeURIComponent(tool.slug)}`),
+        lastModified: modDate,
+        changeFrequency: "weekly",
+        priority: 0.7,
+      });
+    }
+  }
+
+  if (tagsResult.status === "fulfilled" && tagsResult.value.length) {
+    for (const tag of tagsResult.value) {
+      entries.push({
+        url: canonicalUrl(`/tags/${encodeURIComponent(tag.slug)}`),
+        lastModified: new Date(),
+        changeFrequency: "weekly",
+        priority: 0.6,
       });
     }
   }

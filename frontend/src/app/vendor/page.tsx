@@ -62,10 +62,10 @@ export default function VendorHubPage() {
             </p>
           </div>
           <div className="mt-6">
-            <Link href="/login">
+            <Link href="/submit">
               <Button variant="outline" size="md" className="w-full">
-                Sign in to claim
-                <Clock className="w-4 h-4 ml-1.5" />
+                Verify and claim listing
+                <BadgeCheck className="w-4 h-4 ml-1.5" />
               </Button>
             </Link>
           </div>
