@@ -107,11 +107,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         body: JSON.stringify({ email: cleanEmail }),
       });
 
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         return {
           success: false,
-          error: data.detail || "Unable to send verification code. Please check your email.",
+          error:
+            data.detail ||
+            data.error?.message ||
+            "Unable to send verification code. Please check your email.",
         };
       }
 
@@ -143,11 +146,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           body: JSON.stringify({ email: cleanEmail, code: cleanCode }),
         });
 
-        const data = await res.json();
+        const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           return {
             success: false,
-            error: data.detail || "Invalid code. Please try again.",
+            error:
+              data.detail ||
+              data.error?.message ||
+              "Invalid code. Please try again.",
           };
         }
 

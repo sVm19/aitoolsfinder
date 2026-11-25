@@ -31,9 +31,25 @@ def calculate_secret_hash(username: str) -> str:
     return base64.b64encode(dig).decode()
 
 
+def _base_cognito_payload(username: str) -> Dict[str, Any]:
+    """Build base Cognito payload with ClientId and optional SecretHash."""
+    if not settings.COGNITO_APP_CLIENT_ID:
+        raise CognitoError(
+            "ConfigurationError", "COGNITO_APP_CLIENT_ID must be configured"
+        )
+
+    payload: Dict[str, Any] = {
+        "ClientId": settings.COGNITO_APP_CLIENT_ID,
+        "Username": username,
+    }
+    if settings.COGNITO_CLIENT_SECRET:
+        payload["SecretHash"] = calculate_secret_hash(username)
+    return payload
+
+
 def _call_cognito_api(target: str, payload: Dict[str, Any]) -> Dict[str, Any]:
     """Call an AWS Cognito Identity Provider API action using urllib."""
-    region = settings.COGNITO_REGION or "ap-southeast-2"
+    region = settings.COGNITO_REGION or "us-east-1"
     url = f"https://cognito-idp.{region}.amazonaws.com/"
     headers = {
         "X-Amz-Target": f"AWSCognitoIdentityProviderService.{target}",
@@ -55,7 +71,8 @@ def _call_cognito_api(target: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         err_body = exc.read().decode("utf-8")
         try:
             err_json = json.loads(err_body)
-            err_type = err_json.get("__type", "UnknownError")
+            raw_type = str(err_json.get("__type", "UnknownError"))
+            err_type = raw_type.split("#")[-1]
             err_msg = err_json.get("message", "Cognito request failed")
         except Exception:
             err_type = "HttpError"
@@ -81,19 +98,17 @@ def send_cognito_code(email: str) -> Dict[str, Any]:
     """Send an authentication verification code to user's email via AWS Cognito.
 
     If user does not exist, registers them via SignUp (triggers verification email).
-    If user already exists, triggers ForgotPassword (triggers verification email).
+    If user already exists and is confirmed, triggers ForgotPassword.
+    If user already exists but is unconfirmed, falls back to ResendConfirmationCode.
     """
     clean_email = email.strip().lower()
-    secret_hash = calculate_secret_hash(clean_email)
-    client_id = settings.COGNITO_APP_CLIENT_ID
+    base_payload = _base_cognito_payload(clean_email)
 
     # 1. Attempt SignUp first (for first-time users)
     # Use a secure strong auto-generated password so the user never has to set or remember one
     temp_password = f"P@{uuid.uuid4().hex[:14]}Aa1!"
     signup_payload = {
-        "ClientId": client_id,
-        "SecretHash": secret_hash,
-        "Username": clean_email,
+        **base_payload,
         "Password": temp_password,
         "UserAttributes": [{"Name": "email", "Value": clean_email}],
     }
@@ -117,14 +132,8 @@ def send_cognito_code(email: str) -> Dict[str, Any]:
             logger.warning(f"SignUp failed with {err.error_type}: {err.message}")
 
     # 2. Existing user -> trigger ForgotPassword code
-    forgot_payload = {
-        "ClientId": client_id,
-        "SecretHash": secret_hash,
-        "Username": clean_email,
-    }
-
     try:
-        res = _call_cognito_api("ForgotPassword", forgot_payload)
+        res = _call_cognito_api("ForgotPassword", dict(base_payload))
         delivery = res.get("CodeDeliveryDetails", {})
         destination = delivery.get("Destination", clean_email)
         return {
@@ -134,6 +143,20 @@ def send_cognito_code(email: str) -> Dict[str, Any]:
             "message": f"Verification code sent to {destination}",
         }
     except CognitoError as err:
+        if err.error_type == "InvalidParameterException":
+            # Existing unconfirmed user has no verified email yet -> resend confirmation code
+            logger.info(
+                f"ForgotPassword failed with InvalidParameterException for {clean_email}, trying ResendConfirmationCode"
+            )
+            res = _call_cognito_api("ResendConfirmationCode", dict(base_payload))
+            delivery = res.get("CodeDeliveryDetails", {})
+            destination = delivery.get("Destination", clean_email)
+            return {
+                "success": True,
+                "is_new_user": True,
+                "destination": destination,
+                "message": f"Verification code sent to {destination}",
+            }
         if err.error_type == "UserNotFoundException":
             raise CognitoError(
                 "UserNotFound",
@@ -151,54 +174,39 @@ def verify_cognito_code(email: str, code: str) -> Dict[str, Any]:
     """Verify the 6-digit confirmation code with AWS Cognito."""
     clean_email = email.strip().lower()
     clean_code = code.strip().replace(" ", "")
-    secret_hash = calculate_secret_hash(clean_email)
-    client_id = settings.COGNITO_APP_CLIENT_ID
+    base_payload = _base_cognito_payload(clean_email)
 
-    # 1. Try ConfirmSignUp (if newly registered)
+    signup_err: CognitoError | None = None
+
+    # 1. Try ConfirmSignUp (if newly registered / unconfirmed)
     try:
         _call_cognito_api(
             "ConfirmSignUp",
             {
-                "ClientId": client_id,
-                "SecretHash": secret_hash,
-                "Username": clean_email,
+                **base_payload,
                 "ConfirmationCode": clean_code,
             },
         )
         return {"success": True, "email": clean_email, "mode": "signup_confirmed"}
     except CognitoError as err:
-        # If user is already confirmed or was an existing user, try ConfirmForgotPassword
-        if err.error_type in (
-            "NotAuthorizedException",
-            "UserNotFoundException",
-            "InvalidParameterException",
-        ):
-            logger.info(
-                f"ConfirmSignUp skipped ({err.error_type}), trying ConfirmForgotPassword"
-            )
-        elif err.error_type == "CodeMismatchException":
+        if err.error_type == "LimitExceededException":
             raise CognitoError(
-                "CodeMismatch",
-                "Invalid verification code. Please check your email and try again.",
+                "RateLimitExceeded",
+                "Too many attempts. Please request a new code in a few minutes.",
             )
-        elif err.error_type == "ExpiredCodeException":
-            raise CognitoError(
-                "ExpiredCode",
-                "Verification code has expired. Please request a new code.",
-            )
-        else:
-            logger.warning(f"ConfirmSignUp failed: {err.error_type} - {err.message}")
+        signup_err = err
+        logger.info(
+            f"ConfirmSignUp did not complete ({err.error_type}), trying ConfirmForgotPassword"
+        )
 
-    # 2. Try ConfirmForgotPassword
+    # 2. Try ConfirmForgotPassword (existing confirmed user)
     # Reset internal password to new secure token
     new_password = f"P@{uuid.uuid4().hex[:14]}Bb2!"
     try:
         _call_cognito_api(
             "ConfirmForgotPassword",
             {
-                "ClientId": client_id,
-                "SecretHash": secret_hash,
-                "Username": clean_email,
+                **base_payload,
                 "ConfirmationCode": clean_code,
                 "Password": new_password,
             },
@@ -209,12 +217,16 @@ def verify_cognito_code(email: str, code: str) -> Dict[str, Any]:
             "mode": "forgot_password_confirmed",
         }
     except CognitoError as err:
-        if err.error_type == "CodeMismatchException":
+        if err.error_type == "CodeMismatchException" or (
+            signup_err and signup_err.error_type == "CodeMismatchException"
+        ):
             raise CognitoError(
                 "CodeMismatch",
                 "Invalid verification code. Please check your email and try again.",
             )
-        if err.error_type == "ExpiredCodeException":
+        if err.error_type == "ExpiredCodeException" or (
+            signup_err and signup_err.error_type == "ExpiredCodeException"
+        ):
             raise CognitoError(
                 "ExpiredCode",
                 "Verification code has expired. Please request a new code.",
