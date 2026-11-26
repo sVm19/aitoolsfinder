@@ -1,22 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
   <defs>
-    <linearGradient id="fav-v" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#8B5CF6"/>
-      <stop offset="100%" stop-color="#6D28D9"/>
+    <linearGradient id="fav-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#BAE6FD"/>
+      <stop offset="100%" stop-color="#0EA5E9"/>
     </linearGradient>
-    <linearGradient id="fav-o" x1="0%" y1="100%" x2="100%" y2="0%">
+    <linearGradient id="fav-orange" x1="0%" y1="100%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#FF5E1E"/>
-      <stop offset="100%" stop-color="#FFA043"/>
+      <stop offset="100%" stop-color="#FFB347"/>
     </linearGradient>
   </defs>
-  <!-- Background squircle tile for high contrast favicon visibility in browser tabs -->
-  <rect width="256" height="256" rx="56" fill="#030206"/>
-  <rect width="256" height="256" rx="56" fill="none" stroke="#2C2638" stroke-width="4"/>
-  <!-- Scaled Symbol centered -->
-  <g transform="translate(18, 18) scale(0.859375)">
-    <path fill="url(#fav-v)" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
-    <path fill="url(#fav-o)" d="M128 64 L180 94 L128 124 L76 94 Z"/>
-    <path fill="url(#fav-v)" d="M76 118 L128 148 L180 118 L180 134 L128 164 L76 134 Z"/>
-    <path fill="url(#fav-v)" d="M76 152 L128 182 L180 152 L180 168 L128 198 L76 168 Z"/>
-  </g>
+  <!-- High-contrast squircle tile with visible cyan rim on dark & light browser tabs -->
+  <rect x="6" y="6" width="244" height="244" rx="56" fill="#0B1220" stroke="#38BDF8" stroke-width="10"/>
+  <!-- Bold geometric prism stack (sized for 16x16 clarity) -->
+  <path fill="url(#fav-orange)" d="M128 42 L202 84 L128 126 L54 84 Z"/>
+  <path fill="url(#fav-cyan)" d="M54 114 L128 156 L202 114 L202 140 L128 182 L54 140 Z"/>
+  <path fill="url(#fav-cyan)" fill-opacity="0.85" d="M54 156 L128 198 L202 156 L202 180 L128 222 L54 180 Z"/>
 </svg>
