@@ -326,7 +326,9 @@ class GroqClientAdapter:
                         continue
                     await self._record_failure()
                     if status_code >= 500 or status_code in (408, 429):
-                        raise GroqUnavailable("Groq is temporarily unavailable.") from exc
+                        raise GroqUnavailable(
+                            "Groq is temporarily unavailable."
+                        ) from exc
                     raise GroqRequestError(
                         f"Groq rejected the request with status {status_code}."
                     ) from exc

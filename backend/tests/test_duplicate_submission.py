@@ -4,7 +4,13 @@ from pathlib import Path
 
 
 def test_vendor_router_rejects_duplicate_slug_or_domain_with_409():
-    router_path = Path(__file__).resolve().parent.parent / "src" / "modules" / "vendor" / "router.py"
+    router_path = (
+        Path(__file__).resolve().parent.parent
+        / "src"
+        / "modules"
+        / "vendor"
+        / "router.py"
+    )
     source = router_path.read_text(encoding="utf-8")
 
     # Ensure the old UUID-suffix workaround is gone

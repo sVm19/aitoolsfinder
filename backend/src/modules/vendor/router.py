@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, Request, status, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from typing import List, Optional
 
 from src.core.database import get_db
@@ -73,7 +73,9 @@ async def create_submission(
             detail="Tool name must contain alphanumeric characters.",
         )
 
-    parsed_host = (urlparse(payload.website_url).hostname or "").lower().removeprefix("www.")
+    parsed_host = (
+        (urlparse(payload.website_url).hostname or "").lower().removeprefix("www.")
+    )
     if not parsed_host:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

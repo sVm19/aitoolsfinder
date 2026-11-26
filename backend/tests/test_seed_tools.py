@@ -7,8 +7,6 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
-
 SCRIPTS_DIR = Path(__file__).resolve().parent.parent / "scripts"
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
@@ -18,8 +16,16 @@ import seed_tools  # noqa: E402
 
 class TestRecordNormalization:
     def test_rejects_unsafe_url_and_normalizes_valid_record(self):
-        assert seed_tools.normalize_record({"name": "Bad", "website_url": "ftp://bad.com"}) is None
-        assert seed_tools.normalize_record({"name": "Bad", "website_url": "https://u:p@bad.com"}) is None
+        assert (
+            seed_tools.normalize_record({"name": "Bad", "website_url": "ftp://bad.com"})
+            is None
+        )
+        assert (
+            seed_tools.normalize_record(
+                {"name": "Bad", "website_url": "https://u:p@bad.com"}
+            )
+            is None
+        )
 
         rec = seed_tools.normalize_record(
             {
@@ -32,7 +38,12 @@ class TestRecordNormalization:
                 "tag_slugs": ["analytics", "ai"],
                 "pricing_model": "freemium",
                 "pricing_plans": [
-                    {"name": "Free", "is_free": True, "amount_minor": 0, "billing_interval": "monthly"}
+                    {
+                        "name": "Free",
+                        "is_free": True,
+                        "amount_minor": 0,
+                        "billing_interval": "monthly",
+                    }
                 ],
                 "features": ["Session Replay", "Heatmaps"],
             }
@@ -46,7 +57,12 @@ class TestRecordNormalization:
         score = seed_tools.compute_score_payload(
             features=["Feature A", "Feature B"],
             pricing_plans=[
-                {"name": "Free", "is_free": True, "amount_minor": 0, "billing_interval": "monthly"}
+                {
+                    "name": "Free",
+                    "is_free": True,
+                    "amount_minor": 0,
+                    "billing_interval": "monthly",
+                }
             ],
         )
         assert score["score_version"] == "v1"
@@ -100,7 +116,12 @@ class TestBatchUpsert:
                             "tag_slugs": ["ai"],
                             "pricing_model": "freemium",
                             "pricing_plans": [
-                                {"name": "Free", "is_free": True, "amount_minor": 0, "billing_interval": "monthly"}
+                                {
+                                    "name": "Free",
+                                    "is_free": True,
+                                    "amount_minor": 0,
+                                    "billing_interval": "monthly",
+                                }
                             ],
                             "features": ["Fast search", "API"],
                         }
@@ -113,7 +134,9 @@ class TestBatchUpsert:
 
         cat_id = uuid.uuid4()
         tag_id = uuid.uuid4()
-        existing_verified = SimpleNamespace(id=uuid.uuid4(), slug="curated-tool", is_verified=True)
+        existing_verified = SimpleNamespace(
+            id=uuid.uuid4(), slug="curated-tool", is_verified=True
+        )
 
         fake_session = MagicMock()
         fake_session.execute = AsyncMock(
@@ -155,4 +178,6 @@ class TestBatchUpsert:
         assert stats["inserted"] == 1
         assert stats["skipped_verified"] == 1
         assert fake_session.commit.await_count >= 1
-        assert len(added_objs) >= 5  # Tool, ToolCategory, ToolTag, PricingPlan, Features, ScoreHistory
+        assert (
+            len(added_objs) >= 5
+        )  # Tool, ToolCategory, ToolTag, PricingPlan, Features, ScoreHistory

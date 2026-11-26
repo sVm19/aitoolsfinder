@@ -18,7 +18,9 @@ import collect_seeds  # noqa: E402
 
 class TestNormalizeUrl:
     def test_strips_query_params_and_normalizes_root_domain(self):
-        assert collect_seeds.normalize_url("https://cursor.com/?ref=producthunt#top") == (
+        assert collect_seeds.normalize_url(
+            "https://cursor.com/?ref=producthunt#top"
+        ) == (
             "https://cursor.com",
             "cursor.com",
         )
@@ -190,5 +192,7 @@ def test_deduplicates_across_sources_and_existing_file(tmp_path: Path):
         )
     assert added == 1
     assert total == 2
-    lines = [json.loads(l) for l in out_file.read_text(encoding="utf-8").splitlines()]
-    assert [l["domain"] for l in lines] == ["cursor.com", "linear.app"]
+    lines = [
+        json.loads(line) for line in out_file.read_text(encoding="utf-8").splitlines()
+    ]
+    assert [row["domain"] for row in lines] == ["cursor.com", "linear.app"]

@@ -137,7 +137,11 @@ def test_verify_cognito_code_without_client_secret(monkeypatch):
 async def test_verify_magic_code_endpoint(client):
     with patch(
         "src.modules.identity.router.verify_cognito_code",
-        return_value={"success": True, "email": "alice@example.com", "mode": "signup_confirmed"},
+        return_value={
+            "success": True,
+            "email": "alice@example.com",
+            "mode": "signup_confirmed",
+        },
     ):
         res = await client.post(
             "/api/v1/auth/magic-code/verify",

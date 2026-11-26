@@ -47,7 +47,10 @@ class TestHtmlExtraction:
         [
             ("Too short", True),
             ("This domain is for sale on GoDaddy. Buy this domain now! " * 3, True),
-            ("Cursor is an AI-powered code editor built for multi-file editing and chat.", False),
+            (
+                "Cursor is an AI-powered code editor built for multi-file editing and chat.",
+                False,
+            ),
         ],
     )
     def test_detects_parked_or_empty(self, text: str, expected: bool):
@@ -66,10 +69,26 @@ class TestTaxonomyValidation:
             "tag_slugs": ["ai", "nonexistent-tag", "code-assistant"],
             "pricing_model": "FREEMIUM",
             "pricing_plans": [
-                {"name": "Hobby", "is_free": True, "amount_minor": 0, "billing_interval": "monthly"},
-                {"name": "Pro", "is_free": False, "amount_minor": 2000, "billing_interval": "monthly"},
+                {
+                    "name": "Hobby",
+                    "is_free": True,
+                    "amount_minor": 0,
+                    "billing_interval": "monthly",
+                },
+                {
+                    "name": "Pro",
+                    "is_free": False,
+                    "amount_minor": 2000,
+                    "billing_interval": "monthly",
+                },
             ],
-            "features": ["Tab autocomplete", "Codebase chat", "Multi-file edit", "", "CLI"],
+            "features": [
+                "Tab autocomplete",
+                "Codebase chat",
+                "Multi-file edit",
+                "",
+                "CLI",
+            ],
         }
         cleaned = enrich_tools.validate_enrichment(raw, valid_cats, valid_tags)
         assert cleaned["tagline"] == "AI code editor for fast shipping."
@@ -77,7 +96,12 @@ class TestTaxonomyValidation:
         assert cleaned["tag_slugs"] == ["ai", "code-assistant"]
         assert cleaned["pricing_model"] == "freemium"
         assert len(cleaned["pricing_plans"]) == 2
-        assert cleaned["features"] == ["Tab autocomplete", "Codebase chat", "Multi-file edit", "CLI"]
+        assert cleaned["features"] == [
+            "Tab autocomplete",
+            "Codebase chat",
+            "Multi-file edit",
+            "CLI",
+        ]
 
     def test_falls_back_for_unknown_category_and_pricing_model(self):
         cleaned = enrich_tools.validate_enrichment(
@@ -151,20 +175,47 @@ class TestGroqAndResume:
         seeds_path.write_text(
             "\n".join(
                 [
-                    json.dumps({"name": "AlreadyDone", "website_url": "https://done.com", "domain": "done.com", "source": "yc", "hint": ""}),
-                    json.dumps({"name": "NewTool", "website_url": "https://newtool.ai", "domain": "newtool.ai", "source": "yc", "hint": "AI tool"}),
+                    json.dumps(
+                        {
+                            "name": "AlreadyDone",
+                            "website_url": "https://done.com",
+                            "domain": "done.com",
+                            "source": "yc",
+                            "hint": "",
+                        }
+                    ),
+                    json.dumps(
+                        {
+                            "name": "NewTool",
+                            "website_url": "https://newtool.ai",
+                            "domain": "newtool.ai",
+                            "source": "yc",
+                            "hint": "AI tool",
+                        }
+                    ),
                 ]
             )
             + "\n",
             encoding="utf-8",
         )
         out_path.write_text(
-            json.dumps({"name": "AlreadyDone", "domain": "done.com", "website_url": "https://done.com"}) + "\n",
+            json.dumps(
+                {
+                    "name": "AlreadyDone",
+                    "domain": "done.com",
+                    "website_url": "https://done.com",
+                }
+            )
+            + "\n",
             encoding="utf-8",
         )
 
         with (
-            patch.object(enrich_tools, "fetch_page_text", return_value="NewTool is an AI workflow automation platform for teams."),
+            patch.object(
+                enrich_tools,
+                "fetch_page_text",
+                return_value="NewTool is an AI workflow automation platform for teams.",
+            ),
             patch.object(
                 enrich_tools,
                 "call_groq_json",
@@ -189,7 +240,10 @@ class TestGroqAndResume:
 
         assert processed == 1
         assert skipped == 1
-        rows = [json.loads(l) for l in out_path.read_text(encoding="utf-8").splitlines()]
+        rows = [
+            json.loads(line)
+            for line in out_path.read_text(encoding="utf-8").splitlines()
+        ]
         assert [r["domain"] for r in rows] == ["done.com", "newtool.ai"]
         assert rows[1]["slug"] == "newtool"
 
@@ -251,4 +305,3 @@ class TestLocalEnrichment:
         row = json.loads(out_path.read_text(encoding="utf-8").splitlines()[0])
         assert row["slug"] == "fastmetric"
         assert row["primary_category_slug"] in {"analytics", "ai"}
-
