@@ -62,21 +62,63 @@ async def create_submission(
     Supports both anonymous public visitors and authenticated vendor users.
     Persists taxonomy tags, features, pricing, and triggers a receipt email.
     """
+    from urllib.parse import urlparse
     from uuid import UUID as UUIDType
+    from src.modules.catalog.schemas import slugify
 
-    # Generate slug from tool name
-    slug = payload.tool_name.lower().replace(" ", "-").replace("__", "-").strip("-")
-
-    # Check if a submission with this slug already exists in pending/approved status
-    result = await session.execute(
-        select(ToolSubmissionModel).where(
-            ToolSubmissionModel.tool_slug == slug,
-            ToolSubmissionModel.status.in_(["pending", "approved"]),
+    slug = slugify(payload.tool_name)
+    if not slug:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="Tool name must contain alphanumeric characters.",
         )
-    )
-    existing = result.scalar_one_or_none()
-    if existing:
-        slug = f"{slug}-{uuid.uuid4().hex[:8]}"
+
+    parsed_host = (urlparse(payload.website_url).hostname or "").lower().removeprefix("www.")
+    if not parsed_host:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="A valid website URL is required.",
+        )
+
+    domain_filters = [
+        ToolSubmissionModel.tool_slug == slug,
+        ToolSubmissionModel.website_url.ilike(f"%://{parsed_host}"),
+        ToolSubmissionModel.website_url.ilike(f"%://{parsed_host}/%"),
+        ToolSubmissionModel.website_url.ilike(f"%://www.{parsed_host}"),
+        ToolSubmissionModel.website_url.ilike(f"%://www.{parsed_host}/%"),
+    ]
+    existing_sub = (
+        await session.execute(
+            select(ToolSubmissionModel.id).where(
+                ToolSubmissionModel.status.in_(["pending", "approved"]),
+                or_(*domain_filters),
+            )
+        )
+    ).first()
+    if existing_sub:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This project has already been submitted and is pending review or approved.",
+        )
+
+    existing_tool = (
+        await session.execute(
+            select(ToolModel.id).where(
+                or_(
+                    ToolModel.slug == slug,
+                    ToolModel.website_url.ilike(f"%://{parsed_host}"),
+                    ToolModel.website_url.ilike(f"%://{parsed_host}/%"),
+                    ToolModel.website_url.ilike(f"%://www.{parsed_host}"),
+                    ToolModel.website_url.ilike(f"%://www.{parsed_host}/%"),
+                )
+            )
+        )
+    ).first()
+    if existing_tool:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This project is already listed in the catalog.",
+        )
 
     # Vendor Profile Resolution: Guarantee vendor_id is never NULL
     vendor_email = (

@@ -1,0 +1,20 @@
+{"name": "HireArt", "website_url": "http://hireart.com", "domain": "hireart.com", "source": "yc", "hint": "Gives businesses everything needed to hire & manage W2 contractors."}
+{"name": "Gusto", "website_url": "https://gusto.com", "domain": "gusto.com", "source": "yc", "hint": "Provides growing businesses with everything to take care of their team"}
+{"name": "Amplitude", "website_url": "https://amplitude.com", "domain": "amplitude.com", "source": "yc", "hint": "Digital Analytics Platform"}
+{"name": "Apollo", "website_url": "http://apollographql.com", "domain": "apollographql.com", "source": "yc", "hint": "Apollo helps engineering teams accelerate delivery"}
+{"name": "HackerRank", "website_url": "http://hackerrank.com", "domain": "hackerrank.com", "source": "yc", "hint": "Change the world to value skills over pedigree"}
+{"name": "OneSignal", "website_url": "https://onesignal.com", "domain": "onesignal.com", "source": "yc", "hint": "Engage customers through personalized omni-channel messaging"}
+{"name": "Streak", "website_url": "http://streak.com", "domain": "streak.com", "source": "yc", "hint": "Streak transforms Gmail into a powerful CRM"}
+{"name": "Quartzy", "website_url": "https://www.quartzy.com", "domain": "quartzy.com", "source": "yc", "hint": "Marketplace for life science supplies."}
+{"name": "AgileMD", "website_url": "https://agilemd.com", "domain": "agilemd.com", "source": "yc", "hint": "Predictive analytics and clinical pathways for hospitals"}
+{"name": "Sift", "website_url": "https://sift.com", "domain": "sift.com", "source": "yc", "hint": "The Leader in Digital Trust & Safety"}
+{"name": "Cc Switch", "website_url": "https://ccswitch.io", "domain": "ccswitch.io", "source": "github", "hint": "A cross-platform desktop All-in-One assistant for Claude Code, Codex, OpenCode,DeepSeek Harness and more. Only official website: ccswitch.io"}
+{"name": "Browser Use", "website_url": "https://browser-use.com", "domain": "browser-use.com", "source": "github", "hint": "Open-source Python library for AI browser agents, plus Browser Use Cloud: stealth browsers and a hosted agent API."}
+{"name": "Paperclip", "website_url": "https://paperclip.ing", "domain": "paperclip.ing", "source": "github", "hint": "The open-source app everyone uses to manage agents at work"}
+{"name": "Private Gpt", "website_url": "https://www.zylon.ai/private-gpt", "domain": "zylon.ai", "source": "github", "hint": "Complete API layer for private AI applications on local models: RAG, skills, tools, MCP, text-to-sql, and more. Works with any OpenAI-compatible inference server."}
+{"name": "Prompt Optimizer", "website_url": "https://prompt.always200.com", "domain": "prompt.always200.com", "source": "github", "hint": "An AI prompt optimizer for writing better prompts and getting better AI results."}
+{"name": "Ai Website Cloner Template", "website_url": "https://dsc.gg/jcodesmore", "domain": "dsc.gg", "source": "github", "hint": "Clone any website with one command using AI coding agents"}
+{"name": "Medusa", "website_url": "https://medusajs.com", "domain": "medusajs.com", "source": "github", "hint": "The world's most flexible commerce platform for agents and developers"}
+{"name": "Openclaude", "website_url": "https://openclaude.twigpine.com", "domain": "openclaude.twigpine.com", "source": "github", "hint": "runs anywhere. uses anything"}
+{"name": "Opencli", "website_url": "https://opencli.info", "domain": "opencli.info", "source": "github", "hint": "Make Any Website into CLI & Use your logged-in browser by AI agent."}
+{"name": "Moli", "website_url": "https://browser.lexmount.com", "domain": "browser.lexmount.com", "source": "github", "hint": "Best headless browser for AI agents. Lite, Fast, High-Compatibility. Built in Rust"}

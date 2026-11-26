@@ -31,6 +31,7 @@ import {
   type ToolSubmissionPayload,
   type ToolSubmissionReceipt,
 } from "@/lib/catalog-api";
+import { useAuth } from "@/lib/auth-context";
 
 type PricingModel = "free" | "freemium" | "paid" | "one-time" | "custom";
 type SubmissionType = "standard" | "featured";
@@ -88,6 +89,7 @@ interface SubmissionViewProps {
 }
 
 export function SubmissionView({ categories = [] }: SubmissionViewProps) {
+  const { user } = useAuth();
   const [step, setStep] = useState(1);
   const [submissionType, setSubmissionType] = useState<SubmissionType>("standard");
 
@@ -229,6 +231,29 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
       };
 
       const res = await createToolSubmission(payload);
+      try {
+        const key = "aitoolsfinder_submitted_tools";
+        const existing = JSON.parse(localStorage.getItem(key) || "[]");
+        const nextList = Array.isArray(existing) ? existing : [];
+        const selectedCat = categories.find((c) => c.id === primaryCategoryId);
+        nextList.unshift({
+          id: res.id,
+          tool_name: res.tool_name,
+          tool_slug: res.tool_slug,
+          submission_type: submissionType,
+          owner_email: (user?.email || submitterEmail).trim().toLowerCase(),
+          tagline: payload.tagline,
+          category: selectedCat?.name || "AI",
+          category_slug: selectedCat?.slug || "ai",
+          pricing_model: payload.pricing_model,
+          starting_price_minor: payload.starting_price_minor ?? null,
+          website_url: payload.website_url,
+          submitted_at: new Date().toISOString(),
+        });
+        localStorage.setItem(key, JSON.stringify(nextList));
+      } catch {
+        // Ignore storage errors
+      }
       setReceipt(res);
     } catch (err) {
       if (err instanceof CatalogApiError) {
@@ -266,7 +291,7 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
             <div className="flex items-center justify-between text-muted-foreground">
               <span>Review Plan:</span>
               <span className="font-semibold text-foreground uppercase tracking-wider text-xs">
-                {submissionType === "featured" ? "Fast-Track Featured (24–48h)" : "Standard Review (3–5 Days)"}
+                {submissionType === "featured" ? "Quick Review (24–48h)" : "Standard Review (3–5 Days)"}
               </span>
             </div>
             <div className="flex items-center justify-between text-muted-foreground">
@@ -473,15 +498,26 @@ export function SubmissionView({ categories = [] }: SubmissionViewProps) {
                   </span>
                   {submissionType === "featured" && <Check className="w-4 h-4 text-accent" />}
                 </div>
-                <h3 className="text-lg font-bold text-foreground">Featured SaaS & Verified</h3>
+                <h3 className="text-lg font-bold text-foreground">Quick Review</h3>
                 <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                  Guaranteed review within 24–48 hours, instant &ldquo;Verified&rdquo; badge, priority backlink indexing, and top category placement.
+                  Skip the 5-day queue. Go live in 24–48 hours with an instant &ldquo;Verified&rdquo; badge, priority dofollow indexing, and top category placement.
                 </p>
                 <ul className="mt-4 space-y-1.5 text-xs text-subtle-foreground">
-                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-accent" /> Priority 24–48h SLA & Dofollow Backlink</li>
-                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Verified Founder badge</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-accent" /> Priority 24–48h SLA &amp; Dofollow Backlink</li>
+                  <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Instant Verified Founder badge</li>
                   <li className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-emerald-400" /> Top-of-category comparison spotlight</li>
                 </ul>
+                <div
+                  className={`mt-5 flex items-center justify-center rounded-xl px-3.5 py-2 text-xs font-semibold transition-colors ${
+                    submissionType === "featured"
+                      ? "bg-accent text-black"
+                      : "bg-accent/15 text-accent border border-accent/40"
+                  }`}
+                >
+                  {submissionType === "featured"
+                    ? "Selected · Get Listed in 24–48h ✓"
+                    : "Choose Quick Review (Free) →"}
+                </div>
               </div>
             </div>
           </div>

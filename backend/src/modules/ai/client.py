@@ -227,8 +227,9 @@ def build_groq_payload(
     return {
         "model": model or settings.GROQ_MODEL,
         "messages": [dict(message) for message in messages],
-        "max_tokens": max_tokens,
+        "max_completion_tokens": max_tokens,
         "temperature": temperature,
+        "response_format": {"type": "json_object"},
     }
 
 
@@ -252,18 +253,18 @@ def parse_groq_response(data: Mapping[str, Any]) -> GroqCompletion:
 
 
 class GroqClientAdapter:
-    """Bounded Groq adapter with retries, mirroring OpenRouterClient patterns."""
+    """Bounded Groq adapter with retries via httpx, mirroring OpenRouterClient."""
 
-    def __init__(self, *, groq_api_key: str | None = None) -> None:
-        try:
-            from groq import Groq as GroqClient
-        except ImportError as exc:
-            raise GroqUnavailable("The Groq SDK is not installed.") from exc
-
-        self._groq = GroqClient(
-            api_key=groq_api_key or settings.GROQ_API_KEY,
-            timeout=float(settings.OPENROUTER_TIMEOUT_SECONDS),
-        )
+    def __init__(
+        self,
+        *,
+        groq_api_key: str | None = None,
+        model: str | None = None,
+        transport: httpx.AsyncBaseTransport | None = None,
+    ) -> None:
+        self._api_key = groq_api_key or settings.GROQ_API_KEY
+        self._model = model or settings.GROQ_MODEL
+        self._transport = transport
         self._failures = 0
         self._open_until = 0.0
         self._circuit_lock = asyncio.Lock()
@@ -275,44 +276,60 @@ class GroqClientAdapter:
         max_tokens: int = 1200,
         temperature: float = 0.2,
     ) -> GroqCompletion:
-        if not self._groq.api_key:
+        if not self._api_key:
             raise GroqUnavailable("Groq is not configured.")
 
         if await self._is_circuit_open():
             raise GroqUnavailable("Groq is temporarily unavailable.")
 
         payload = build_groq_payload(
-            messages, max_tokens=max_tokens, temperature=temperature
+            messages, model=self._model, max_tokens=max_tokens, temperature=temperature
         )
+        headers = {
+            "Authorization": f"Bearer {self._api_key}",
+            "Content-Type": "application/json",
+        }
         max_retries = max(0, settings.OPENROUTER_MAX_RETRIES)
+        timeout = max(1.0, float(settings.OPENROUTER_TIMEOUT_SECONDS))
         started_at = time.monotonic()
 
-        for attempt in range(max_retries + 1):
-            try:
-                response = await asyncio.to_thread(
-                    self._groq.chat.completions.create, **payload
-                )
-                completion = parse_groq_response(response.model_dump())
-                await self._record_success()
-                logger.info(
-                    "Groq completion model=%s latency_s=%.2f",
-                    completion.model,
-                    time.monotonic() - started_at,
-                )
-                return completion
-            except Exception as exc:
-                status_code = getattr(exc, "status_code", None)
-                retryable = (
-                    status_code is None or status_code in _RETRYABLE_STATUS_CODES
-                )
-                if not retryable:
-                    raise GroqRequestError("Groq rejected the request.") from exc
-                if attempt < max_retries:
-                    await asyncio.sleep(0.25 * (2**attempt))
-                    continue
-                await self._record_failure()
-                logger.warning("Groq unavailable after %s attempt(s)", attempt + 1)
-                raise GroqUnavailable("Groq is temporarily unavailable.") from exc
+        async with httpx.AsyncClient(
+            timeout=timeout, transport=self._transport
+        ) as client:
+            for attempt in range(max_retries + 1):
+                try:
+                    response = await client.post(
+                        GROQ_CHAT_COMPLETIONS_URL,
+                        json=payload,
+                        headers=headers,
+                    )
+                    response.raise_for_status()
+                    completion = parse_groq_response(response.json())
+                    await self._record_success()
+                    logger.info(
+                        "Groq completion model=%s latency_s=%.2f",
+                        completion.model,
+                        time.monotonic() - started_at,
+                    )
+                    return completion
+                except (httpx.TimeoutException, httpx.TransportError) as exc:
+                    if attempt < max_retries:
+                        await asyncio.sleep(0.25 * (2**attempt))
+                        continue
+                    await self._record_failure()
+                    logger.warning("Groq unavailable after %s attempt(s)", attempt + 1)
+                    raise GroqUnavailable("Groq is temporarily unavailable.") from exc
+                except httpx.HTTPStatusError as exc:
+                    status_code = exc.response.status_code
+                    if status_code in _RETRYABLE_STATUS_CODES and attempt < max_retries:
+                        await asyncio.sleep(0.5 * (2**attempt))
+                        continue
+                    await self._record_failure()
+                    if status_code >= 500 or status_code in (408, 429):
+                        raise GroqUnavailable("Groq is temporarily unavailable.") from exc
+                    raise GroqRequestError(
+                        f"Groq rejected the request with status {status_code}."
+                    ) from exc
 
         raise GroqUnavailable("Groq is temporarily unavailable.")
 

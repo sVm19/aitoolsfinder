@@ -233,6 +233,41 @@ async def get_saved_tools(
     return output
 
 
+@router.get("/users/me/submissions")
+async def get_my_submissions(
+    current_user: UserContext = Depends(get_current_user),
+    session: AsyncSession = Depends(get_db),
+) -> List[dict]:
+    """Return submissions owned by the authenticated user only."""
+    from sqlalchemy import or_
+    from src.modules.vendor.models import ToolSubmissionModel, VendorModel
+
+    user_email = current_user.email.strip().lower()
+    result = await session.execute(
+        select(ToolSubmissionModel)
+        .join(VendorModel, ToolSubmissionModel.vendor_id == VendorModel.id)
+        .where(
+            or_(
+                VendorModel.user_id == current_user.id,
+                VendorModel.email == user_email,
+            )
+        )
+        .order_by(ToolSubmissionModel.created_at.desc())
+    )
+    rows = result.scalars().all()
+    return [
+        {
+            "id": str(sub.id),
+            "tool_name": sub.tool_name,
+            "tool_slug": sub.tool_slug,
+            "website_url": sub.website_url,
+            "status": sub.status,
+            "submitted_at": sub.created_at.isoformat() if sub.created_at else None,
+        }
+        for sub in rows
+    ]
+
+
 @router.post(
     "/users/me/saved-tools/{tool_id}",
     response_model=BookmarkToggleResponse,

@@ -13,12 +13,8 @@ import {
   Sparkles,
   GitCompare,
   User,
-  Menu,
-  X,
   ArrowRight,
   FolderGit2,
-  ChevronDown,
-  LayoutDashboard,
   Settings,
   LogOut,
   ShieldCheck,
@@ -26,6 +22,14 @@ import {
 } from "lucide-react";
 import { useStack } from "@/components/stack/stack-provider";
 import { useAuth } from "@/lib/auth-context";
+import {
+  gsap,
+  MorphSVGPlugin,
+  Observer,
+  ScrollTrigger,
+  prefersReducedMotion,
+  useGSAP,
+} from "@/lib/gsap";
 
 const NAV_LINKS = [
   { name: "Explore", href: "/explore", icon: Compass },
@@ -45,6 +49,10 @@ export function Navbar() {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
+  const menuTopLineRef = useRef<SVGPathElement>(null);
+  const menuMidLineRef = useRef<SVGPathElement>(null);
+  const menuBotLineRef = useRef<SVGPathElement>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   // Close profile dropdown on outside click
@@ -59,18 +67,87 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [profileMenuOpen]);
 
-  // Subtle scroll styling toggle (scrolled state)
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!headerRef.current) return;
-      const isScrolled = window.scrollY > 16;
-      headerRef.current.classList.toggle("is-scrolled", isScrolled);
-    };
+  // GSAP ScrollTrigger progress bar + scrolled state
+  useGSAP(
+    () => {
+      if (progressRef.current) {
+        gsap.to(progressRef.current, {
+          scaleX: 1,
+          ease: "none",
+          scrollTrigger: {
+            start: 0,
+            end: "max",
+            scrub: true,
+          },
+        });
+      }
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+      const st = ScrollTrigger.create({
+        start: 16,
+        end: "max",
+        onEnter: () => headerRef.current?.classList.add("is-scrolled"),
+        onLeaveBack: () => headerRef.current?.classList.remove("is-scrolled"),
+      });
+
+      if (window.scrollY > 16) {
+        headerRef.current?.classList.add("is-scrolled");
+      }
+
+      return () => {
+        st.kill();
+      };
+    },
+    { scope: headerRef }
+  );
+
+  // MorphSVG mobile menu icon (Hamburger <-> Close X)
+  useGSAP(
+    () => {
+      const top = menuTopLineRef.current;
+      const mid = menuMidLineRef.current;
+      const bot = menuBotLineRef.current;
+      if (!top || !mid || !bot) return;
+
+      const dur = prefersReducedMotion() ? 0 : 0.28;
+
+      if (mobileMenuOpen) {
+        gsap.to(top, {
+          morphSVG: "M5 5L19 19",
+          duration: dur,
+          ease: "earlyst-out",
+        });
+        gsap.to(mid, {
+          opacity: 0,
+          scaleX: 0.2,
+          transformOrigin: "center",
+          duration: dur * 0.6,
+        });
+        gsap.to(bot, {
+          morphSVG: "M5 19L19 5",
+          duration: dur,
+          ease: "earlyst-out",
+        });
+      } else {
+        gsap.to(top, {
+          morphSVG: "M4 6H20",
+          duration: dur,
+          ease: "earlyst-out",
+        });
+        gsap.to(mid, {
+          opacity: 1,
+          scaleX: 1,
+          duration: dur * 0.8,
+        });
+        gsap.to(bot, {
+          morphSVG: "M4 18H20",
+          duration: dur,
+          ease: "earlyst-out",
+        });
+      }
+      void MorphSVGPlugin;
+    },
+    { dependencies: [mobileMenuOpen] }
+  );
 
   // Keyboard accessibility and body scroll lock for mobile menu
   useEffect(() => {
@@ -114,7 +191,7 @@ export function Navbar() {
     <>
       <header
         ref={headerRef}
-        className="sticky top-0 z-50 w-full bg-background/90 backdrop-blur-xl transition-[background-color,box-shadow] duration-300 relative"
+        className="fixed top-0 inset-x-0 z-50 w-full bg-background/95 border-b border-border/70 transition-[background-color,box-shadow] duration-200"
       >
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand Identity & Primary Nav */}
@@ -344,24 +421,39 @@ export function Navbar() {
               <Search className="w-4 h-4" />
             </Link>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Button (MorphSVG animated) */}
             <button
               ref={menuButtonRef}
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
-              className="inline-flex items-center justify-center h-8 w-8 rounded-md border border-border bg-surface-1 text-foreground hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex items-center justify-center h-9 w-9 rounded-md border border-border bg-surface-1 text-foreground hover:bg-surface-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-navigation"
               aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             >
-              {mobileMenuOpen ? (
-                <X className="w-4 h-4 text-foreground" />
-              ) : (
-                <Menu className="w-4 h-4 text-foreground" />
-              )}
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                className="w-4 h-4 text-foreground"
+                aria-hidden="true"
+              >
+                <path ref={menuTopLineRef} d="M4 6H20" />
+                <path ref={menuMidLineRef} d="M4 12H20" />
+                <path ref={menuBotLineRef} d="M4 18H20" />
+              </svg>
             </button>
           </div>
         </div>
+
+        {/* ScrollTrigger Progress Line */}
+        <div
+          ref={progressRef}
+          className="nav-progress pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-gradient-to-r from-primary via-primary-hover to-accent"
+          aria-hidden="true"
+        />
 
         {/* --- Shallow & Blurry Luminous Edge Transition --- */}
         {/* 1. Dynamic animated luminous beam along the seam */}
@@ -372,13 +464,7 @@ export function Navbar() {
 
         {/* 2. Soft diffused glow reflection beneath the hairline */}
         <div
-          className="header-glow-reflection pointer-events-none absolute inset-x-0 bottom-[-1px] h-[3px]"
-          aria-hidden="true"
-        />
-
-        {/* 3. Progressive feather blur extending below the header into the landing page */}
-        <div
-          className="header-feather-blur pointer-events-none absolute inset-x-0 -bottom-3.5 h-3.5 backdrop-blur-[8px]"
+          className="header-glow-reflection pointer-events-none absolute inset-x-0 bottom-[-1px] h-[2px]"
           aria-hidden="true"
         />
       </header>

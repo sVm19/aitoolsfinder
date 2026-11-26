@@ -34,18 +34,26 @@ export default async function OpenGraphImage({
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div
             style={{
-              width: 42,
-              height: 42,
+              width: 44,
+              height: 44,
               borderRadius: 12,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              background: "#7022FC",
-              fontSize: 18,
-              fontWeight: 700,
+              background: "#121018",
+              border: "1px solid #302A3A",
             }}
           >
-            AI
+            <svg width="32" height="32" viewBox="16 16 224 224" fill="none">
+              <path
+                fill="#8B5CF6"
+                fillRule="evenodd"
+                d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"
+              />
+              <path fill="#FF5E1E" d="M128 64 L180 94 L128 124 L76 94 Z" />
+              <path fill="#8B5CF6" d="M76 118 L128 148 L180 118 L180 134 L128 164 L76 134 Z" />
+              <path fill="#8B5CF6" d="M76 152 L128 182 L180 152 L180 168 L128 198 L76 168 Z" />
+            </svg>
           </div>
           <div style={{ fontSize: 24, fontWeight: 700 }}>AIToolsFinder</div>
           <div style={{ marginLeft: "auto", color: "#C4A3FD", fontSize: 16, letterSpacing: 3 }}>

@@ -24,8 +24,8 @@ export function BrandSymbol({
     >
       <defs>
         <linearGradient id="orbit-violet" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#A78BFA" />
-          <stop offset="100%" stopColor="#7C3AED" />
+          <stop offset="0%" stopColor="#38BDF8" />
+          <stop offset="100%" stopColor="#0EA5E9" />
         </linearGradient>
         <linearGradient id="stack-orange" x1="0%" y1="100%" x2="100%" y2="0%">
           <stop offset="0%" stopColor="#FF5E1E" />

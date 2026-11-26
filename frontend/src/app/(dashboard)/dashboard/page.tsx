@@ -1,19 +1,23 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/common/coming-soon";
+import { DashboardView } from "@/components/dashboard/dashboard-view";
 
 export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "The AIToolsFinder dashboard is opening soon.",
+  title: "Submitted Tools & Founder Dashboard",
+  description: "Manage your submitted AI tools, review status, and founder profile on AIToolsFinder.",
   robots: { index: false, follow: false },
 };
 
 export default function DashboardPage() {
   return (
-    <ComingSoon
-      eyebrow="Dashboard"
-      title="Your dashboard is opening soon"
-      description="Saved tools, followed categories, and account preferences will live here once accounts launch."
-      breadcrumb="Dashboard"
-    />
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-5xl px-4 py-12">
+          <div className="h-64 rounded-3xl border border-border bg-surface-1/60 animate-pulse" />
+        </div>
+      }
+    >
+      <DashboardView />
+    </Suspense>
   );
 }

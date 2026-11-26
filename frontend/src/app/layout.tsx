@@ -8,7 +8,7 @@ import { TiunProvider } from "@/components/providers/tiun-provider";
 import { AuthProvider } from "@/lib/auth-context";
 import { StackDrawer } from "@/components/stack/stack-drawer";
 import { AuthModal } from "@/components/common/auth-modal";
-import { CustomCursor } from "@/components/bits/custom-cursor";
+import { ButtonRipple } from "@/components/common/button-ripple";
 import { AttributionTracker } from "@/components/common/attribution-tracker";
 
 export const metadata: Metadata = {
@@ -65,8 +65,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="dark" data-type="software">
       <body suppressHydrationWarning className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-foreground">
-        <div className="site-grain" aria-hidden="true" />
-        <CustomCursor />
+        <ButtonRipple />
         <Suspense fallback={null}>
           <AttributionTracker />
         </Suspense>

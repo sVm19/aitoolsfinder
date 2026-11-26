@@ -1,31 +1,28 @@
 import type { Metadata } from "next";
 import { HomeView } from "@/components/home/home-view";
+import { getHomeToolsPage } from "@/lib/home-catalog";
 import { canonicalUrl } from "@/lib/site";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
-  title: "AIToolsFinder — Find the Best AI Tool For Your Exact Job",
+  title: "AIToolsFinder — Browse AI Tools & SaaS Products",
   description:
-    "Discover, compare, and evaluate 1,200+ verified AI tools and B2B SaaS platforms. Audited pricing, capability teardowns, alternatives, and intelligence scores.",
+    "Scroll and discover verified AI tools and SaaS products from YC, GitHub, and Product Hunt. Compare pricing models, features, and capabilities side by side.",
   alternates: {
     canonical: canonicalUrl("/"),
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const initialData = await getHomeToolsPage({ page: 1, pageSize: 24 });
+
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "AIToolsFinder",
     url: canonicalUrl("/"),
-    description: "Find the best AI tool for your exact job.",
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${canonicalUrl("/explore")}?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
+    description: "Browse and compare AI tools and SaaS products.",
   };
 
   const organizationJsonLd = {
@@ -33,7 +30,7 @@ export default function HomePage() {
     "@type": "Organization",
     name: "AIToolsFinder",
     url: canonicalUrl("/"),
-    logo: canonicalUrl("/brand/logo.svg"),
+    logo: canonicalUrl("/brand/brand-symbol.svg"),
     description: "AI Tool Intelligence Platform",
   };
 
@@ -51,7 +48,11 @@ export default function HomePage() {
           __html: JSON.stringify(organizationJsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <HomeView />
+      <HomeView
+        initialTools={initialData.items}
+        initialTotal={initialData.total}
+        initialTotalPages={initialData.totalPages}
+      />
     </>
   );
 }

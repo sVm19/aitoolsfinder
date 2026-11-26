@@ -1,7 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import { useRef } from "react";
+import {
+  gsap,
+  SplitText as GsapSplitText,
+  prefersReducedMotion,
+  useGSAP,
+} from "@/lib/gsap";
 import { cn } from "@/lib/utils";
 
 export function SplitText({
@@ -19,44 +24,52 @@ export function SplitText({
 }) {
   const rootRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    const words = root.querySelectorAll<HTMLElement>("[data-word]");
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  useGSAP(
+    () => {
+      const root = rootRef.current;
+      if (!root || prefersReducedMotion()) return;
 
-    const context = gsap.context(() => {
-      gsap.from(words, {
-        y: 28,
+      const split = new GsapSplitText(root, {
+        type: "words",
+        wordsClass: "split-word inline-block",
+      });
+
+      gsap.from(split.words, {
+        y: 24,
         autoAlpha: 0,
-        stagger: 0.045,
-        duration: 0.75,
-        ease: "power3.out",
+        stagger: 0.035,
+        duration: 0.7,
+        ease: "earlyst-out",
         clearProps: "transform,opacity,visibility",
       });
-    }, root);
 
-    return () => context.revert();
-  }, [text]);
+      return () => {
+        split.revert();
+      };
+    },
+    { scope: rootRef, dependencies: [text] }
+  );
 
-  const words = text.split(" ");
+  if (!accent) {
+    return (
+      <Tag id={id} ref={rootRef as never} className={cn(className)}>
+        {text}
+      </Tag>
+    );
+  }
 
+  const parts = text.split(new RegExp(`(${accent})`, "gi"));
   return (
     <Tag id={id} ref={rootRef as never} className={cn(className)}>
-      {words.map((word, index) => {
-        const isAccent = accent && word.replace(/[.,]/g, "") === accent;
-        return (
-          <span key={`${word}-${index}`} className="inline-block whitespace-pre">
-            <span
-              data-word
-              className={cn("inline-block", isAccent && "text-primary-content")}
-            >
-              {word}
-              {index < words.length - 1 ? "\u00A0" : ""}
-            </span>
+      {parts.map((part, idx) =>
+        part.toLowerCase() === accent.toLowerCase() ? (
+          <span key={idx} className="text-primary-content">
+            {part}
           </span>
-        );
-      })}
+        ) : (
+          <span key={idx}>{part}</span>
+        )
+      )}
     </Tag>
   );
 }

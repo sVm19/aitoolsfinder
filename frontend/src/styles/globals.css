@@ -12,35 +12,35 @@
   --font-display: var(--font-plus-jakarta);
   --font-mono: var(--font-jetbrains);
 
-  /* Refined Brand Palette matching The Focal Prism Identity */
-  --background: #020104; /* Obsidian Deep Space */
-  --foreground: #F8F7FB; /* Primary high-contrast text */
-  
-  --primary: #7C3AED; /* Electric Violet */
-  --primary-foreground: #FFFFFF;
-  --primary-hover: #9047FF;
-  --primary-content: #DDD6FE; /* Accessible high-clarity violet text */
+  /* Precision Signal Design System — Obsidian Slate + Electric Cyan + Solar Flame */
+  --background: #05070b;
+  --foreground: #f4f7fb;
 
-  --accent: #FF5E1E; /* Solar Flame Orange */
-  --accent-foreground: #010102;
-  --accent-hover: #FF783E;
+  --primary: #0ea5e9;
+  --primary-foreground: #031018;
+  --primary-hover: #38bdf8;
+  --primary-content: #bae6fd;
+
+  --accent: #ff5e1e;
+  --accent-foreground: #05070b;
+  --accent-hover: #ff783e;
 
   /* Surfaces */
-  --surface-1: #0A0812; /* Dark surface */
-  --surface-2: #120F1D; /* Secondary surface */
-  --surface-3: #1B1629; /* Elevated surface */
+  --surface-1: #0b0f17;
+  --surface-2: #111824;
+  --surface-3: #182233;
 
   /* Text Neutrals */
-  --muted: #1B1629;
-  --muted-foreground: #B9B2C7; /* Secondary text */
-  --text-muted: #958DA6; /* AA contrast on elevated surfaces */
+  --muted: #182233;
+  --muted-foreground: #b0bccf;
+  --text-muted: #8a99b2;
 
   /* Structural */
-  --border: #2D263B; /* Refined geometric border */
-  --ring: #7C3AED;
+  --border: #1f2a3c;
+  --ring: #38bdf8;
   --radius: 0.75rem;
-  --shadow-lavender-glow: 0 0 24px -4px rgba(124, 58, 237, 0.40);
-  --shadow-orange-glow: 0 0 24px -4px rgba(255, 94, 30, 0.40);
+  --shadow-lavender-glow: 0 0 24px -4px rgba(14, 165, 233, 0.36);
+  --shadow-orange-glow: 0 0 24px -4px rgba(255, 94, 30, 0.36);
 }
 
 * {
@@ -61,12 +61,17 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
 .site-grain {
   position: fixed;
   inset: 0;
   z-index: 30;
   pointer-events: none;
-  opacity: 0.09;
+  opacity: 0.045;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
   background-size: 180px 180px;
 }
@@ -74,71 +79,56 @@ body {
 .spotlight-card {
   background-color: var(--surface-1);
   background-image: radial-gradient(
-    220px circle at var(--mx, 50%) var(--my, 0%),
-    rgba(196, 163, 253, 0.18),
-    transparent 46%
+    260px circle at var(--mx, 50%) var(--my, 0%),
+    rgba(56, 189, 248, 0.12),
+    transparent 50%
   );
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-.tilt-card {
-  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
-  transform-style: preserve-3d;
-  will-change: transform;
+/* GSAP Button Hover Sheen & Magnetic Layer */
+.gsap-btn-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    140px circle at var(--btn-mx, 50%) var(--btn-my, 50%),
+    rgba(255, 255, 255, 0.24),
+    rgba(56, 189, 248, 0.1) 45%,
+    transparent 75%
+  );
+  will-change: opacity, transform;
+}
+
+.gsap-btn-border-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.45);
 }
 
 .marquee-track {
-  animation: marquee 36s linear infinite;
+  display: flex;
+  width: max-content;
 }
 
-.aurora-blob {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(48px);
-  opacity: 0.55;
-}
-
-.aurora-blob-a {
-  left: -4rem;
-  top: 12%;
-  height: 22rem;
-  width: 22rem;
-  background: rgba(112, 34, 252, 0.28);
-  animation: drift 14s ease-in-out infinite;
-}
-
-.aurora-blob-b {
-  right: 6%;
-  top: 28%;
-  height: 18rem;
-  width: 26rem;
-  background: rgba(253, 143, 50, 0.16);
-  animation: drift 18s ease-in-out infinite reverse;
-}
-
-.orbit-ring {
-  position: absolute;
-  inset: 10%;
-  border-radius: 999px;
-  border: 1px solid rgba(196, 163, 253, 0.45);
-  transform: rotateX(68deg) rotateZ(0deg);
-  animation: orbit-spin 18s linear infinite;
-}
-
-.orbit-ring-alt {
-  inset: 22%;
-  border-color: rgba(253, 143, 50, 0.45);
-  animation-duration: 12s;
-  animation-direction: reverse;
-}
-
-.scene-in {
-  animation: scene-in 0.9s ease forwards;
+@media (prefers-reduced-motion: no-preference) {
+  .marquee-track {
+    animation: marquee 36s linear infinite;
+  }
 }
 
 .pulse-dot {
-  animation: pulse-dot 2.4s ease-out infinite;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pulse-dot {
+    animation: pulse-dot 2.4s ease-out infinite;
+  }
 }
 
 .nav-progress {
@@ -156,67 +146,75 @@ body {
   width: 14px;
   height: 4px;
   border-radius: 9999px;
-  background: #FD8F32;
-  box-shadow: 0 0 10px 2px #FD8F32, 0 0 16px 4px #7022FC;
+  background: #ff5e1e;
+  box-shadow: 0 0 10px 2px #ff5e1e, 0 0 16px 4px #0ea5e9;
 }
 
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
-@keyframes drift {
-  0%, 100% { transform: translate3d(0, 0, 0); }
-  50% { transform: translate3d(24px, -18px, 0); }
-}
-
-@keyframes orbit-spin {
-  to { transform: rotateX(68deg) rotateZ(360deg); }
-}
-
-@keyframes scene-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes pulse-dot {
-  0% { transform: scale(1); opacity: 0.7; }
-  70% { transform: scale(2.4); opacity: 0; }
-  100% { opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
-/* --- Luminous Header Seam: Shallow, Blurry, Animated Edge Transition --- */
+/* --- Luminous Header Seam --- */
 .header-luminous-edge {
   background: linear-gradient(
     90deg,
     transparent 0%,
     rgba(255, 255, 255, 0.04) 15%,
-    rgba(124, 58, 237, 0.35) 35%,
-    rgba(255, 94, 30, 0.65) 50%,
-    rgba(124, 58, 237, 0.35) 65%,
+    rgba(14, 165, 233, 0.4) 35%,
+    rgba(255, 94, 30, 0.6) 50%,
+    rgba(14, 165, 233, 0.4) 65%,
     rgba(255, 255, 255, 0.04) 85%,
     transparent 100%
   );
   background-size: 200% 100%;
-  animation: header-edge-drift 8s ease-in-out infinite alternate;
   opacity: 0.65;
   transition: opacity 0.3s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .header-luminous-edge {
+    animation: header-edge-drift 8s ease-in-out infinite alternate;
+  }
 }
 
 .header-glow-reflection {
   background: linear-gradient(
     90deg,
     transparent 10%,
-    rgba(124, 58, 237, 0.22) 35%,
-    rgba(255, 94, 30, 0.4) 50%,
-    rgba(124, 58, 237, 0.22) 65%,
+    rgba(14, 165, 233, 0.22) 35%,
+    rgba(255, 94, 30, 0.36) 50%,
+    rgba(14, 165, 233, 0.22) 65%,
     transparent 90%
   );
   background-size: 200% 100%;
-  animation: header-edge-drift 8s ease-in-out infinite alternate;
   filter: blur(4px);
-  opacity: 0.5;
+  opacity: 0.45;
   transition: opacity 0.3s ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .header-glow-reflection {
+    animation: header-edge-drift 8s ease-in-out infinite alternate;
+  }
 }
 
 .header-feather-blur {
@@ -234,8 +232,8 @@ body {
 }
 
 header.is-scrolled {
-  background-color: rgba(2, 1, 4, 0.92);
-  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.8), 0 2px 10px -2px rgba(124, 58, 237, 0.15);
+  background-color: rgba(5, 7, 11, 0.92);
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.8), 0 2px 10px -2px rgba(14, 165, 233, 0.14);
 }
 
 header.is-scrolled .header-luminous-edge {
@@ -246,29 +244,46 @@ header.is-scrolled .header-glow-reflection {
   opacity: 0.75;
 }
 
-/* Hide default cursor on non-touch devices */
-@media (pointer: fine) {
-  body {
-    cursor: none;
+/* Defer layout/paint for below-the-fold catalog cards */
+.below-fold-card {
+  content-visibility: auto;
+  contain-intrinsic-size: auto none auto 280px;
+}
+
+/* Smooth compositor-only button click ripple */
+.btn-ripple-wave {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.38) 0%, rgba(255, 255, 255, 0) 72%);
+  transform: scale(0);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn-ripple-wave {
+    animation: btn-ripple 580ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 }
 
-/* Hide custom cursor on touch devices */
-@media (pointer: coarse) {
-  .custom-cursor {
-    display: none !important;
+@keyframes btn-ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
   }
 }
 
-/* Reduced motion support */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  ::before,
-  ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+/* ScrollSmoother wrapper & content defaults */
+#smooth-wrapper {
+  position: relative;
+  width: 100%;
 }
 
+#smooth-content {
+  will-change: transform;
+}

@@ -63,7 +63,7 @@ class Settings(BaseSettings):
     OPENROUTER_API_KEY: Optional[str] = None
     OPENROUTER_MODEL: str = "anthropic/claude-3.5-sonnet"
     GROQ_API_KEY: Optional[str] = None
-    GROQ_MODEL: str = "meta-llama/llama3-8b-8192"
+    GROQ_MODEL: str = "openai/gpt-oss-120b"
     OPENROUTER_TIMEOUT_SECONDS: float = 10.0
     OPENROUTER_MAX_RETRIES: int = 2
     TIUN_BASE_URL: str = "https://api.tiun.business"

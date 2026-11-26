@@ -102,15 +102,12 @@ export function CategoryExplorer({
         <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
           {CATEGORY_GROUPS.map((group) => {
             const active = selectedGroup === group.id;
-            const count =
-              group.id === "all"
-                ? ALL_CATEGORIES.length
-                : ALL_CATEGORIES.filter((c) => c.group === group.id).length;
 
             return (
               <button
                 key={group.id}
                 type="button"
+                aria-pressed={active}
                 onClick={() => setSelectedGroup(group.id)}
                 className={`rounded-full px-3 py-1 text-xs font-medium transition-all ${
                   active
@@ -118,8 +115,7 @@ export function CategoryExplorer({
                     : "border border-border/80 bg-surface-1/60 text-muted-foreground hover:border-white/20 hover:bg-surface-2 hover:text-foreground"
                 }`}
               >
-                <span>{group.label}</span>
-                <span className="ml-1.5 opacity-60 font-mono text-[11px]">({count})</span>
+                {group.label}
               </button>
             );
           })}
@@ -127,19 +123,13 @@ export function CategoryExplorer({
 
         {/* Results status banner */}
         <div className="flex items-center justify-between text-xs text-muted-foreground px-1">
-          <div className="flex items-center gap-2">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="pulse-dot absolute inline-flex h-full w-full rounded-full bg-primary" />
-              <span className="relative h-1.5 w-1.5 rounded-full bg-primary" />
-            </span>
-            <span>
-              {isFiltering
-                ? `Found ${filteredCategories.length} ${filteredCategories.length === 1 ? "category" : "categories"} matching your filter`
-                : shouldShowAll
-                ? `Showing all ${ALL_CATEGORIES.length} verified categories`
-                : `Showing ${displayedCategories.length} featured categories (of ${ALL_CATEGORIES.length} total)`}
-            </span>
-          </div>
+          <span>
+            {isFiltering
+              ? `Matching categories`
+              : shouldShowAll
+              ? `All categories`
+              : `Featured categories`}
+          </span>
 
           {!isFiltering && (
             <button
@@ -147,7 +137,7 @@ export function CategoryExplorer({
               onClick={() => setIsExpanded(!isExpanded)}
               className="inline-flex items-center gap-1 text-primary-content hover:text-white font-medium transition-colors"
             >
-              <span>{isExpanded ? "Show featured (6)" : `View all ${ALL_CATEGORIES.length} categories`}</span>
+              <span>{isExpanded ? "Show fewer" : "View all categories"}</span>
               {isExpanded ? (
                 <ChevronUp className="h-3.5 w-3.5" />
               ) : (
@@ -158,21 +148,17 @@ export function CategoryExplorer({
         </div>
       </div>
 
-      {/* Categories Grid */}
+      {/* Compact Categories Grid */}
       {displayedCategories.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {displayedCategories.map((category) => (
-            <div key={category.slug} className="h-full">
-              <CategoryCard
-                name={category.name}
-                slug={category.slug}
-                icon={category.icon}
-                description={category.description}
-                toolCount={category.toolCount}
-                popularTools={category.popularTools}
-                className="h-full min-h-[160px] transition-transform duration-200 hover:-translate-y-1"
-              />
-            </div>
+            <CategoryCard
+              key={category.slug}
+              name={category.name}
+              slug={category.slug}
+              icon={category.icon}
+              description={category.description}
+            />
           ))}
         </div>
       ) : (

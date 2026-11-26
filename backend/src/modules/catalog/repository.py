@@ -198,7 +198,11 @@ class CatalogRepository:
         elif sort == "alphabetical":
             stmt = stmt.order_by(ToolModel.name.asc(), ToolModel.id.asc())
         else:
-            stmt = stmt.order_by(ToolModel.created_at.desc(), ToolModel.id.asc())
+            stmt = stmt.order_by(
+                ToolModel.is_sponsored.desc(),
+                ToolModel.created_at.desc(),
+                ToolModel.id.asc(),
+            )
         stmt = stmt.offset(skip).limit(limit)
         items = (await self.session.execute(stmt)).scalars().all()
         return list(items), total

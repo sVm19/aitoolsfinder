@@ -1,3 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="AIToolsFinder Brand Symbol (Monochrome)">
-  <path fill="#FFFFFF" fill-rule="evenodd" d="M128 26 L232 206 L190 206 L171 173 L85 173 L66 206 L24 206 Z M128 92 L149 128 L107 128 Z M128 138 L152 162 L128 186 L104 162 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="16 16 224 224" width="256" height="256" fill="none" role="img" aria-label="AIToolsFinder Brand Symbol (Monochrome)">
+  <path fill="#FFFFFF" fill-rule="evenodd" d="M128 20 C187.646 20 236 68.354 236 128 C236 187.646 187.646 236 128 236 C68.354 236 20 187.646 20 128 C20 68.354 68.354 20 128 20 Z M128 36 C77.19 36 36 77.19 36 128 C36 178.81 77.19 220 128 220 C178.81 220 220 178.81 220 128 C220 77.19 178.81 36 128 36 Z"/>
+  <path fill="#FFFFFF" d="M128 64 L180 94 L128 124 L76 94 Z"/>
+  <path fill="#FFFFFF" d="M76 118 L128 148 L180 118 L180 134 L128 164 L76 134 Z"/>
+  <path fill="#FFFFFF" d="M76 152 L128 182 L180 152 L180 168 L128 198 L76 168 Z"/>
 </svg>

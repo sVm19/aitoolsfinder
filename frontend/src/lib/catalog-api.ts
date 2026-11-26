@@ -198,10 +198,15 @@ async function getApiJson<T>(path: string, init?: RequestInit): Promise<T> {
 
 async function postApiJson<T>(path: string, payload: unknown): Promise<T> {
   let response: Response;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("aitoolsfinder_token");
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+  }
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(payload),
       cache: "no-store",
     });
@@ -589,6 +594,22 @@ export async function createToolSubmission(
   payload: ToolSubmissionPayload,
 ): Promise<ToolSubmissionReceipt> {
   return postApiJson("/submissions", payload);
+}
+
+export interface UserOwnedSubmission {
+  id: string;
+  tool_name: string;
+  tool_slug: string;
+  website_url?: string | null;
+  status: string;
+  submitted_at?: string | null;
+}
+
+export async function getMySubmissions(token: string): Promise<UserOwnedSubmission[]> {
+  return getApiJson<UserOwnedSubmission[]>("/users/me/submissions", {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
 }
 
 export async function subscribeNewsletter(
