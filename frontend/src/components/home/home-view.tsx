@@ -2,12 +2,17 @@
 
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ArrowRight, Layers, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { SmoothScrollShell } from "@/components/scroll/smooth-scroll-shell";
-import { HeroCanvas } from "@/components/animations/hero-canvas";
 import { HeroSignalDiagram } from "@/components/animations/hero-signal-diagram";
+
+const HeroCanvas = dynamic(
+  () => import("@/components/animations/hero-canvas").then((m) => m.HeroCanvas),
+  { ssr: false }
+);
 import { SplitText } from "@/components/bits/split-text";
 import { ToolCard, type ToolCardData } from "@/components/tool/tool-card";
 import { Button } from "@/components/ui/button";
