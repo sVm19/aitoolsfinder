@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import * as PIXI from "pixi.js";
+import type * as PIXIType from "pixi.js";
 import {
   gsap,
   Observer,
@@ -18,13 +18,15 @@ export function HeroCanvas() {
     if (!container || prefersReducedMotion()) return;
 
     let destroyed = false;
-    let app: PIXI.Application | null = null;
+    let app: PIXIType.Application | null = null;
     let obs: Observer | null = null;
     let visibilityTrigger: ScrollTrigger | null = null;
     const tweens: gsap.core.Tween[] = [];
 
     const initPixi = async () => {
       try {
+        const PIXI = await import("pixi.js");
+        if (destroyed) return;
         PixiPlugin.registerPIXI(PIXI);
         const instance = new PIXI.Application();
         await instance.init({
