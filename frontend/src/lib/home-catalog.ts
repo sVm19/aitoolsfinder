@@ -123,7 +123,7 @@ function getDailyLocalTools(): ToolCardData[] {
 
 export async function getHomeToolsPage({
   page = 1,
-  pageSize = 24,
+  pageSize = 12,
   category = "all",
   pricing = "all",
 }: {
@@ -137,6 +137,13 @@ export async function getHomeToolsPage({
   page: number;
   totalPages: number;
 }> {
+  const normalizedPage = Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1;
+  const normalizedPageSize = Number.isFinite(pageSize)
+    ? Math.min(48, Math.max(1, Math.floor(pageSize)))
+    : 12;
+  const normalizedCategory = (category || "all").toLowerCase().trim() || "all";
+  const normalizedPricing = (pricing || "all").toLowerCase().trim() || "all";
+
   const apiBase = (
     process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || ""
   ).replace(/\/+$/, "");
@@ -144,30 +151,37 @@ export async function getHomeToolsPage({
   if (apiBase && Date.now() >= backendCircuitOpenUntil) {
     try {
       const params = new URLSearchParams({
-        page: String(page),
-        page_size: String(pageSize),
+        page: String(normalizedPage),
+        page_size: String(normalizedPageSize),
+        sort: "newest",
       });
-      if (category !== "all") params.set("category", category);
-      if (pricing !== "all") params.set("pricing_model", pricing);
+      if (normalizedCategory !== "all") params.set("category", normalizedCategory);
+      if (normalizedPricing !== "all") params.set("pricing_model", normalizedPricing);
 
       const response = await fetch(`${apiBase}/tools?${params.toString()}`, {
         signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
-        next: { revalidate: 60 },
+        cache: "no-store",
       });
 
       if (response.ok) {
         const res = (await response.json()) as PaginatedResponse<CatalogTool>;
-        if (res.items.length > 0 && res.total > Object.keys(CURATED_TOOLS).length) {
+        const isFiltered =
+          normalizedCategory !== "all" || normalizedPricing !== "all";
+        const hasFullCatalog = res.total > Object.keys(CURATED_TOOLS).length;
+        if (isFiltered || (res.items.length > 0 && hasFullCatalog)) {
           const cats = Object.values(CURATED_CATEGORIES);
+          const total = Math.max(0, res.total);
+          const totalPages = Math.max(1, Math.ceil(total / normalizedPageSize));
+          const safePage = Math.min(Math.max(1, res.page || normalizedPage), totalPages);
           return {
             items: res.items.map((t) => toToolCardData(t, cats)),
-            total: res.total,
-            page: res.page,
-            totalPages: res.total_pages,
+            total,
+            page: safePage,
+            totalPages,
           };
         }
       }
-      // Backend returned error or empty catalog; trip circuit breaker briefly
+      // Backend returned error or unseeded catalog; trip circuit breaker briefly
       backendCircuitOpenUntil = Date.now() + BACKEND_CIRCUIT_COOLDOWN_MS;
     } catch {
       // Backend unreachable or timed out; trip circuit breaker and fall back
@@ -176,20 +190,24 @@ export async function getHomeToolsPage({
   }
 
   let allTools = getDailyLocalTools();
-  if (category !== "all") {
-    allTools = allTools.filter((t) => t.categorySlug === category);
+  if (normalizedCategory !== "all") {
+    allTools = allTools.filter(
+      (t) => t.categorySlug.toLowerCase().trim() === normalizedCategory
+    );
   }
-  if (pricing !== "all") {
-    allTools = allTools.filter((t) => t.pricingModel === pricing);
+  if (normalizedPricing !== "all") {
+    allTools = allTools.filter(
+      (t) => t.pricingModel.toLowerCase().trim() === normalizedPricing
+    );
   }
 
   const total = allTools.length;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const safePage = Math.min(Math.max(1, page), totalPages);
-  const start = (safePage - 1) * pageSize;
+  const totalPages = Math.max(1, Math.ceil(total / normalizedPageSize));
+  const safePage = Math.min(Math.max(1, normalizedPage), totalPages);
+  const start = (safePage - 1) * normalizedPageSize;
 
   return {
-    items: allTools.slice(start, start + pageSize),
+    items: allTools.slice(start, start + normalizedPageSize),
     total,
     page: safePage,
     totalPages,

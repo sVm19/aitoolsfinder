@@ -6,6 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from src.modules.catalog.models import (
     CategoryModel,
+    FeatureModel,
     TagModel,
     ToolModel,
     ToolCategoryModel,
@@ -168,25 +169,78 @@ class CatalogRepository:
             conditions.append(ToolModel.is_verified.is_(is_verified))
 
         search_rank = None
-        if query:
-            if self.session.get_bind().dialect.name == "postgresql":
-                ts_query = func.websearch_to_tsquery("english", query)
-                conditions.append(
-                    or_(
-                        ToolModel.search_vector.op("@@")(ts_query),
-                        ToolModel.name.op("%")(query),
-                    )
-                )
-                search_rank = func.ts_rank_cd(ToolModel.search_vector, ts_query)
-            else:
-                pattern = f"%{query}%"
-                conditions.append(
+        cleaned_query = query.strip() if query else ""
+        if cleaned_query:
+            words = [word for word in cleaned_query.split() if word]
+            word_conditions = []
+            for word in words:
+                pattern = f"%{word}%"
+                word_conditions.append(
                     or_(
                         ToolModel.name.ilike(pattern),
                         ToolModel.tagline.ilike(pattern),
                         ToolModel.description.ilike(pattern),
+                        ToolModel.primary_category_id.in_(
+                            select(CategoryModel.id).where(
+                                or_(
+                                    CategoryModel.name.ilike(pattern),
+                                    CategoryModel.slug.ilike(pattern),
+                                )
+                            )
+                        ),
+                        ToolModel.id.in_(
+                            select(ToolCategoryModel.tool_id)
+                            .join(
+                                CategoryModel,
+                                CategoryModel.id == ToolCategoryModel.category_id,
+                            )
+                            .where(
+                                or_(
+                                    CategoryModel.name.ilike(pattern),
+                                    CategoryModel.slug.ilike(pattern),
+                                )
+                            )
+                        ),
+                        ToolModel.id.in_(
+                            select(ToolTagModel.tool_id)
+                            .join(TagModel, TagModel.id == ToolTagModel.tag_id)
+                            .where(
+                                or_(
+                                    TagModel.name.ilike(pattern),
+                                    TagModel.slug.ilike(pattern),
+                                )
+                            )
+                        ),
+                        ToolModel.id.in_(
+                            select(ToolFeatureModel.tool_id)
+                            .join(
+                                FeatureModel,
+                                FeatureModel.id == ToolFeatureModel.feature_id,
+                            )
+                            .where(
+                                or_(
+                                    FeatureModel.name.ilike(pattern),
+                                    FeatureModel.description.ilike(pattern),
+                                    ToolFeatureModel.notes.ilike(pattern),
+                                )
+                            )
+                        ),
                     )
                 )
+
+            all_words_match = and_(*word_conditions)
+            if self.session.get_bind().dialect.name == "postgresql":
+                ts_query = func.websearch_to_tsquery("english", cleaned_query)
+                conditions.append(
+                    or_(
+                        all_words_match,
+                        ToolModel.search_vector.op("@@")(ts_query),
+                        ToolModel.name.op("%")(cleaned_query),
+                    )
+                )
+                search_rank = func.ts_rank_cd(ToolModel.search_vector, ts_query)
+            else:
+                conditions.append(all_words_match)
 
         where_clause = and_(*conditions) if conditions else True
         count_stmt = select(func.count(ToolModel.id)).where(where_clause)

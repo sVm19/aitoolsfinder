@@ -1,12 +1,18 @@
 "use client";
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { ArrowRight, ChevronLeft, ChevronRight, Layers, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { SmoothScrollShell } from "@/components/scroll/smooth-scroll-shell";
+import { SplitText } from "@/components/bits/split-text";
+import { ToolCard, type ToolCardData } from "@/components/tool/tool-card";
+import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { ErrorState } from "@/components/ui/error-state";
+import { cn } from "@/lib/utils";
 
 const HeroCanvas = dynamic(
   () => import("@/components/animations/hero-canvas").then((m) => m.HeroCanvas),
@@ -20,29 +26,19 @@ const HeroSignalDiagram = dynamic(
     ),
   { ssr: false }
 );
-import { SplitText } from "@/components/bits/split-text";
-import { ToolCard, type ToolCardData } from "@/components/tool/tool-card";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { cn } from "@/lib/utils";
-import {
-  Draggable,
-  Flip,
-  InertiaPlugin,
-  prefersReducedMotion,
-  useGSAP,
-} from "@/lib/gsap";
+
+const PAGE_SIZE = 12;
 
 const CATEGORY_PILLS = [
   { slug: "all", label: "All Tools" },
-  { slug: "ai", label: "AI" },
+  { slug: "ai", label: "AI & Models" },
   { slug: "developer-tools", label: "Developer Tools" },
   { slug: "marketing", label: "Marketing" },
   { slug: "productivity", label: "Productivity" },
   { slug: "sales", label: "Sales" },
   { slug: "analytics", label: "Analytics" },
   { slug: "design", label: "Design" },
-  { slug: "writing", label: "Writing" },
+  { slug: "writing", label: "Writing & SEO" },
   { slug: "automation", label: "Automation" },
   { slug: "hr", label: "HR" },
   { slug: "security", label: "Security" },
@@ -58,47 +54,62 @@ const PRICING_PILLS = [
 interface HomeViewProps {
   initialTools: ToolCardData[];
   initialTotal: number;
+  initialPage?: number;
   initialTotalPages: number;
+  initialCategory?: string;
+  initialPricing?: string;
+}
+
+function buildQueryUrl(category: string, pricing: string, nextPage: number): string {
+  const params = new URLSearchParams();
+  if (category !== "all") params.set("category", category);
+  if (pricing !== "all") params.set("pricing", pricing);
+  if (nextPage > 1) params.set("page", String(nextPage));
+  const qs = params.toString();
+  return qs ? `/?${qs}` : "/";
 }
 
 export function HomeView({
   initialTools,
   initialTotal,
+  initialPage = 1,
   initialTotalPages,
+  initialCategory = "all",
+  initialPricing = "all",
 }: HomeViewProps) {
   const [tools, setTools] = useState<ToolCardData[]>(initialTools);
   const [total, setTotal] = useState(initialTotal);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(initialTotalPages);
-  const [activeCategory, setActiveCategory] = useState("all");
-  const [activePricing, setActivePricing] = useState("all");
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const [activePricing, setActivePricing] = useState(initialPricing);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [quickReviewTools, setQuickReviewTools] = useState<ToolCardData[]>([]);
 
-  const catalogTopRef = useRef<HTMLElement>(null);
-  const railBoundsRef = useRef<HTMLDivElement>(null);
-  const railTrackRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLUListElement>(null);
-  const flipStateRef = useRef<Flip.FlipState | null>(null);
+  const catalogListRef = useRef<HTMLElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const pageCacheRef = useRef<
-    Map<
+  const requestIdRef = useRef(0);
+  const pageCacheRef = useRef(
+    new Map<
       string,
-      { items: ToolCardData[]; total: number; page: number; totalPages: number }
-    >
-  >(
-    new Map([
-      [
-        "1|all|all",
-        {
-          items: initialTools,
-          total: initialTotal,
-          page: 1,
-          totalPages: initialTotalPages,
-        },
-      ],
-    ])
+      {
+        items: ToolCardData[];
+        total: number;
+        page: number;
+        totalPages: number;
+      }
+    >()
   );
+
+  useEffect(() => {
+    pageCacheRef.current.set(`${initialPage}|${initialCategory}|${initialPricing}`, {
+      items: initialTools,
+      total: initialTotal,
+      page: initialPage,
+      totalPages: initialTotalPages,
+    });
+  }, [initialTools, initialTotal, initialPage, initialTotalPages, initialCategory, initialPricing]);
 
   useEffect(() => {
     try {
@@ -120,7 +131,7 @@ export function HomeView({
           slug: String(item.tool_slug),
           tagline: String(item.tagline || "Newly submitted via Quick Review."),
           category: String(item.category || "AI"),
-          categorySlug: String(item.category_slug || "ai"),
+          categorySlug: String(item.category_slug || "ai").toLowerCase().trim(),
           pricingModel:
             (item.pricing_model as ToolCardData["pricingModel"]) || "freemium",
           startingPrice: item.starting_price_minor
@@ -136,168 +147,152 @@ export function HomeView({
     }
   }, []);
 
-  // Draggable + InertiaPlugin for horizontal category rail (deferred post-layout)
-  useGSAP(
-    () => {
-      const boundsEl = railBoundsRef.current;
-      const trackEl = railTrackRef.current;
-      if (!boundsEl || !trackEl) return;
+  const fetchTools = useCallback(
+    async ({
+      nextPage,
+      category,
+      pricing,
+      syncUrl = true,
+    }: {
+      nextPage: number;
+      category: string;
+      pricing: string;
+      syncUrl?: boolean;
+    }) => {
+      const safeReqPage =
+        Number.isFinite(nextPage) && nextPage >= 1 ? Math.floor(nextPage) : 1;
+      const cacheKey = `${safeReqPage}|${category}|${pricing}`;
 
-      let instances: Draggable[] = [];
-      const rafId = requestAnimationFrame(() => {
-        instances = Draggable.create(trackEl, {
-          type: "x",
-          bounds: boundsEl,
-          inertia: true,
-          edgeResistance: 0.75,
-          dragClickables: false,
-          minimumMovement: 6,
-          allowNativeTouchScrolling: true,
-        });
-      });
+      if (syncUrl && typeof window !== "undefined") {
+        const nextUrl = buildQueryUrl(category, pricing, safeReqPage);
+        const currentUrl = `${window.location.pathname}${window.location.search}`;
+        if (currentUrl !== nextUrl) {
+          window.history.pushState({ category, pricing, page: safeReqPage }, "", nextUrl);
+        }
+      }
 
-      void InertiaPlugin;
-
-      return () => {
-        cancelAnimationFrame(rafId);
-        instances.forEach((d) => d.kill());
-      };
-    },
-    { scope: railBoundsRef }
-  );
-
-  const captureFlipState = () => {
-    if (prefersReducedMotion() || !gridRef.current) return;
-    const items = gridRef.current.querySelectorAll(".tool-card-item");
-    if (items.length > 0) {
-      flipStateRef.current = Flip.getState(items);
-    }
-  };
-
-  useLayoutEffect(() => {
-    const state = flipStateRef.current;
-    if (!state || prefersReducedMotion()) {
-      flipStateRef.current = null;
-      return;
-    }
-    flipStateRef.current = null;
-    Flip.from(state, {
-      duration: 0.42,
-      ease: "earlyst-out",
-      stagger: 0.015,
-      simple: true,
-      prune: true,
-    });
-  }, [tools, activeCategory, activePricing]);
-
-  const applyToolsResponse = (
-    data: {
-      items: ToolCardData[];
-      total: number;
-      page: number;
-      totalPages: number;
-    },
-    append: boolean
-  ) => {
-    if (!append) {
-      captureFlipState();
-    }
-    setTools((prev) => {
-      if (!append) return data.items;
-      const seen = new Set(prev.map((t) => t.slug));
-      const fresh = data.items.filter((t) => !seen.has(t.slug));
-      return [...prev, ...fresh];
-    });
-    setTotal(data.total);
-    setPage(data.page);
-    setTotalPages(data.totalPages);
-  };
-
-  const fetchTools = async ({
-    nextPage,
-    category,
-    pricing,
-    append,
-  }: {
-    nextPage: number;
-    category: string;
-    pricing: string;
-    append: boolean;
-  }) => {
-    const cacheKey = `${nextPage}|${category}|${pricing}`;
-    if (!append) {
       const cached = pageCacheRef.current.get(cacheKey);
       if (cached) {
         abortControllerRef.current?.abort();
+        requestIdRef.current += 1;
+        setErrorMessage(null);
         setIsLoading(false);
-        applyToolsResponse(cached, false);
+        setTools(cached.items);
+        setTotal(cached.total);
+        setPage(cached.page);
+        setTotalPages(cached.totalPages);
         return;
       }
-    }
 
-    abortControllerRef.current?.abort();
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+      const reqId = ++requestIdRef.current;
 
-    setIsLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: String(nextPage),
-        pageSize: "24",
-        category,
-        pricing,
-      });
-      const res = await fetch(`/api/home-tools?${params.toString()}`, {
-        signal: controller.signal,
-      });
-      if (!res.ok) return;
-      const data = (await res.json()) as {
-        items: ToolCardData[];
-        total: number;
-        page: number;
-        totalPages: number;
-      };
-      if (!append) {
+      setIsLoading(true);
+      setErrorMessage(null);
+      try {
+        const params = new URLSearchParams({
+          page: String(safeReqPage),
+          pageSize: String(PAGE_SIZE),
+          category,
+          pricing,
+        });
+        const res = await fetch(`/api/home-tools?${params.toString()}`, {
+          signal: controller.signal,
+          cache: "no-store",
+        });
+        if (!res.ok) {
+          throw new Error(`Request failed (${res.status})`);
+        }
+        const data = (await res.json()) as {
+          items: ToolCardData[];
+          total: number;
+          page: number;
+          totalPages: number;
+        };
+        if (reqId !== requestIdRef.current) return;
+
         pageCacheRef.current.set(cacheKey, data);
+        setTools(data.items);
+        setTotal(data.total);
+        setPage(data.page);
+        setTotalPages(data.totalPages);
+
+        if (syncUrl && typeof window !== "undefined" && data.page !== safeReqPage) {
+          const correctedUrl = buildQueryUrl(category, pricing, data.page);
+          window.history.replaceState(
+            { category, pricing, page: data.page },
+            "",
+            correctedUrl
+          );
+        }
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") {
+          return;
+        }
+        if (reqId !== requestIdRef.current) return;
+        setErrorMessage("Could not load tools right now. Please try again.");
+      } finally {
+        if (reqId === requestIdRef.current) {
+          setIsLoading(false);
+        }
       }
-      applyToolsResponse(data, append);
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-        return;
-      }
-    } finally {
-      if (abortControllerRef.current === controller) {
-        setIsLoading(false);
-      }
-    }
-  };
+    },
+    []
+  );
+
+  // Sync browser Back/Forward navigation with filters & page
+  useEffect(() => {
+    const handlePopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      const nextCat = (params.get("category") || "all").toLowerCase().trim() || "all";
+      const nextPrice = (params.get("pricing") || "all").toLowerCase().trim() || "all";
+      const parsedPage = Number(params.get("page") || "1");
+      const nextPg =
+        Number.isFinite(parsedPage) && parsedPage >= 1 ? Math.floor(parsedPage) : 1;
+
+      setActiveCategory(nextCat);
+      setActivePricing(nextPrice);
+      fetchTools({
+        nextPage: nextPg,
+        category: nextCat,
+        pricing: nextPrice,
+        syncUrl: false,
+      });
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [fetchTools]);
 
   const handleCategoryChange = (slug: string) => {
-    if (slug === activeCategory) return;
+    if (slug === activeCategory && page === 1 && !errorMessage) return;
     setActiveCategory(slug);
+    setPage(1);
     fetchTools({
       nextPage: 1,
       category: slug,
       pricing: activePricing,
-      append: false,
     });
   };
 
   const handlePricingChange = (value: string) => {
-    if (value === activePricing) return;
+    if (value === activePricing && page === 1 && !errorMessage) return;
     setActivePricing(value);
+    setPage(1);
     fetchTools({
       nextPage: 1,
       category: activeCategory,
       pricing: value,
-      append: false,
     });
   };
 
   const handleResetFilters = () => {
     setActiveCategory("all");
     setActivePricing("all");
-    fetchTools({ nextPage: 1, category: "all", pricing: "all", append: false });
+    setPage(1);
+    fetchTools({ nextPage: 1, category: "all", pricing: "all" });
   };
 
   const handlePageChange = (targetPage: number) => {
@@ -308,11 +303,10 @@ export function HomeView({
       nextPage: targetPage,
       category: activeCategory,
       pricing: activePricing,
-      append: false,
     });
-    if (catalogTopRef.current) {
+    if (catalogListRef.current) {
       const top =
-        catalogTopRef.current.getBoundingClientRect().top + window.scrollY - 72;
+        catalogListRef.current.getBoundingClientRect().top + window.scrollY - 76;
       window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
     }
   };
@@ -331,18 +325,29 @@ export function HomeView({
     return pages;
   };
 
-  const visibleQuickReview = quickReviewTools.filter((t) => {
-    if (activeCategory !== "all" && t.categorySlug !== activeCategory)
-      return false;
-    if (activePricing !== "all" && t.pricingModel !== activePricing)
-      return false;
-    return true;
-  });
+  const visibleQuickReview =
+    page === 1
+      ? quickReviewTools.filter((t) => {
+          if (activeCategory !== "all" && t.categorySlug !== activeCategory)
+            return false;
+          if (activePricing !== "all" && t.pricingModel !== activePricing)
+            return false;
+          return true;
+        })
+      : [];
   const quickSlugs = new Set(visibleQuickReview.map((t) => t.slug));
   const displayedTools = [
     ...visibleQuickReview,
     ...tools.filter((t) => !quickSlugs.has(t.slug)),
   ];
+
+  const totalMatching = total + visibleQuickReview.length;
+  const rangeStart =
+    totalMatching === 0 ? 0 : (page - 1) * PAGE_SIZE + 1;
+  const rangeEnd =
+    totalMatching === 0
+      ? 0
+      : Math.min(totalMatching, (page - 1) * PAGE_SIZE + displayedTools.length);
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/30 selection:text-white">
@@ -416,41 +421,32 @@ export function HomeView({
             </div>
           </section>
 
-          {/* Draggable + Inertia Browse Filters */}
+          {/* Browse Filters */}
           <section
-            ref={catalogTopRef}
             aria-label="Browse filters"
             className="bg-transparent"
           >
             <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3.5 lg:px-8">
-              <div
-                ref={railBoundsRef}
-                className="relative overflow-hidden py-0.5"
-              >
-                <div
-                  ref={railTrackRef}
-                  className="flex w-max items-center gap-2 cursor-grab active:cursor-grabbing"
-                >
-                  {CATEGORY_PILLS.map((pill) => {
-                    const selected = activeCategory === pill.slug;
-                    return (
-                      <button
-                        key={pill.slug}
-                        type="button"
-                        aria-pressed={selected}
-                        onClick={() => handleCategoryChange(pill.slug)}
-                        className={cn(
-                          "shrink-0 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors duration-150 min-h-[44px] sm:min-h-9 active:scale-[0.97]",
-                          selected
-                            ? "border-primary bg-primary text-primary-foreground font-semibold shadow-lavender-glow"
-                            : "border-border bg-surface-1 text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                        )}
-                      >
-                        {pill.label}
-                      </button>
-                    );
-                  })}
-                </div>
+              <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                {CATEGORY_PILLS.map((pill) => {
+                  const selected = activeCategory === pill.slug;
+                  return (
+                    <button
+                      key={pill.slug}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => handleCategoryChange(pill.slug)}
+                      className={cn(
+                        "shrink-0 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors duration-150 min-h-[44px] sm:min-h-9 active:scale-[0.97]",
+                        selected
+                          ? "border-primary bg-primary text-primary-foreground font-semibold shadow-lavender-glow"
+                          : "border-border bg-surface-1 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                      )}
+                    >
+                      {pill.label}
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-2">
@@ -477,8 +473,11 @@ export function HomeView({
                 </div>
 
                 <p className="text-xs font-mono text-muted-foreground" aria-live="polite">
-                  Showing {displayedTools.length} of{" "}
-                  {total + visibleQuickReview.length} tools
+                  {isLoading
+                    ? "Loading tools..."
+                    : totalMatching === 0
+                    ? "Showing 0 of 0 tools"
+                    : `Showing ${rangeStart}–${rangeEnd} of ${totalMatching.toLocaleString()} tools`}
                 </p>
               </div>
             </div>
@@ -486,10 +485,32 @@ export function HomeView({
 
           {/* Scrollable Tool Catalog */}
           <section
+            ref={catalogListRef}
             aria-label="AI tools and SaaS directory"
+            aria-busy={isLoading}
             className="mx-auto max-w-7xl px-4 py-8 lg:px-8"
           >
-            {displayedTools.length === 0 ? (
+            {errorMessage ? (
+              <ErrorState
+                title="Unable to load tools"
+                description={errorMessage}
+                action={
+                  <Button
+                    variant="primary"
+                    size="md"
+                    onClick={() =>
+                      fetchTools({
+                        nextPage: page,
+                        category: activeCategory,
+                        pricing: activePricing,
+                      })
+                    }
+                  >
+                    Retry
+                  </Button>
+                }
+              />
+            ) : displayedTools.length === 0 && !isLoading ? (
               <EmptyState
                 title="No tools match those filters"
                 description="Try switching back to all categories or all pricing models."
@@ -505,17 +526,14 @@ export function HomeView({
               />
             ) : (
               <ul
-                ref={gridRef}
-                aria-busy={isLoading}
                 className={cn(
                   "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150",
-                  isLoading && "opacity-60"
+                  isLoading && "opacity-60 pointer-events-none"
                 )}
               >
                 {displayedTools.map((tool, index) => (
                   <li
                     key={tool.slug}
-                    data-flip-id={tool.slug}
                     className={cn(
                       "tool-card-item transition-transform duration-150 hover:-translate-y-0.5",
                       index >= 6 && "below-fold-card"
@@ -527,7 +545,7 @@ export function HomeView({
               </ul>
             )}
 
-            {totalPages > 1 && (
+            {totalPages > 1 && !errorMessage && (
               <nav
                 aria-label="Catalog pagination"
                 className="mt-10 flex flex-wrap items-center justify-center gap-1.5"
@@ -557,13 +575,13 @@ export function HomeView({
                     <Button
                       key={item}
                       type="button"
-                      variant={item === page ? "primary" : "outline"}
+                      variant={item === page ? "accent" : "outline"}
                       size="sm"
                       disabled={isLoading}
                       onClick={() => handlePageChange(item)}
                       aria-label={`Page ${item}`}
                       aria-current={item === page ? "page" : undefined}
-                      className="min-w-9 font-mono"
+                      className="min-w-10 font-mono"
                     >
                       {item}
                     </Button>

@@ -6,7 +6,14 @@ export function toToolCardData(
   tool: CatalogTool,
   categories: CatalogCategory[],
 ): ToolCardData {
-  const category = categories.find((item) => item.id === tool.primary_category_id);
+  const primaryCat = (
+    tool as { primary_category?: { name?: string; slug?: string } }
+  ).primary_category;
+  const category = categories.find(
+    (item) =>
+      item.id === tool.primary_category_id ||
+      (primaryCat?.slug && item.slug === primaryCat.slug),
+  );
   const curated = CURATED_TOOLS[tool.slug.toLowerCase().trim()];
   const startingPlan = curated?.pricing_plans?.find((p) => !p.is_free && p.amount_minor);
   const startingPrice = startingPlan && startingPlan.amount_minor
@@ -18,8 +25,19 @@ export function toToolCardData(
     name: tool.name,
     slug: tool.slug,
     tagline: tool.tagline || curated?.tagline || tool.description || "No short description supplied.",
-    category: category?.name ?? curated?.primary_category?.name ?? "Uncategorized",
-    categorySlug: category?.slug ?? curated?.primary_category?.slug ?? "",
+    category:
+      category?.name ??
+      primaryCat?.name ??
+      curated?.primary_category?.name ??
+      "Uncategorized",
+    categorySlug: (
+      category?.slug ??
+      primaryCat?.slug ??
+      curated?.primary_category?.slug ??
+      ""
+    )
+      .toLowerCase()
+      .trim(),
     pricingModel: tool.pricing_model,
     websiteUrl: (tool as { website_url?: string }).website_url || curated?.website_url,
     startingPrice,

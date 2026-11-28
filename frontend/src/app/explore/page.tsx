@@ -3,11 +3,11 @@ import { canonicalUrl } from "@/lib/site";
 import { ExploreView, type ExploreFilters } from "./view";
 import {
   getActiveCategories,
-  getExploreTools,
   type CatalogCategory,
   type PaginatedResponse,
   type CatalogTool,
 } from "@/lib/catalog-api";
+import { searchExploreTools } from "@/lib/explore-catalog";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -59,7 +59,7 @@ export default async function ExplorePage({
   if (scalar(raw.sort)) apiParams.set("sort", filters.sort);
 
   const [toolsResult, categoriesResult] = await Promise.allSettled([
-    getExploreTools(apiParams),
+    searchExploreTools(apiParams),
     getActiveCategories(),
   ]);
   const results =
