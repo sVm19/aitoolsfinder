@@ -180,11 +180,11 @@ export function ToolCard({
             )}
 
             <div className="min-w-0">
-              <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href={`/tools/${tool.slug}`}
                   prefetch={false}
-                  className="font-semibold text-foreground hover:text-primary-content transition-colors truncate"
+                  className="inline-flex items-center min-h-7 font-semibold text-foreground hover:text-primary-content transition-colors truncate"
                 >
                   {tool.name}
                 </Link>
@@ -194,7 +194,7 @@ export function ToolCard({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[10px] font-semibold bg-accent/15 text-accent hover:bg-accent hover:text-white transition-colors"
+                    className="inline-flex items-center justify-center min-h-7 min-w-7 gap-1 rounded px-2 py-1 text-xs font-semibold bg-accent/15 text-accent hover:bg-accent hover:text-white transition-colors"
                     title={`Visit official ${tool.name} website (opens in new tab)`}
                     aria-label={`Visit official ${tool.name} website (opens in new tab)`}
                   >
@@ -217,12 +217,12 @@ export function ToolCard({
                 <Link
                   href={`/categories/${tool.categorySlug}`}
                   prefetch={false}
-                  className="text-xs text-subtle-foreground hover:text-muted-foreground transition-colors block truncate mt-0.5"
+                  className="inline-flex items-center min-h-7 py-0.5 text-xs text-subtle-foreground hover:text-muted-foreground transition-colors truncate mt-1"
                 >
                   {tool.category}
                 </Link>
               ) : (
-                <span className="text-xs text-subtle-foreground block truncate mt-0.5">
+                <span className="inline-flex items-center min-h-7 py-0.5 text-xs text-subtle-foreground truncate mt-1">
                   {tool.category}
                 </span>
               )}
