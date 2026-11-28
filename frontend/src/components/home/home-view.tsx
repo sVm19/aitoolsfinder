@@ -274,7 +274,7 @@ export function HomeView({
           <section
             aria-labelledby="home-title"
             data-enter
-            className="relative isolate overflow-hidden border-b border-border"
+            className="relative isolate overflow-hidden"
           >
             <HeroCanvas />
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/30 via-background/75 to-background" />
@@ -334,7 +334,7 @@ export function HomeView({
           {/* Draggable + Inertia Browse Filters */}
           <section
             aria-label="Browse filters"
-            className="border-b border-border bg-background"
+            className="bg-background"
           >
             <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3.5 lg:px-8">
               <div

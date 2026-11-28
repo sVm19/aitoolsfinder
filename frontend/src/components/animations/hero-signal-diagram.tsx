@@ -129,7 +129,38 @@ export function HeroSignalDiagram({ totalTools }: HeroSignalDiagramProps) {
           className="w-full h-28 overflow-visible"
           aria-hidden="true"
         >
-          {/* Source & Target Nodes */}
+          {/* Animated SVG Paths (rendered behind nodes so labels stay crisp) */}
+          <path
+            ref={pathTopRef}
+            d="M 72 60 C 110 60, 118 60, 148 60 C 232 60, 240 22, 284 22"
+            fill="none"
+            stroke="#0ea5e9"
+            strokeOpacity="0.55"
+            strokeWidth="1.5"
+          />
+          <path
+            ref={pathMidRef}
+            d="M 72 60 L 284 60"
+            fill="none"
+            stroke="#38bdf8"
+            strokeOpacity="0.65"
+            strokeWidth="1.5"
+          />
+          <path
+            ref={pathBotRef}
+            d="M 72 60 C 110 60, 118 60, 148 60 C 232 60, 240 98, 284 98"
+            fill="none"
+            stroke="#ff5e1e"
+            strokeOpacity="0.55"
+            strokeWidth="1.5"
+          />
+
+          {/* MotionPath Pulses */}
+          <circle ref={pulseTopRef} r="3.5" fill="#38bdf8" />
+          <circle ref={pulseMidRef} r="3.5" fill="#bae6fd" />
+          <circle ref={pulseBotRef} r="3.5" fill="#ff5e1e" />
+
+          {/* Source & Target Nodes (rendered on top of paths) */}
           <rect
             x="8"
             y="44"
@@ -158,7 +189,7 @@ export function HeroSignalDiagram({ totalTools }: HeroSignalDiagramProps) {
             rx="10"
             fill="#182233"
             stroke="#0ea5e9"
-            strokeOpacity="0.6"
+            strokeOpacity="0.7"
           />
           <text
             x="182"
@@ -230,37 +261,6 @@ export function HeroSignalDiagram({ totalTools }: HeroSignalDiagramProps) {
           >
             Stack
           </text>
-
-          {/* Animated SVG Paths */}
-          <path
-            ref={pathTopRef}
-            d="M 72 60 C 110 60, 118 60, 148 60 C 232 60, 240 22, 284 22"
-            fill="none"
-            stroke="#0ea5e9"
-            strokeOpacity="0.55"
-            strokeWidth="1.5"
-          />
-          <path
-            ref={pathMidRef}
-            d="M 72 60 L 284 60"
-            fill="none"
-            stroke="#38bdf8"
-            strokeOpacity="0.65"
-            strokeWidth="1.5"
-          />
-          <path
-            ref={pathBotRef}
-            d="M 72 60 C 110 60, 118 60, 148 60 C 232 60, 240 98, 284 98"
-            fill="none"
-            stroke="#ff5e1e"
-            strokeOpacity="0.55"
-            strokeWidth="1.5"
-          />
-
-          {/* MotionPath Pulses */}
-          <circle ref={pulseTopRef} r="3.5" fill="#38bdf8" />
-          <circle ref={pulseMidRef} r="3.5" fill="#bae6fd" />
-          <circle ref={pulseBotRef} r="3.5" fill="#ff5e1e" />
         </svg>
       </div>
 
