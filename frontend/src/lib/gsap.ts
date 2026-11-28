@@ -12,7 +12,6 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { Observer } from "gsap/Observer";
 import { PixiPlugin } from "gsap/PixiPlugin";
 import { ScrambleTextPlugin } from "gsap/ScrambleTextPlugin";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SplitText } from "gsap/SplitText";
@@ -26,7 +25,6 @@ export function registerGsapPlugins() {
   gsap.registerPlugin(
     useGSAP,
     ScrollTrigger,
-    ScrollSmoother,
     Observer,
     MorphSVGPlugin,
     DrawSVGPlugin,
@@ -63,7 +61,6 @@ export {
   gsap,
   useGSAP,
   ScrollTrigger,
-  ScrollSmoother,
   Observer,
   MorphSVGPlugin,
   DrawSVGPlugin,

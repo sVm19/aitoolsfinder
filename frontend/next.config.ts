@@ -17,6 +17,7 @@ const contentSecurityPolicy = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  productionBrowserSourceMaps: true,
   output: "standalone",
   outputFileTracingRoot: path.join(__dirname),
   experimental: {

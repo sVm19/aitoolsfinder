@@ -16,11 +16,14 @@ export function HeroCanvas() {
   useEffect(() => {
     const container = containerRef.current;
     if (!container || prefersReducedMotion()) return;
+    if (window.innerWidth < 1024) return;
 
     let destroyed = false;
     let app: PIXIType.Application | null = null;
     let obs: Observer | null = null;
     let visibilityTrigger: ScrollTrigger | null = null;
+    let idleHandle: number | null = null;
+    let timerHandle: ReturnType<typeof setTimeout> | null = null;
     const tweens: gsap.core.Tween[] = [];
 
     const initPixi = async () => {
@@ -119,10 +122,24 @@ export function HeroCanvas() {
       }
     };
 
-    initPixi();
+    if (typeof window.requestIdleCallback === "function") {
+      idleHandle = window.requestIdleCallback(() => {
+        if (!destroyed) initPixi();
+      }, { timeout: 2000 });
+    } else {
+      timerHandle = setTimeout(() => {
+        if (!destroyed) initPixi();
+      }, 1200);
+    }
 
     return () => {
       destroyed = true;
+      if (idleHandle !== null && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(idleHandle);
+      }
+      if (timerHandle !== null) {
+        clearTimeout(timerHandle);
+      }
       tweens.forEach((t) => t.kill());
       obs?.kill();
       visibilityTrigger?.kill();
