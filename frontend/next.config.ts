@@ -5,11 +5,11 @@ const isProduction = process.env.NODE_ENV === "production";
 
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isProduction ? "" : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com${isProduction ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://cdn.aitoolsfinder.cloud https://ruykzodjhxywrykodnco.supabase.co https://*.supabase.co https://*.amazonaws.com https://images.unsplash.com https://www.google.com https://*.google.com https://*.gstatic.com https://unavatar.io https://logo.clearbit.com",
   "font-src 'self' data:",
-  "connect-src 'self' https://aitoolsfinder.cloud https://ruykzodjhxywrykodnco.supabase.co https://*.supabase.co https://*.amazonaws.com http://localhost:8000 http://127.0.0.1:8000",
+  "connect-src 'self' https://aitoolsfinder.cloud https://cloudflareinsights.com https://ruykzodjhxywrykodnco.supabase.co https://*.supabase.co https://*.amazonaws.com http://localhost:8000 http://127.0.0.1:8000",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
