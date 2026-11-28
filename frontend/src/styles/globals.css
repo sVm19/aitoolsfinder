@@ -41,6 +41,18 @@
   --radius: 0.75rem;
   --shadow-lavender-glow: 0 0 24px -4px rgba(14, 165, 233, 0.36);
   --shadow-orange-glow: 0 0 24px -4px rgba(255, 94, 30, 0.36);
+
+  /* Page View Transition ("blur crossfade") — tune timings, blur, and scale here */
+  --vt-exit-duration: 200ms;
+  --vt-exit-blur: 6px;
+  --vt-exit-scale: 0.99;
+  --vt-exit-ease: cubic-bezier(0.4, 0, 1, 1);
+
+  --vt-enter-duration: 360ms;
+  --vt-enter-delay: 40ms;
+  --vt-enter-blur: 8px;
+  --vt-enter-scale: 1.01;
+  --vt-enter-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 * {
@@ -286,4 +298,107 @@ header.is-scrolled .header-glow-reflection {
 
 #smooth-content {
   will-change: transform;
+}
+
+/* --- Page Blur Crossfade (CSS View Transitions) --- */
+.vt-site-header {
+  view-transition-name: site-header;
+}
+
+.vt-site-aurora {
+  view-transition-name: site-aurora;
+}
+
+.vt-page-content {
+  view-transition-name: page-content;
+}
+
+/* Lighter blur on small screens to avoid GPU stutter on card-heavy pages */
+@media (max-width: 767px) {
+  :root {
+    --vt-exit-blur: 3px;
+    --vt-enter-blur: 4px;
+  }
+}
+
+@keyframes vt-page-exit {
+  from {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    filter: blur(var(--vt-exit-blur));
+    transform: scale(var(--vt-exit-scale));
+  }
+}
+
+@keyframes vt-page-enter {
+  from {
+    opacity: 0;
+    filter: blur(var(--vt-enter-blur));
+    transform: scale(var(--vt-enter-scale));
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: scale(1);
+  }
+}
+
+/* Keep root background, fixed header, and aurora glow still & sharp */
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root),
+::view-transition-group(site-header),
+::view-transition-old(site-header),
+::view-transition-new(site-header),
+::view-transition-group(site-aurora),
+::view-transition-old(site-aurora),
+::view-transition-new(site-aurora) {
+  animation: none;
+}
+
+::view-transition-group(site-header) {
+  z-index: 50;
+}
+
+::view-transition-group(site-aurora) {
+  z-index: 0;
+}
+
+::view-transition-group(page-content) {
+  animation: none;
+  z-index: 10;
+}
+
+::view-transition-old(page-content),
+::view-transition-new(page-content) {
+  height: auto;
+  min-height: 100%;
+  transform-origin: 50% 0%;
+  will-change: opacity, filter, transform;
+}
+
+::view-transition-old(page-content) {
+  animation: vt-page-exit var(--vt-exit-duration) var(--vt-exit-ease) both;
+}
+
+::view-transition-new(page-content) {
+  animation: vt-page-enter var(--vt-enter-duration) var(--vt-enter-ease) var(--vt-enter-delay) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-site-header,
+  .vt-site-aurora,
+  .vt-page-content {
+    view-transition-name: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

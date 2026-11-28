@@ -28,7 +28,7 @@ export function PageShell({
 
       {withAuroraGlow && (
         <div
-          className="pointer-events-none fixed inset-0 overflow-hidden z-0"
+          className="vt-site-aurora pointer-events-none fixed inset-0 overflow-hidden z-0"
           aria-hidden="true"
           style={{
             background:

@@ -10,6 +10,7 @@ import { StackDrawer } from "@/components/stack/stack-drawer";
 import { AuthModal } from "@/components/common/auth-modal";
 import { ButtonRipple } from "@/components/common/button-ripple";
 import { AttributionTracker } from "@/components/common/attribution-tracker";
+import { ViewTransitionProvider } from "@/components/common/view-transition-provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -65,6 +66,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="dark" data-type="software">
       <body suppressHydrationWarning className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-foreground">
+        <ViewTransitionProvider />
         <ButtonRipple />
         <Suspense fallback={null}>
           <AttributionTracker />

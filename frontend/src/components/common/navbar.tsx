@@ -36,7 +36,7 @@ const NAV_LINKS = [
   { name: "Categories", href: "/categories", icon: Layers },
   { name: "Rankings", href: "/rankings", icon: Award },
   { name: "Compare", href: "/compare", icon: GitCompare },
-  { name: "AI Finder", href: "/ai-finder", icon: Sparkles },
+  { name: "Finder", href: "/ai-finder", icon: Sparkles },
 ];
 
 export function Navbar() {
@@ -191,7 +191,7 @@ export function Navbar() {
     <>
       <header
         ref={headerRef}
-        className="fixed top-0 inset-x-0 z-50 w-full bg-background/95 border-b border-border/70 transition-[background-color,box-shadow] duration-200"
+        className="vt-site-header fixed top-0 inset-x-0 z-50 w-full bg-background/95 border-b border-border/70 transition-[background-color,box-shadow] duration-200"
       >
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Brand Identity & Primary Nav */}

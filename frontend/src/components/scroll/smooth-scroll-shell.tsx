@@ -45,7 +45,7 @@ export function SmoothScrollShell({ children }: SmoothScrollShellProps) {
   void ScrollToPlugin;
 
   return (
-    <div ref={rootRef} className="flex flex-1 flex-col">
+    <div ref={rootRef} className="vt-page-content flex flex-1 flex-col">
       {children}
 
       {showTop && (

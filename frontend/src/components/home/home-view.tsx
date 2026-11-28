@@ -3,7 +3,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { ArrowRight, Layers, Sparkles } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Layers, Sparkles } from "lucide-react";
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { SmoothScrollShell } from "@/components/scroll/smooth-scroll-shell";
@@ -68,11 +68,30 @@ export function HomeView({
   const [isLoading, setIsLoading] = useState(false);
   const [quickReviewTools, setQuickReviewTools] = useState<ToolCardData[]>([]);
 
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const catalogTopRef = useRef<HTMLElement>(null);
   const railBoundsRef = useRef<HTMLDivElement>(null);
   const railTrackRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLUListElement>(null);
   const flipStateRef = useRef<Flip.FlipState | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const pageCacheRef = useRef<
+    Map<
+      string,
+      { items: ToolCardData[]; total: number; page: number; totalPages: number }
+    >
+  >(
+    new Map([
+      [
+        "1|all|all",
+        {
+          items: initialTools,
+          total: initialTotal,
+          page: 1,
+          totalPages: initialTotalPages,
+        },
+      ],
+    ])
+  );
 
   useEffect(() => {
     try {
@@ -122,7 +141,8 @@ export function HomeView({
         bounds: boundsEl,
         inertia: true,
         edgeResistance: 0.75,
-        dragClickables: true,
+        dragClickables: false,
+        minimumMovement: 6,
         allowNativeTouchScrolling: true,
       });
 
@@ -159,6 +179,29 @@ export function HomeView({
     });
   }, [tools, activeCategory, activePricing]);
 
+  const applyToolsResponse = (
+    data: {
+      items: ToolCardData[];
+      total: number;
+      page: number;
+      totalPages: number;
+    },
+    append: boolean
+  ) => {
+    if (!append) {
+      captureFlipState();
+    }
+    setTools((prev) => {
+      if (!append) return data.items;
+      const seen = new Set(prev.map((t) => t.slug));
+      const fresh = data.items.filter((t) => !seen.has(t.slug));
+      return [...prev, ...fresh];
+    });
+    setTotal(data.total);
+    setPage(data.page);
+    setTotalPages(data.totalPages);
+  };
+
   const fetchTools = async ({
     nextPage,
     category,
@@ -170,6 +213,21 @@ export function HomeView({
     pricing: string;
     append: boolean;
   }) => {
+    const cacheKey = `${nextPage}|${category}|${pricing}`;
+    if (!append) {
+      const cached = pageCacheRef.current.get(cacheKey);
+      if (cached) {
+        abortControllerRef.current?.abort();
+        setIsLoading(false);
+        applyToolsResponse(cached, false);
+        return;
+      }
+    }
+
+    abortControllerRef.current?.abort();
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
     setIsLoading(true);
     try {
       const params = new URLSearchParams({
@@ -178,7 +236,9 @@ export function HomeView({
         category,
         pricing,
       });
-      const res = await fetch(`/api/home-tools?${params.toString()}`);
+      const res = await fetch(`/api/home-tools?${params.toString()}`, {
+        signal: controller.signal,
+      });
       if (!res.ok) return;
       const data = (await res.json()) as {
         items: ToolCardData[];
@@ -187,23 +247,22 @@ export function HomeView({
         totalPages: number;
       };
       if (!append) {
-        captureFlipState();
+        pageCacheRef.current.set(cacheKey, data);
       }
-      setTools((prev) => {
-        if (!append) return data.items;
-        const seen = new Set(prev.map((t) => t.slug));
-        const fresh = data.items.filter((t) => !seen.has(t.slug));
-        return [...prev, ...fresh];
-      });
-      setTotal(data.total);
-      setPage(data.page);
-      setTotalPages(data.totalPages);
+      applyToolsResponse(data, append);
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
     } finally {
-      setIsLoading(false);
+      if (abortControllerRef.current === controller) {
+        setIsLoading(false);
+      }
     }
   };
 
   const handleCategoryChange = (slug: string) => {
+    if (slug === activeCategory) return;
     setActiveCategory(slug);
     fetchTools({
       nextPage: 1,
@@ -214,6 +273,7 @@ export function HomeView({
   };
 
   const handlePricingChange = (value: string) => {
+    if (value === activePricing) return;
     setActivePricing(value);
     fetchTools({
       nextPage: 1,
@@ -229,27 +289,36 @@ export function HomeView({
     fetchTools({ nextPage: 1, category: "all", pricing: "all", append: false });
   };
 
-  useEffect(() => {
-    const sentinel = loadMoreRef.current;
-    if (!sentinel || page >= totalPages || isLoading) return;
+  const handlePageChange = (targetPage: number) => {
+    if (targetPage < 1 || targetPage > totalPages || targetPage === page || isLoading) {
+      return;
+    }
+    fetchTools({
+      nextPage: targetPage,
+      category: activeCategory,
+      pricing: activePricing,
+      append: false,
+    });
+    if (catalogTopRef.current) {
+      const top =
+        catalogTopRef.current.getBoundingClientRect().top + window.scrollY - 72;
+      window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    }
+  };
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && !isLoading && page < totalPages) {
-          fetchTools({
-            nextPage: page + 1,
-            category: activeCategory,
-            pricing: activePricing,
-            append: true,
-          });
-        }
-      },
-      { rootMargin: "320px" }
-    );
-
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [page, totalPages, isLoading, activeCategory, activePricing]);
+  const getPageNumbers = (): Array<number | "ellipsis"> => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages: Array<number | "ellipsis"> = [1];
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+    if (start > 2) pages.push("ellipsis");
+    for (let p = start; p <= end; p++) pages.push(p);
+    if (end < totalPages - 1) pages.push("ellipsis");
+    pages.push(totalPages);
+    return pages;
+  };
 
   const visibleQuickReview = quickReviewTools.filter((t) => {
     if (activeCategory !== "all" && t.categorySlug !== activeCategory)
@@ -269,7 +338,13 @@ export function HomeView({
       <Navbar />
 
       <SmoothScrollShell>
-        <main className="flex-1 pt-14">
+        <main
+          className="flex-1 pt-14"
+          style={{
+            background:
+              "radial-gradient(960px 520px at 16% 0%, rgba(14, 165, 233, 0.11), transparent 72%), radial-gradient(820px 480px at 86% 6%, rgba(255, 94, 30, 0.08), transparent 70%)",
+          }}
+        >
           {/* Precision Hero */}
           <section
             aria-labelledby="home-title"
@@ -277,7 +352,6 @@ export function HomeView({
             className="relative isolate overflow-hidden"
           >
             <HeroCanvas />
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-background/30 via-background/75 to-background" />
 
             <div className="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:py-16 lg:px-8">
               <div className="flex flex-wrap items-center gap-3">
@@ -333,8 +407,9 @@ export function HomeView({
 
           {/* Draggable + Inertia Browse Filters */}
           <section
+            ref={catalogTopRef}
             aria-label="Browse filters"
-            className="bg-background"
+            className="bg-transparent"
           >
             <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3.5 lg:px-8">
               <div
@@ -420,7 +495,11 @@ export function HomeView({
             ) : (
               <ul
                 ref={gridRef}
-                className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3"
+                aria-busy={isLoading}
+                className={cn(
+                  "grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 transition-opacity duration-150",
+                  isLoading && "opacity-60"
+                )}
               >
                 {displayedTools.map((tool, index) => (
                   <li
@@ -437,26 +516,61 @@ export function HomeView({
               </ul>
             )}
 
-            {page < totalPages && (
-              <div ref={loadMoreRef} className="mt-10 flex justify-center">
+            {totalPages > 1 && (
+              <nav
+                aria-label="Catalog pagination"
+                className="mt-10 flex flex-wrap items-center justify-center gap-1.5"
+              >
                 <Button
+                  type="button"
                   variant="outline"
-                  size="md"
-                  disabled={isLoading}
-                  onClick={() =>
-                    fetchTools({
-                      nextPage: page + 1,
-                      category: activeCategory,
-                      pricing: activePricing,
-                      append: true,
-                    })
-                  }
+                  size="sm"
+                  disabled={page <= 1 || isLoading}
+                  onClick={() => handlePageChange(page - 1)}
+                  aria-label="Previous page"
                 >
-                  {isLoading
-                    ? "Loading more tools..."
-                    : `Load more tools (${total - tools.length} remaining)`}
+                  <ChevronLeft className="h-4 w-4" />
+                  <span>Prev</span>
                 </Button>
-              </div>
+
+                {getPageNumbers().map((item, idx) =>
+                  item === "ellipsis" ? (
+                    <span
+                      key={`ellipsis-${idx}`}
+                      className="px-2 text-xs text-muted-foreground select-none"
+                      aria-hidden="true"
+                    >
+                      …
+                    </span>
+                  ) : (
+                    <Button
+                      key={item}
+                      type="button"
+                      variant={item === page ? "primary" : "outline"}
+                      size="sm"
+                      disabled={isLoading}
+                      onClick={() => handlePageChange(item)}
+                      aria-label={`Page ${item}`}
+                      aria-current={item === page ? "page" : undefined}
+                      className="min-w-9 font-mono"
+                    >
+                      {item}
+                    </Button>
+                  )
+                )}
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={page >= totalPages || isLoading}
+                  onClick={() => handlePageChange(page + 1)}
+                  aria-label="Next page"
+                >
+                  <span>Next</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </nav>
             )}
           </section>
         </main>

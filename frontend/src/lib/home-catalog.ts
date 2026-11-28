@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ToolCardData } from "@/components/tool/tool-card";
 import { CURATED_CATEGORIES, CURATED_TOOLS } from "@/lib/curated-tools";
-import { getExploreTools } from "@/lib/catalog-api";
+import type { CatalogTool, PaginatedResponse } from "@/lib/catalog-api";
 import { toToolCardData } from "@/lib/catalog-presentation";
 
 interface EnrichedRow {
@@ -39,12 +39,33 @@ export function dailyShuffle<T>(items: T[], seed: number): T[] {
   return out;
 }
 
-function readLocalEnrichedTools(): ToolCardData[] {
+let cachedLocalTools: { mtimeMs: number; tools: ToolCardData[] } | null = null;
+let cachedShuffled: { seed: number; mtimeMs: number; tools: ToolCardData[] } | null = null;
+let backendCircuitOpenUntil = 0;
+
+const BACKEND_TIMEOUT_MS = 1500;
+const BACKEND_CIRCUIT_COOLDOWN_MS = 30_000;
+
+function readLocalEnrichedTools(): { tools: ToolCardData[]; mtimeMs: number } {
   const candidates = [
     path.resolve(process.cwd(), "..", "data", "enriched.jsonl"),
     path.resolve(process.cwd(), "data", "enriched.jsonl"),
     path.resolve(process.cwd(), "..", "data", "enriched_sample.jsonl"),
   ];
+
+  let resolvedPath: string | null = null;
+  let mtimeMs = 0;
+  for (const filePath of candidates) {
+    if (fs.existsSync(filePath)) {
+      resolvedPath = filePath;
+      mtimeMs = fs.statSync(filePath).mtimeMs;
+      break;
+    }
+  }
+
+  if (cachedLocalTools && cachedLocalTools.mtimeMs === mtimeMs) {
+    return { tools: cachedLocalTools.tools, mtimeMs };
+  }
 
   const bySlug = new Map<string, ToolCardData>();
 
@@ -52,9 +73,8 @@ function readLocalEnrichedTools(): ToolCardData[] {
     bySlug.set(curated.slug, toToolCardData(curated, Object.values(CURATED_CATEGORIES)));
   }
 
-  for (const filePath of candidates) {
-    if (!fs.existsSync(filePath)) continue;
-    const lines = fs.readFileSync(filePath, "utf-8").split(/\r?\n/);
+  if (resolvedPath) {
+    const lines = fs.readFileSync(resolvedPath, "utf-8").split(/\r?\n/);
     for (const line of lines) {
       if (!line.trim()) continue;
       try {
@@ -79,10 +99,26 @@ function readLocalEnrichedTools(): ToolCardData[] {
         // Ignore malformed line
       }
     }
-    break;
   }
 
-  return Array.from(bySlug.values());
+  const tools = Array.from(bySlug.values());
+  cachedLocalTools = { mtimeMs, tools };
+  return { tools, mtimeMs };
+}
+
+function getDailyLocalTools(): ToolCardData[] {
+  const seed = getDailyShuffleSeed();
+  const { tools, mtimeMs } = readLocalEnrichedTools();
+  if (
+    cachedShuffled &&
+    cachedShuffled.seed === seed &&
+    cachedShuffled.mtimeMs === mtimeMs
+  ) {
+    return cachedShuffled.tools;
+  }
+  const shuffled = dailyShuffle(tools, seed);
+  cachedShuffled = { seed, mtimeMs, tools: shuffled };
+  return shuffled;
 }
 
 export async function getHomeToolsPage({
@@ -101,8 +137,11 @@ export async function getHomeToolsPage({
   page: number;
   totalPages: number;
 }> {
-  const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.INTERNAL_API_BASE_URL;
-  if (apiBase) {
+  const apiBase = (
+    process.env.INTERNAL_API_BASE_URL || process.env.NEXT_PUBLIC_API_BASE_URL || ""
+  ).replace(/\/+$/, "");
+
+  if (apiBase && Date.now() >= backendCircuitOpenUntil) {
     try {
       const params = new URLSearchParams({
         page: String(page),
@@ -111,22 +150,32 @@ export async function getHomeToolsPage({
       if (category !== "all") params.set("category", category);
       if (pricing !== "all") params.set("pricing_model", pricing);
 
-      const res = await getExploreTools(params);
-      if (res.items.length > 0 && res.total > Object.keys(CURATED_TOOLS).length) {
-        const cats = Object.values(CURATED_CATEGORIES);
-        return {
-          items: res.items.map((t) => toToolCardData(t, cats)),
-          total: res.total,
-          page: res.page,
-          totalPages: res.total_pages,
-        };
+      const response = await fetch(`${apiBase}/tools?${params.toString()}`, {
+        signal: AbortSignal.timeout(BACKEND_TIMEOUT_MS),
+        next: { revalidate: 60 },
+      });
+
+      if (response.ok) {
+        const res = (await response.json()) as PaginatedResponse<CatalogTool>;
+        if (res.items.length > 0 && res.total > Object.keys(CURATED_TOOLS).length) {
+          const cats = Object.values(CURATED_CATEGORIES);
+          return {
+            items: res.items.map((t) => toToolCardData(t, cats)),
+            total: res.total,
+            page: res.page,
+            totalPages: res.total_pages,
+          };
+        }
       }
+      // Backend returned error or empty catalog; trip circuit breaker briefly
+      backendCircuitOpenUntil = Date.now() + BACKEND_CIRCUIT_COOLDOWN_MS;
     } catch {
-      // Fall back to local enriched JSONL + curated tools
+      // Backend unreachable or timed out; trip circuit breaker and fall back
+      backendCircuitOpenUntil = Date.now() + BACKEND_CIRCUIT_COOLDOWN_MS;
     }
   }
 
-  let allTools = dailyShuffle(readLocalEnrichedTools(), getDailyShuffleSeed());
+  let allTools = getDailyLocalTools();
   if (category !== "all") {
     allTools = allTools.filter((t) => t.categorySlug === category);
   }
