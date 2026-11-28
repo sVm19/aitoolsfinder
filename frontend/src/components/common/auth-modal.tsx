@@ -117,7 +117,7 @@ export function AuthModal() {
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 mb-3">
               <CheckCircle2 className="h-5 w-5" />
             </div>
-            <h4 className="text-sm font-semibold text-foreground">Signed In Successfully!</h4>
+            <h3 className="text-sm font-semibold text-foreground">Signed In Successfully!</h3>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
               Your session is active as <span className="font-semibold text-foreground">{user?.email || email}</span>. Your stack and preferences are now saved.
             </p>

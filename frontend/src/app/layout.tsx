@@ -1,25 +1,25 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans, Outfit, JetBrains_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "@/styles/globals.css";
 
-const plusJakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  weight: ["500", "600", "700", "800"],
+const plusJakarta = localFont({
+  src: "./fonts/plus-jakarta-sans.woff2",
+  weight: "500 800",
   variable: "--font-plus-jakarta",
   display: "swap",
 });
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "800"],
+const outfit = localFont({
+  src: "./fonts/outfit.woff2",
+  weight: "400 800",
   variable: "--font-outfit",
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+const jetbrainsMono = localFont({
+  src: "./fonts/jetbrains-mono.woff2",
+  weight: "400 700",
   variable: "--font-jetbrains",
   display: "swap",
 });

@@ -425,12 +425,12 @@ export function HeroMatcherSlot() {
         {/* Tool Info */}
         <div className="flex items-start justify-between gap-3 mb-2.5">
           <div>
-            <h4 className="text-lg font-semibold text-foreground tracking-tight flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-foreground tracking-tight flex items-center gap-2">
               <span>{currentMatch.name}</span>
               <span className="rounded-md bg-white/[0.06] border border-white/10 px-2 py-0.5 text-[10px] font-normal text-muted-foreground">
                 {currentMatch.category}
               </span>
-            </h4>
+            </h3>
             <p className="text-xs text-subtle-foreground mt-0.5 font-mono">
               {currentMatch.pricing}
             </p>
