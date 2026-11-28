@@ -67,34 +67,42 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [profileMenuOpen]);
 
-  // GSAP ScrollTrigger progress bar + scrolled state
+  // GSAP ScrollTrigger progress bar + scrolled state (deferred post-layout to avoid forced reflow)
   useGSAP(
     () => {
-      if (progressRef.current) {
-        gsap.to(progressRef.current, {
-          scaleX: 1,
-          ease: "none",
-          scrollTrigger: {
-            start: 0,
-            end: "max",
-            scrub: true,
-          },
-        });
-      }
+      let progressTween: gsap.core.Tween | null = null;
+      let st: ScrollTrigger | null = null;
 
-      const st = ScrollTrigger.create({
-        start: 16,
-        end: "max",
-        onEnter: () => headerRef.current?.classList.add("is-scrolled"),
-        onLeaveBack: () => headerRef.current?.classList.remove("is-scrolled"),
+      const rafId = requestAnimationFrame(() => {
+        if (progressRef.current) {
+          progressTween = gsap.to(progressRef.current, {
+            scaleX: 1,
+            ease: "none",
+            scrollTrigger: {
+              start: 0,
+              end: "max",
+              scrub: true,
+            },
+          });
+        }
+
+        st = ScrollTrigger.create({
+          start: 16,
+          end: "max",
+          onEnter: () => headerRef.current?.classList.add("is-scrolled"),
+          onLeaveBack: () => headerRef.current?.classList.remove("is-scrolled"),
+        });
+
+        if (window.scrollY > 16) {
+          headerRef.current?.classList.add("is-scrolled");
+        }
       });
 
-      if (window.scrollY > 16) {
-        headerRef.current?.classList.add("is-scrolled");
-      }
-
       return () => {
-        st.kill();
+        cancelAnimationFrame(rafId);
+        progressTween?.scrollTrigger?.kill();
+        progressTween?.kill();
+        st?.kill();
       };
     },
     { scope: headerRef }

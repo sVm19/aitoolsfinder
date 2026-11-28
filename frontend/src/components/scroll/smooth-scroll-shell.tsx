@@ -20,15 +20,19 @@ export function SmoothScrollShell({ children }: SmoothScrollShellProps) {
 
   useGSAP(
     () => {
-      const trigger = ScrollTrigger.create({
-        start: 420,
-        end: "max",
-        onEnter: () => setShowTop(true),
-        onLeaveBack: () => setShowTop(false),
+      let trigger: ScrollTrigger | null = null;
+      const rafId = requestAnimationFrame(() => {
+        trigger = ScrollTrigger.create({
+          start: 420,
+          end: "max",
+          onEnter: () => setShowTop(true),
+          onLeaveBack: () => setShowTop(false),
+        });
       });
 
       return () => {
-        trigger.kill();
+        cancelAnimationFrame(rafId);
+        trigger?.kill();
       };
     },
     { scope: rootRef }
