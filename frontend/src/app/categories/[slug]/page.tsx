@@ -46,7 +46,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const category = await resolveCategory(slug);
   if (!category) {
-    return { title: "AI Tool Category", robots: { index: false, follow: true } };
+    return { title: "AI Tool Category", robots: { index: true, follow: true } };
   }
   return {
     title: category.seo_title ?? `${category.name} AI Tools`,

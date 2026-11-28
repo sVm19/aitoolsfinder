@@ -111,7 +111,7 @@ export async function generateMetadata({
       title,
       description,
       alternates: { canonical: url },
-      robots: { index: hasUsefulContent(tool), follow: true },
+      robots: { index: true, follow: true },
       openGraph: {
         title,
         description,
@@ -129,7 +129,7 @@ export async function generateMetadata({
       twitter: { card: "summary", title, description },
     };
   } catch {
-    return { title: "AI Tool Profile", robots: { index: false, follow: true } };
+    return { title: "AI Tool Profile", robots: { index: true, follow: true } };
   }
 }
 

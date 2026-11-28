@@ -35,7 +35,7 @@ export async function generateMetadata({
       title: `${tag.name} AI Tools`,
       description: `Browse published AI tools tagged ${tag.name} and compare their available product details.`,
       alternates: { canonical: canonicalUrl(`/tags/${encodeURIComponent(slug)}`) },
-      robots: { index: tools.total > 0, follow: true },
+      robots: { index: true, follow: true },
       openGraph: {
         title: `${tag.name} AI Tools | AIToolsFinder`,
         description: `Browse published AI tools tagged ${tag.name}.`,
@@ -44,7 +44,7 @@ export async function generateMetadata({
       },
     };
   } catch {
-    return { title: "AI Tool Tag", robots: { index: false, follow: true } };
+    return { title: "AI Tool Tag", robots: { index: true, follow: true } };
   }
 }
 

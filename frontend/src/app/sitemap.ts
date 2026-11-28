@@ -8,6 +8,9 @@ import {
   type CatalogTool,
 } from "@/lib/catalog-api";
 import { canonicalUrl } from "@/lib/site";
+import { CURATED_CATEGORIES } from "@/lib/curated-tools";
+import { readLocalEnrichedTools } from "@/lib/home-catalog";
+import { BLOG_POSTS } from "@/lib/blog-posts";
 
 export const dynamic = "force-dynamic";
 
@@ -118,6 +121,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: canonicalUrl("/blog"),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
       url: canonicalUrl("/submit"),
       lastModified: now,
       changeFrequency: "monthly",
@@ -174,17 +183,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
+  for (const post of BLOG_POSTS) {
+    addEntry({
+      url: canonicalUrl(`/blog/${encodeURIComponent(post.slug)}`),
+      lastModified: lastModified(post.updatedAt),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    });
+  }
+
+  const seenCategorySlugs = new Set<string>();
   if (categoriesResult.status === "fulfilled" && categoriesResult.value.length) {
     for (const category of categoriesResult.value) {
+      seenCategorySlugs.add(category.slug);
       const modDate = lastModified(category.updated_at);
-      // Category hub
       addEntry({
         url: canonicalUrl(`/categories/${encodeURIComponent(category.slug)}`),
         lastModified: modDate,
         changeFrequency: "weekly",
         priority: 0.8,
       });
-      // Category rankings
       addEntry({
         url: canonicalUrl(`/rankings/${encodeURIComponent(category.slug)}`),
         lastModified: modDate,
@@ -193,18 +211,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       });
     }
   }
+  for (const category of Object.values(CURATED_CATEGORIES)) {
+    if (seenCategorySlugs.has(category.slug)) continue;
+    addEntry({
+      url: canonicalUrl(`/categories/${encodeURIComponent(category.slug)}`),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    });
+    addEntry({
+      url: canonicalUrl(`/rankings/${encodeURIComponent(category.slug)}`),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
+  }
 
+  const seenToolSlugs = new Set<string>();
   if (toolsResult.status === "fulfilled" && toolsResult.value.length) {
     for (const tool of toolsResult.value) {
+      seenToolSlugs.add(tool.slug);
       const modDate = lastModified(tool.updated_at);
-      // Tool detail
       addEntry({
         url: canonicalUrl(`/tools/${encodeURIComponent(tool.slug)}`),
         lastModified: modDate,
         changeFrequency: "weekly",
         priority: 0.7,
       });
-      // Alternatives page
       addEntry({
         url: canonicalUrl(`/alternatives/${encodeURIComponent(tool.slug)}`),
         lastModified: modDate,
@@ -212,6 +245,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
       });
     }
+  }
+  for (const tool of readLocalEnrichedTools().tools) {
+    if (seenToolSlugs.has(tool.slug)) continue;
+    seenToolSlugs.add(tool.slug);
+    addEntry({
+      url: canonicalUrl(`/tools/${encodeURIComponent(tool.slug)}`),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
+    addEntry({
+      url: canonicalUrl(`/alternatives/${encodeURIComponent(tool.slug)}`),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    });
   }
 
   if (tagsResult.status === "fulfilled" && tagsResult.value.length) {

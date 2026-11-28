@@ -1,0 +1,32 @@
+# AIToolsFinder — Full Platform & Content Summary
+
+Canonical URL: https://aitoolsfinder.cloud
+Sitemap: https://aitoolsfinder.cloud/sitemap.xml
+
+## What AIToolsFinder Does
+AIToolsFinder indexes over 1,200 AI tools and B2B SaaS products sourced from Y Combinator batches, GitHub open-source repositories, and Product Hunt launches. Instead of vague marketing blurbs, each listing tracks:
+- Pricing model (`free`, `freemium`, `paid`, `usage_based`, `contact_sales`) and starting monthly price.
+- Primary category and capability tags.
+- Side-by-side comparison matrices (`/compare` and `/compare/[slug]`).
+- Published alternatives (`/alternatives/[slug]`).
+
+## Who It Helps
+- Software engineers choosing AI code editors, terminal agents, or LLM APIs.
+- Founders and small teams auditing software spend before adding new SaaS seats.
+- Marketers, writers, and operators looking for verified free-tier or freemium tools.
+
+## Editorial Guides (/blog)
+1. **How to Pick an AI Coding Assistant Without Overpaying for Seats** (`/blog/how-to-pick-an-ai-coding-assistant-without-overpaying`): Compares Cursor, GitHub Copilot, and terminal-first coding agents on monthly seat cost, multi-file editing, and credit overages.
+2. **Free vs. Paid AI Tools: What Actually Changes When You Upgrade** (`/blog/free-vs-paid-ai-tools-what-actually-changes`): Explains the four real differences between free and paid plans (rate limits, context window size, privacy/training opt-outs, and team controls).
+3. **How to Compare AI Tools by Total Cost, Not Sticker Price** (`/blog/how-to-compare-ai-tools-by-total-cost-not-sticker-price`): A step-by-step checklist for spotting hidden credit caps, per-seat minimums, and usage overages.
+4. **Building a Lean AI Stack for Small Teams Under $100/Month** (`/blog/building-a-lean-ai-stack-for-small-teams`): A practical four-tool setup covering coding, writing, meeting notes, and workflow automation.
+
+## Core URLs
+- Directory: https://aitoolsfinder.cloud/
+- Explore & Search: https://aitoolsfinder.cloud/explore
+- Task Matcher (Finder): https://aitoolsfinder.cloud/ai-finder
+- Categories: https://aitoolsfinder.cloud/categories
+- Rankings: https://aitoolsfinder.cloud/rankings
+- Compare: https://aitoolsfinder.cloud/compare
+- Submit a Tool (Free): https://aitoolsfinder.cloud/submit
+- Scoring Methodology: https://aitoolsfinder.cloud/methodology

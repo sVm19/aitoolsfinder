@@ -24,6 +24,7 @@ export function Footer() {
     { name: "Curated Rankings", href: "/rankings" },
     { name: "Side-by-Side Comparisons", href: "/compare" },
     { name: "AI Finder Assistant", href: "/ai-finder" },
+    { name: "Guides & Blog", href: "/blog" },
     { name: "Scoring Methodology", href: "/methodology" },
     { name: "API Documentation", href: canonicalUrl("/api/docs") },
   ];

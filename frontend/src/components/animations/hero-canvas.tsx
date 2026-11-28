@@ -138,8 +138,8 @@ export function HeroCanvas() {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 overflow-hidden"
       style={{
-        background:
-          "radial-gradient(600px circle at 15% 20%, rgba(14, 165, 233, 0.12), transparent 60%), radial-gradient(500px circle at 88% 55%, rgba(255, 94, 30, 0.09), transparent 60%)",
+        maskImage: "linear-gradient(to bottom, black 55%, transparent 100%)",
+        WebkitMaskImage: "linear-gradient(to bottom, black 55%, transparent 100%)",
       }}
     />
   );

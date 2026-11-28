@@ -62,14 +62,14 @@ export async function generateMetadata({
       title,
       description,
       alternates: { canonical: url },
-      robots: { index: pricingFilter === "all" && page === 1 && result.total > 0, follow: true },
+      robots: { index: true, follow: true },
       openGraph: { title: `${title} | AIToolsFinder`, description, url, type: "website" },
     };
   } catch {
     return {
       title: "AI Tool Rankings",
       alternates: { canonical: url },
-      robots: { index: false, follow: true },
+      robots: { index: true, follow: true },
     };
   }
 }

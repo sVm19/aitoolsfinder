@@ -32,14 +32,14 @@ export async function generateMetadata({
       title,
       description,
       alternates: { canonical: url },
-      robots: { index: data.alternatives.length > 0, follow: true },
+      robots: { index: true, follow: true },
       openGraph: { title: `${title} | AIToolsFinder`, description, url, type: "website" },
     };
   } catch {
     return {
       title: "AI Tool Alternatives",
       alternates: { canonical: canonicalUrl(`/alternatives/${encodeURIComponent(slug)}`) },
-      robots: { index: false, follow: true },
+      robots: { index: true, follow: true },
     };
   }
 }

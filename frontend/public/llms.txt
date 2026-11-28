@@ -1,25 +1,35 @@
-# AIToolsFinder.cloud
+# AIToolsFinder (aitoolsfinder.cloud)
 
-> Find the best AI tool for your exact job.
+> Compare 1,200+ AI tools and B2B SaaS products with audited pricing tiers, capability teardowns, and side-by-side alternatives.
 
-AIToolsFinder is a verified AI Tool Intelligence Platform that helps professionals, developers, and teams discover, compare, and benchmark AI tools and B2B SaaS platforms. Every listing includes verified pricing tiers, capability teardowns, alternatives, and explainable intelligence scores.
+AIToolsFinder is an independent AI and SaaS directory built for engineers, marketers, founders, and small teams who want clear pricing and real capability comparisons before buying software.
 
-## Primary Taxonomy Categories
+## Key Links
 
-- [Developer Tools](https://aitoolsfinder.cloud/categories/developer-tools): AI code editors, terminal agents, copilot extensions, and code review assistants.
-- [Productivity](https://aitoolsfinder.cloud/categories/productivity): AI workspace copilots, task automation, meeting transcription, and document synthesis.
-- [Marketing](https://aitoolsfinder.cloud/categories/marketing): Ad creative generators, audience intelligence, campaign copywriters, and conversion optimization.
-- [Writing & SEO](https://aitoolsfinder.cloud/categories/writing): Long-form content generators, programmatic SEO platforms, grammar and style engines.
-- [AI & Models](https://aitoolsfinder.cloud/categories/ai): Foundation models, LLM APIs, open-source weights, and multimodal inference gateways.
-- [Business & Sales](https://aitoolsfinder.cloud/categories/business): AI CRM copilots, cold outbound automation, sales call recorders, and lead enrichment.
-- [Design & UI](https://aitoolsfinder.cloud/categories/design): Generative UI scaffolders, vector illustration tools, and design system assistants.
-- [Video & Animation](https://aitoolsfinder.cloud/categories/video): Text-to-video generators, AI video editors, realistic avatar creators, and caption tools.
-- [Audio & Speech](https://aitoolsfinder.cloud/categories/audio): Voice cloning, podcast mastering, AI speech-to-text, and background noise removal.
-- [Image & Generative Art](https://aitoolsfinder.cloud/categories/image): Text-to-image models, photo enhancers, canvas editors, and brand asset generators.
-- [Automation & Workflows](https://aitoolsfinder.cloud/categories/automation): Agentic orchestration, webhook pipelines, and browser automation agents.
+- [Home Directory](https://aitoolsfinder.cloud/): Browse and filter 1,200+ AI tools and SaaS products by category and pricing model.
+- [Explore Catalog](https://aitoolsfinder.cloud/explore): Full searchable directory with category, pricing, and tag filters.
+- [Tool Finder](https://aitoolsfinder.cloud/ai-finder): Match AI tools to a specific job or workflow.
+- [Side-by-Side Compare](https://aitoolsfinder.cloud/compare): Compare features, pricing models, and capabilities across tools.
+- [Rankings](https://aitoolsfinder.cloud/rankings): Category and tag rankings based on audited benchmarks.
+- [Guides & Blog](https://aitoolsfinder.cloud/blog): Practical guides on pricing audits, AI coding assistants, and lean team stacks.
+- [XML Sitemap](https://aitoolsfinder.cloud/sitemap.xml): Complete machine-readable index of all tools, categories, comparisons, and guides.
+- [Full Context (llms-full.txt)](https://aitoolsfinder.cloud/llms-full.txt): Extended markdown summary for AI search and RAG retrieval.
 
-## Rankings & Intelligence Data
+## Primary Categories
 
-- [Rankings Directory](https://aitoolsfinder.cloud/rankings): Real-time ranking index organized by taxonomy and job-to-be-done.
-- [Methodology](https://aitoolsfinder.cloud/methodology): Complete scoring breakdown across capability, value, and reliability dimensions.
-- [Transparency & Advertising](https://aitoolsfinder.cloud/transparency): Disclosure of affiliate monetization and sponsored placement standards.
+- [Developer Tools](https://aitoolsfinder.cloud/categories/developer-tools): AI code editors, terminal agents, copilot extensions, and code review tools.
+- [Productivity](https://aitoolsfinder.cloud/categories/productivity): Workspace assistants, task automation, meeting notes, and document tools.
+- [Marketing](https://aitoolsfinder.cloud/categories/marketing): Ad creative tools, campaign copywriters, and conversion optimization.
+- [Writing & SEO](https://aitoolsfinder.cloud/categories/writing): Long-form drafting tools, SEO workflows, and editing assistants.
+- [AI & Models](https://aitoolsfinder.cloud/categories/ai): Foundation models, LLM APIs, and inference gateways.
+- [Sales & Business](https://aitoolsfinder.cloud/categories/sales): CRM assistants, outbound automation, and lead enrichment.
+- [Design & UI](https://aitoolsfinder.cloud/categories/design): UI generators, vector tools, and design system helpers.
+- [Automation](https://aitoolsfinder.cloud/categories/automation): Workflow builders, webhooks, and browser agents.
+
+## Featured Comparisons & Methodology
+
+- [Cursor vs GitHub Copilot](https://aitoolsfinder.cloud/compare/cursor-vs-github-copilot)
+- [Claude vs ChatGPT](https://aitoolsfinder.cloud/compare/claude-vs-chatgpt)
+- [Midjourney vs Stable Diffusion](https://aitoolsfinder.cloud/compare/midjourney-vs-stable-diffusion)
+- [Scoring Methodology](https://aitoolsfinder.cloud/methodology)
+- [Affiliate Transparency](https://aitoolsfinder.cloud/transparency)

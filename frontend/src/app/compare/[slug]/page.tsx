@@ -28,7 +28,7 @@ export async function generateMetadata({
       title: `${comparison.title} comparison`,
       description,
       alternates: { canonical: url },
-      robots: { index: comparison.tools.length >= 2, follow: true },
+      robots: { index: true, follow: true },
       openGraph: {
         title: `${comparison.title} | AIToolsFinder`,
         description,
@@ -40,7 +40,7 @@ export async function generateMetadata({
     return {
       title: "AI Tool Comparison",
       alternates: { canonical: canonicalUrl(`/compare/${encodeURIComponent(slug)}`) },
-      robots: { index: false, follow: true },
+      robots: { index: true, follow: true },
     };
   }
 }

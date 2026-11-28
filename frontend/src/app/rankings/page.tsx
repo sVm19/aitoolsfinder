@@ -13,13 +13,13 @@ export async function generateMetadata(): Promise<Metadata> {
       title: "AI Tool Rankings by Category and Tag",
       description: "Browse AI tool rankings by category or tag, based on the latest published intelligence score snapshots.",
       alternates: { canonical: canonicalUrl("/rankings") },
-      robots: { index: categories.length + tags.length > 0, follow: true },
+      robots: { index: true, follow: true },
     };
   } catch {
     return {
       title: "AI Tool Rankings by Category and Tag",
       alternates: { canonical: canonicalUrl("/rankings") },
-      robots: { index: false, follow: true },
+      robots: { index: true, follow: true },
     };
   }
 }

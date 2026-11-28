@@ -46,7 +46,7 @@ let backendCircuitOpenUntil = 0;
 const BACKEND_TIMEOUT_MS = 1500;
 const BACKEND_CIRCUIT_COOLDOWN_MS = 30_000;
 
-function readLocalEnrichedTools(): { tools: ToolCardData[]; mtimeMs: number } {
+export function readLocalEnrichedTools(): { tools: ToolCardData[]; mtimeMs: number } {
   const candidates = [
     path.resolve(process.cwd(), "..", "data", "enriched.jsonl"),
     path.resolve(process.cwd(), "data", "enriched.jsonl"),
