@@ -1,16 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Sora:wght@600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --font-plus-jakarta: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-outfit: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-jetbrains: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-sans: var(--font-plus-jakarta), var(--font-outfit);
-  --font-display: var(--font-plus-jakarta);
-  --font-mono: var(--font-jetbrains);
+  --font-sans: var(--font-plus-jakarta), var(--font-outfit), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-plus-jakarta), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
   /* Precision Signal Design System — Obsidian Slate + Electric Cyan + Solar Flame */
   --background: #05070b;
@@ -185,7 +180,7 @@ body {
   }
 }
 
-/* --- Luminous Header Seam --- */
+/* --- Luminous Header Seam (compositor-friendly opacity only) --- */
 .header-luminous-edge {
   background: linear-gradient(
     90deg,
@@ -197,15 +192,8 @@ body {
     rgba(255, 255, 255, 0.04) 85%,
     transparent 100%
   );
-  background-size: 200% 100%;
   opacity: 0.65;
-  transition: opacity 0.3s ease;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .header-luminous-edge {
-    animation: header-edge-drift 8s ease-in-out infinite alternate;
-  }
+  transition: opacity 0.25s ease;
 }
 
 .header-glow-reflection {
@@ -217,30 +205,8 @@ body {
     rgba(14, 165, 233, 0.22) 65%,
     transparent 90%
   );
-  background-size: 200% 100%;
-  filter: blur(4px);
   opacity: 0.45;
-  transition: opacity 0.3s ease;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .header-glow-reflection {
-    animation: header-edge-drift 8s ease-in-out infinite alternate;
-  }
-}
-
-.header-feather-blur {
-  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
-  -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0) 100%);
-}
-
-@keyframes header-edge-drift {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
+  transition: opacity 0.25s ease;
 }
 
 header.is-scrolled {

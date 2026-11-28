@@ -1,6 +1,28 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { Plus_Jakarta_Sans, Outfit, JetBrains_Mono } from "next/font/google";
 import "@/styles/globals.css";
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-plus-jakarta",
+  display: "swap",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-jetbrains",
+  display: "swap",
+});
 import { canonicalUrl, SITE_URL } from "@/lib/site";
 import { CompareProvider } from "@/components/comparison/compare-provider";
 import { StackProvider } from "@/components/stack/stack-provider";
@@ -64,7 +86,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning className="dark" data-type="software">
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`dark ${plusJakarta.variable} ${outfit.variable} ${jetbrainsMono.variable}`}
+      data-type="software"
+    >
       <body suppressHydrationWarning className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/30 selection:text-foreground">
         <ViewTransitionProvider />
         <ButtonRipple />

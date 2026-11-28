@@ -29,22 +29,26 @@ export function SplitText({
       const root = rootRef.current;
       if (!root || prefersReducedMotion()) return;
 
-      const split = new GsapSplitText(root, {
-        type: "words",
-        wordsClass: "split-word inline-block",
-      });
+      let split: GsapSplitText | null = null;
+      const rafId = requestAnimationFrame(() => {
+        split = new GsapSplitText(root, {
+          type: "words",
+          wordsClass: "split-word inline-block",
+        });
 
-      gsap.from(split.words, {
-        y: 24,
-        autoAlpha: 0,
-        stagger: 0.035,
-        duration: 0.7,
-        ease: "earlyst-out",
-        clearProps: "transform,opacity,visibility",
+        gsap.from(split.words, {
+          y: 20,
+          autoAlpha: 0,
+          stagger: 0.03,
+          duration: 0.6,
+          ease: "earlyst-out",
+          clearProps: "transform,opacity,visibility",
+        });
       });
 
       return () => {
-        split.revert();
+        cancelAnimationFrame(rafId);
+        split?.revert();
       };
     },
     { scope: rootRef, dependencies: [text] }

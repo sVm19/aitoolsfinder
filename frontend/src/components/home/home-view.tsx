@@ -7,10 +7,17 @@ import { ArrowRight, ChevronLeft, ChevronRight, Layers, Sparkles } from "lucide-
 import { Navbar } from "@/components/common/navbar";
 import { Footer } from "@/components/common/footer";
 import { SmoothScrollShell } from "@/components/scroll/smooth-scroll-shell";
-import { HeroSignalDiagram } from "@/components/animations/hero-signal-diagram";
 
 const HeroCanvas = dynamic(
   () => import("@/components/animations/hero-canvas").then((m) => m.HeroCanvas),
+  { ssr: false }
+);
+
+const HeroSignalDiagram = dynamic(
+  () =>
+    import("@/components/animations/hero-signal-diagram").then(
+      (m) => m.HeroSignalDiagram
+    ),
   { ssr: false }
 );
 import { SplitText } from "@/components/bits/split-text";
@@ -129,26 +136,30 @@ export function HomeView({
     }
   }, []);
 
-  // Draggable + InertiaPlugin for horizontal category rail
+  // Draggable + InertiaPlugin for horizontal category rail (deferred post-layout)
   useGSAP(
     () => {
       const boundsEl = railBoundsRef.current;
       const trackEl = railTrackRef.current;
       if (!boundsEl || !trackEl) return;
 
-      const instances = Draggable.create(trackEl, {
-        type: "x",
-        bounds: boundsEl,
-        inertia: true,
-        edgeResistance: 0.75,
-        dragClickables: false,
-        minimumMovement: 6,
-        allowNativeTouchScrolling: true,
+      let instances: Draggable[] = [];
+      const rafId = requestAnimationFrame(() => {
+        instances = Draggable.create(trackEl, {
+          type: "x",
+          bounds: boundsEl,
+          inertia: true,
+          edgeResistance: 0.75,
+          dragClickables: false,
+          minimumMovement: 6,
+          allowNativeTouchScrolling: true,
+        });
       });
 
       void InertiaPlugin;
 
       return () => {
+        cancelAnimationFrame(rafId);
         instances.forEach((d) => d.kill());
       };
     },
@@ -429,7 +440,7 @@ export function HomeView({
                         aria-pressed={selected}
                         onClick={() => handleCategoryChange(pill.slug)}
                         className={cn(
-                          "shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-medium transition-all duration-150 min-h-9 hover:-translate-y-0.5 active:scale-[0.97]",
+                          "shrink-0 rounded-full border px-3.5 py-2 text-xs font-medium transition-colors duration-150 min-h-[44px] sm:min-h-9 active:scale-[0.97]",
                           selected
                             ? "border-primary bg-primary text-primary-foreground font-semibold shadow-lavender-glow"
                             : "border-border bg-surface-1 text-muted-foreground hover:border-primary/40 hover:text-foreground"
@@ -453,7 +464,7 @@ export function HomeView({
                         aria-pressed={selected}
                         onClick={() => handlePricingChange(pill.value)}
                         className={cn(
-                          "rounded-lg border px-3 py-1 text-xs font-medium transition-all duration-150 min-h-8 hover:-translate-y-0.5 active:scale-[0.97]",
+                          "rounded-lg border px-3.5 py-2 sm:py-1 text-xs font-medium transition-colors duration-150 min-h-[44px] sm:min-h-8 active:scale-[0.97]",
                           selected
                             ? "border-accent bg-accent/20 text-accent"
                             : "border-border bg-surface-1/60 text-muted-foreground hover:border-border/80 hover:text-foreground"

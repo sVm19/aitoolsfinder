@@ -81,9 +81,9 @@ export function Footer() {
 
           {/* Popular Categories */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
               Top Categories
-            </h4>
+            </h2>
             <ul className="space-y-2.5 text-sm">
               {categories.map((cat) => (
                 <li key={cat.slug}>
@@ -100,9 +100,9 @@ export function Footer() {
 
           {/* Intelligence & Discovery */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
               Intelligence
-            </h4>
+            </h2>
             <ul className="space-y-2.5 text-sm">
               {intelligenceLinks.map((link) => (
                 <li key={link.name}>
@@ -119,9 +119,9 @@ export function Footer() {
 
           {/* Company & Legal */}
           <div>
-            <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
               Platform & Legal
-            </h4>
+            </h2>
             <ul className="space-y-2.5 text-sm">
               {companyLinks.map((link) => (
                 <li key={link.name}>
