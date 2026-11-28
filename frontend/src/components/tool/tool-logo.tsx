@@ -59,9 +59,9 @@ export function ToolLogo({
     }
   }
 
-  // Real high-resolution official logo URL from product domain
+  // Real high-resolution official logo URL proxied with 1-year cache lifetime
   const realLogoUrl = domain
-    ? `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=128`
+    ? `/api/logo?domain=${encodeURIComponent(domain)}`
     : null;
 
   // If real logo image is available and hasn't errored out, render real official image
@@ -78,8 +78,11 @@ export function ToolLogo({
         <img
           src={realLogoUrl}
           alt={`${name} official logo`}
+          width={44}
+          height={44}
           className="h-full w-full object-contain rounded-md"
           loading="lazy"
+          decoding="async"
           onError={() => setHasError(true)}
         />
       </div>
